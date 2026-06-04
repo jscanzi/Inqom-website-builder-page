@@ -441,9 +441,9 @@ const TEMPLATES_CONFIG = {
   { id:"comparaison", name:"Comparaison", sub:"Avant / Après", seo:false,
     why:"Retournement narratif sans nommer de concurrent.",
     editorialIntent:"Cible implicitement les requêtes de comparaison vs la méthode traditionnelle ou vs concurrents. Le toggle avant/après est un dispositif narratif fort qui permet d'adresser les deux états sans nommer de concurrent. Google lit ce bloc comme du contenu comparatif à haute valeur — il peut remonter sur des requêtes 'alternative à' ou 'vs'.",
-    outputFormats:[{"key":"H2","rule":"Max 8 mots. Ex : Votre cabinet, vos règles"},{"key":"INTRO","rule":"1-2 phrases, max 25 mots."},{"key":"LABEL TOGGLE AVANT","rule":"2-4 mots. Ex : Sans Inqom"},{"key":"H3 PROBLÈME 1 à 3","rule":"STRICT : max 4 mots. Nominatif. Ex : Captation client. Pas de verbe."},{"key":"DESCRIPTION PROBLÈME 1 à 3","rule":"STRICT : 1 phrase, max 15 mots."},{"key":"H3 GAIN 1 à 3","rule":"STRICT : max 4 mots. Miroir du problème. Ex : Relation protégée."},{"key":"DESCRIPTION GAIN 1 à 3","rule":"STRICT : 1 phrase, max 15 mots."}],
-    questions:[{id:"before_label",label:"Label de l'état 'avant'",hint:"Ex : Sans Inqom",rows:1},{id:"pains",label:"3–4 problèmes de l'état 'avant'",hint:"Titre court + 1 phrase chacun",rows:4},{id:"gains",label:"3–4 bénéfices de l'état 'après'",hint:"Répondent aux problèmes ci-dessus",rows:4}],
-    outputs:["H2","INTRO","LABEL TOGGLE AVANT","H3 PROBLÈME 1","DESCRIPTION PROBLÈME 1","H3 PROBLÈME 2","DESCRIPTION PROBLÈME 2","H3 PROBLÈME 3","DESCRIPTION PROBLÈME 3","H3 GAIN 1","DESCRIPTION GAIN 1","H3 GAIN 2","DESCRIPTION GAIN 2","H3 GAIN 3","DESCRIPTION GAIN 3"] },
+    outputFormats:[{"key":"H2","rule":"Max 8 mots. Ex : Votre cabinet, vos règles"},{"key":"INTRO","rule":"1-2 phrases, max 25 mots."},{"key":"LABEL TOGGLE AVANT","rule":"2-4 mots. Ex : Sans Inqom"},{"key":"H3 PROBLÈME 1 à 4","rule":"STRICT : max 4 mots. Nominatif. Ex : Captation client. Pas de verbe."},{"key":"DESCRIPTION PROBLÈME 1 à 4","rule":"STRICT : 1 phrase, max 15 mots."},{"key":"H3 GAIN 1 à 4","rule":"STRICT : max 4 mots. Miroir exact du problème correspondant. Ex : Relation protégée. IMPÉRATIF : même nombre que les PROBLÈMES."},{"key":"DESCRIPTION GAIN 1 à 4","rule":"STRICT : 1 phrase, max 15 mots."}],
+    questions:[{id:"before_label",label:"Label de l'état 'avant'",hint:"Ex : Sans Inqom",rows:1},{id:"pains",label:"4 problèmes de l'état 'avant' (max)",hint:"Titre court + 1 phrase chacun",rows:4},{id:"gains",label:"4 bénéfices miroirs (même nombre que les problèmes)",hint:"Répondent aux problèmes ci-dessus",rows:4}],
+    outputs:["H2","INTRO","LABEL TOGGLE AVANT","H3 PROBLÈME 1","DESCRIPTION PROBLÈME 1","H3 PROBLÈME 2","DESCRIPTION PROBLÈME 2","H3 PROBLÈME 3","DESCRIPTION PROBLÈME 3","H3 PROBLÈME 4","DESCRIPTION PROBLÈME 4","H3 GAIN 1","DESCRIPTION GAIN 1","H3 GAIN 2","DESCRIPTION GAIN 2","H3 GAIN 3","DESCRIPTION GAIN 3","H3 GAIN 4","DESCRIPTION GAIN 4"] },
   { id:"pourqui", name:"Pour qui ?", sub:"Profils & personas", seo:true,
     why:"Crée le sentiment de reconnaissance — l'utilisateur se voit dans la page.",
     editorialIntent:"Machine à longue traîne par profil. Google remonte cette section sur des requêtes comme 'logiciel comptabilité cabinet solo' ou 'plateforme comptable grand cabinet'. Chaque profil est une micro-cible SEO. Le texte doit nommer explicitement le profil, sa situation et son bénéfice principal. Éligible au rich snippet FAQ si formulé en Q/R implicite.",
@@ -893,9 +893,15 @@ function renderWfSection(secId, data) {
       const desc = descKey ? (data[descKey]||'').trim() : '';
       return `<div class="wf-row-item"><div class="wf-dot-bad">✕</div><div><div class="wf-h3">${wfEditable(title, k, secId)}</div>${desc?`<div class="wf-body" style="margin-top:2px;">${wfEditable(desc, descKey, secId)}</div>`:''}</div></div>`;
     }).join('') : `${placeholder(2)}`;
-    const gRows = gainKeys.length ? gainKeys.map(k => {
-      const p = (data[k]||'').split(/\.\s+|\n/).filter(Boolean);
-      return `<div class="wf-row-item"><div class="wf-dot-good">✓</div><div><div class="wf-h3">${wfEditable(p[0]?.trim()||data[k], k, secId)}</div>${p[1]?`<div class="wf-body" style="margin-top:2px;">${wfEditable(p[1].trim(), k+'_d', secId)}</div>`:''}</div></div>`;
+    const gRows = gainKeys.length ? gainKeys.map((k, i) => {
+      const num = (k.match(/\d+/) || [i+1])[0];
+      const title = (data[k]||'').trim();
+      const descKey = keys.find(dk => {
+        const u = dk.toUpperCase();
+        return (u.startsWith('DESCRIPTION GAIN ' + num) || u === 'DESCRIPTION GAIN' + num);
+      });
+      const desc = descKey ? (data[descKey]||'').trim() : '';
+      return `<div class="wf-row-item"><div class="wf-dot-good">✓</div><div><div class="wf-h3">${wfEditable(title, k, secId)}</div>${desc?`<div class="wf-body" style="margin-top:2px;">${wfEditable(desc, descKey, secId)}</div>`:''}</div></div>`;
     }).join('') : `${placeholder(2)}`;
     const toggleLabel = labelToggle ? labelToggle.val : 'Sans ' + state.config.productName;
     return `${tag}
@@ -929,12 +935,21 @@ function renderWfSection(secId, data) {
     const stepKeys = keys.filter(k => k.toUpperCase().includes('ÉTAPE') || k.toUpperCase().includes('ETAPE') || k.toUpperCase().includes('STEP') || (k.toUpperCase().startsWith('H3') && k.match(/\d/)));
     const steps = stepKeys.length ? stepKeys.map((k,i) => {
       const v = data[k]||'';
-      const p = v.split(/\.\s+|\n/);
+      // Find the matching DESCRIPTION key by step number
+      const num = i+1;
+      const descKey = keys.find(dk => {
+        const u = dk.toUpperCase();
+        return u.startsWith('DESCRIPTION') && (u.endsWith(' '+num) || u === 'DESCRIPTION '+num);
+      });
+      const descVal = descKey ? (data[descKey]||'') : '';
       return `<div class="wf-step">
-        <div class="wf-step-num">${i+1}</div>
-        <div><div class="wf-h3">${wfEditable(p[0]?.trim()||v, k, secId)}</div>${p[1]?`<div class="wf-body" style="margin-top:2px;">${wfEditable(p.slice(1).join(' ').trim(), k+'_d', secId)}</div>`:''}</div>
+        <div class="wf-step-num">${num}</div>
+        <div>
+          <div class="wf-h3">${wfEditable(v, k, secId)}</div>
+          ${descVal ? `<div class="wf-body" style="margin-top:3px;color:var(--wf-muted,#6b7280);">${wfEditable(descVal, descKey, secId)}</div>` : `<div class="wf-body" style="margin-top:3px;opacity:.3;">${placeholder(1)}</div>`}
+        </div>
       </div>`;
-    }).join('') : [1,2,3,4].map(n=>`<div class="wf-step"><div class="wf-step-num" style="opacity:.25;">${n}</div><div>${placeholder(1)}</div></div>`).join('');
+    }).join('') : [1,2,3,4].map(n=>`<div class="wf-step"><div class="wf-step-num" style="opacity:.25;">${n}</div><div>${placeholder(1)}<div class="wf-body" style="margin-top:3px;opacity:.2;">${placeholder(1)}</div></div></div>`).join('');
     return `${tag}
       ${h2 ? `<div class="wf-h2" style="margin-bottom:6px;">${wfEditable(h2.val,h2.key,secId)}</div>` : ''}
       ${intro ? `<div class="wf-intro">${wfEditable(intro.val,intro.key,secId)}</div>` : ''}
