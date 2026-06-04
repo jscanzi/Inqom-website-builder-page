@@ -1,0 +1,6 @@
+{
+  "outputDirectory": "public",
+  "rewrites": [
+    { "source": "/api/chat", "destination": "/api/chat.js" }
+  ]
+}
