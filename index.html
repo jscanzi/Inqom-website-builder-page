@@ -348,7 +348,7 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
     <div id="tab-prompt" class="hidden">
       <div class="space-y-4">
         <div class="card p-3" style="background:#fefce8;border-color:#fde68a;"><p class="text-xs" style="color:#92400e;"><strong>Rôle :</strong> Ce prompt est injecté en amont de chaque génération. Il définit le ton, les contraintes stylistiques et l'identité de marque.</p></div>
-        <div><label class="block text-sm font-medium mb-1.5">System prompt</label><textarea class="textarea text-xs" id="cfg-master-prompt" rows="20" spellcheck="false"></textarea><p class="text-xs text-muted-foreground mt-1">Variables : <code class="bg-muted px-1 rounded text-xs">{{product}}</code> <code class="bg-muted px-1 rounded text-xs">{{sector}}</code> <code class="bg-muted px-1 rounded text-xs">{{targets}}</code> <code class="bg-muted px-1 rounded text-xs">{{lang}}</code></p></div>
+        <div><label class="block text-sm font-medium mb-1.5">System prompt</label><textarea class="textarea text-xs" id="cfg-master-prompt" rows="20" spellcheck="false" style="resize:vertical;overflow:auto;min-height:200px;"></textarea><p class="text-xs text-muted-foreground mt-1">Variables : <code class="bg-muted px-1 rounded text-xs">{{product}}</code> <code class="bg-muted px-1 rounded text-xs">{{sector}}</code> <code class="bg-muted px-1 rounded text-xs">{{targets}}</code> <code class="bg-muted px-1 rounded text-xs">{{lang}}</code></p></div>
         <button class="btn btn-secondary text-xs" onclick="resetPrompt()">Réinitialiser par défaut</button>
       </div>
     </div>
