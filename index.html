@@ -237,7 +237,7 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
       <span class="text-xs text-muted-foreground" id="wf-status">En attente…</span>
     </div>
     <div class="flex-1 overflow-y-auto" id="wireframe-panel" style="background:hsl(var(--muted));padding:24px 20px;">
-      <div style="max-width:680px;margin:0 auto;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.10);border:1px solid rgba(0,0,0,.06);">
+      <div style="max-width:900px;margin:0 auto;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.10);border:1px solid rgba(0,0,0,.06);">
         <div class="wf-root" id="wf-root"></div>
       </div>
     </div>
@@ -773,8 +773,15 @@ function startWfEdit(el, secId, outputKey, e) {
 function renderWfSection(secId, data) {
   const keys = Object.keys(data);
   const get = (prefix) => {
-    const k = keys.find(k => k.toUpperCase().startsWith(prefix.toUpperCase()));
-    return k ? { key: k, val: data[k] } : null;
+    // Try startsWith first, then contains
+    let k = keys.find(k => k.toUpperCase().startsWith(prefix.toUpperCase()));
+    if (!k && prefix.length <= 3) {
+      // For short keys like H2, H3 also try exact match with trailing space/colon
+      k = keys.find(k => k.toUpperCase() === prefix.toUpperCase() || 
+                         k.toUpperCase().startsWith(prefix.toUpperCase() + ' ') ||
+                         k.toUpperCase().startsWith(prefix.toUpperCase() + ':'));
+    }
+    return k ? { key: k, val: data[k] || '' } : null;
   };
   const getN = (prefix, n) => {
     const k = keys.find(k => k.toUpperCase().startsWith(prefix.toUpperCase() + ' ' + n) || k.toUpperCase().startsWith('H3 ' + n));
@@ -782,7 +789,15 @@ function renderWfSection(secId, data) {
   };
 
   const h1 = get('TITRE H1') || get('H1');
-  const h2 = get('H2') || get('TITRE DE SECTION') || get('TITRE');
+  // Extra fallback: scan all keys for likely titles if H2 not found
+  const findTitle = () => {
+    const titleKey = keys.find(k => {
+      const u = k.toUpperCase();
+      return u === 'H2' || u === 'H1' || u === 'TITRE' || u.startsWith('H2 ') || u.startsWith('H1 ') || u.startsWith('TITRE ');
+    });
+    return titleKey ? { key: titleKey, val: data[titleKey] } : null;
+  };
+  const h2 = get('H2') || get('TITRE DE SECTION') || get('TITRE') || findTitle();
   const intro = get('INTRO') || get('DÉFINITION') || get('DEFINITION');
   const cta = get('TEXTE CTA') || get('CTA');
   const caption = get('LÉGENDE') || get('LEGENDE') || get('CAPTION');
