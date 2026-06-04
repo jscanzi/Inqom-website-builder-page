@@ -228,6 +228,7 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
       <button class="tab-btn active" onclick="switchTab('general',this)">Général</button>
       <button class="tab-btn" onclick="switchTab('prompt',this)">Master Prompt</button>
       <button class="tab-btn" onclick="switchTab('seo',this)">SEO Global</button>
+      <button class="tab-btn" onclick="switchTab('intents',this)">Intentions</button>
       <button class="tab-btn" onclick="switchTab('skills',this)">
         <span class="flex items-center gap-1.5">Knowledge base <span class="skill-badge" id="skills-count-badge">0</span></span>
       </button>
@@ -254,6 +255,13 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
         <div><label class="block text-sm font-medium mb-1.5">Concurrent principal (confidentiel)</label><input type="text" class="input" id="cfg-competitor" placeholder="Ex : Pennylane"><p class="text-xs text-muted-foreground mt-1">Jamais cité dans les outputs.</p></div>
       </div>
     </div>
+    <div id="tab-intents" class="hidden">
+      <div class="space-y-3">
+        <p class="text-xs text-muted-foreground leading-relaxed">Ces intentions expliquent à l'IA le rôle SEO et éditorial de chaque section. Elles sont injectées dans chaque prompt de génération. Modifiez-les selon votre stratégie.</p>
+        <div id="intents-list" class="space-y-3"></div>
+      </div>
+    </div>
+
     <div id="tab-skills" class="hidden">
       <div class="space-y-3">
         <div class="flex items-center justify-between mb-1">
@@ -338,38 +346,63 @@ const PAGE_TEMPLATES = [
 const SECTIONS = [
   { id:"hero", name:"Hero", sub:"Proposition de valeur", seo:true,
     why:"Première impression — 3 secondes pour convaincre de scroller.",
+    editorialIntent:"Première section indexée par Google. Le H1 doit contenir le mot-clé principal exact. Le sous-titre est le premier signal sémantique — il doit compléter le H1 avec des mots-clés secondaires naturels. L'objectif est d'apparaître sur les requêtes navigationnelles et transactionnelles de la catégorie.",
     questions:[{id:"target",label:"Cible principale",hint:"Ex : cabinet comptable, PME, DAF…",rows:2},{id:"pain",label:"Problème principal que résout le produit",hint:"La douleur avant, pas la solution.",rows:3},{id:"promise",label:"Promesse centrale",hint:"Ce que l'utilisateur obtient concrètement.",rows:3},{id:"kw",label:"Mots-clés SEO prioritaires",hint:"Séparés par des virgules",rows:1,kw:true}],
     outputs:["TITRE H1","SOUS-TITRE","TEXTE CTA PRINCIPAL"] },
   { id:"keydatas", name:"Chiffres clés", sub:"Key datas", seo:false,
     why:"3 métriques fortes pour ancrer la crédibilité immédiatement.",
+    editorialIntent:"Signaux de crédibilité immédiats. Google les lit comme des données structurées. Ces chiffres doivent être vrais, sourcés, et refléter l'autorité du produit. Leur rôle est de réduire le taux de rebond — l'utilisateur comprend en 3 secondes qu'il est au bon endroit.",
     questions:[{id:"stat1",label:"Chiffre clé n°1 — valeur + contexte",hint:"Ex : 2 000 cabinets utilisent Inqom",rows:2},{id:"stat2",label:"Chiffre clé n°2",hint:"",rows:2},{id:"stat3",label:"Chiffre clé n°3",hint:"",rows:2}],
     outputs:["CHIFFRE 1 + LIBELLÉ","CHIFFRE 2 + LIBELLÉ","CHIFFRE 3 + LIBELLÉ"] },
   { id:"sideshow", name:"Side show", sub:"Démo produit", seo:false,
     why:"Montrer avant d'expliquer. Réduit l'effort cognitif du reste.",
-    questions:[{id:"feature",label:"Fonctionnalité à montrer en premier",hint:"Celle qui provoque le 'ah oui' le plus rapide.",rows:2},{id:"caption",label:"Ce que l'utilisateur voit dans le visuel",hint:"En une phrase.",rows:2}],
-    outputs:["TITRE DE SECTION","LÉGENDE VISUEL PRODUIT"] },
+    editorialIntent:"C'est le bloc de définition SEO — l'équivalent du 'What is X?' que tapent les utilisateurs et que Google remonte en featured snippet. Ce n'est PAS une section commerciale. C'est une définition factuelle, dense, sémantiquement riche du produit. Le texte doit répondre à la question 'c'est quoi exactement ?' et contenir la requête cible dans un contexte naturel. Éviter tout superlatif commercial.",
+    questions:[
+      {id:"definition",label:"Définition du produit en 1-2 phrases",hint:"Factuel, sans superlatif. Ce que fait le produit concrètement.",rows:3},
+      {id:"keyword",label:"Requête cible de cette section",hint:"Ex : 'plateforme comptable cabinet' — la recherche exacte que tape l'utilisateur.",rows:1},
+      {id:"caption",label:"Ce que l'utilisateur voit dans le visuel produit",hint:"Description courte de l'interface ou de la fonctionnalité montrée.",rows:2}
+    ],
+    outputs:["TITRE DE SECTION (H2 avec mot-clé)","DÉFINITION PRODUIT (2-3 phrases)","LÉGENDE VISUEL PRODUIT"] },
   { id:"avantages", name:"Avantages", sub:"Bénéfices business", seo:true,
     why:"Langue du décideur. ROI, gain de temps, réduction de risque.",
+    editorialIntent:"Cible les requêtes de comparaison et d'évaluation (phase de considération). L'utilisateur se demande 'pourquoi ce produit plutôt qu'un autre ?'. Chaque bénéfice doit être formulé comme une réponse à une objection implicite. Langue du décideur business, pas du technicien.",
     questions:[{id:"b1",label:"Bénéfice business n°1",hint:"Résultat mesurable ou perçu",rows:2},{id:"b2",label:"Bénéfice business n°2",hint:"",rows:2},{id:"b3",label:"Bénéfice business n°3",hint:"",rows:2},{id:"kw",label:"Mots-clés SEO",hint:"Séparés par des virgules",rows:1,kw:true}],
     outputs:["TITRE DE SECTION","AVANTAGE 1 — TITRE + 1 PHRASE","AVANTAGE 2 — TITRE + 1 PHRASE","AVANTAGE 3 — TITRE + 1 PHRASE"] },
   { id:"casusage", name:"Cas d'usage", sub:"Use cases", seo:true,
     why:"L'utilisateur se reconnaît dans un scénario concret.",
+    editorialIntent:"Cible les requêtes longue traîne par profil et situation ('logiciel comptabilité pour cabinet 50 dossiers', 'outil comptable multi-bureaux'). Chaque cas doit nommer explicitement un profil reconnaissable. C'est aussi le bloc qui crée le sentiment de reconnaissance — 'c'est exactement moi'.",
     questions:[{id:"uc1",label:"Cas d'usage n°1 — profil + situation",hint:"Ex : cabinet gérant 50 dossiers",rows:3},{id:"uc2",label:"Cas d'usage n°2",hint:"",rows:3},{id:"uc3",label:"Cas d'usage n°3 (optionnel)",hint:"",rows:2},{id:"kw",label:"Mots-clés SEO",hint:"Séparés par des virgules",rows:1,kw:true}],
     outputs:["TITRE DE SECTION","CAS 1 — TITRE + 2 PHRASES","CAS 2 — TITRE + 2 PHRASES","CAS 3 — TITRE + 2 PHRASES"] },
   { id:"howitworks", name:"Comment ça marche", sub:"Mécanisme produit", seo:false,
     why:"Lever l'ambiguïté sur le modèle avant les features.",
+    editorialIntent:"Google valorise les pages qui expliquent le processus — c'est un signal d'expertise. Ce bloc cible les requêtes 'comment fonctionne X' et 'comment faire Y avec X'. Les étapes doivent être concrètes, actionnables, avec des verbes d'action. Idéalement éligible au format FAQ/HowTo rich snippet.",
     questions:[{id:"s1",label:"Étape 1",hint:"Ex : connectez votre banque",rows:2},{id:"s2",label:"Étape 2",hint:"",rows:2},{id:"s3",label:"Étape 3",hint:"",rows:2},{id:"s4",label:"Étape 4 (optionnelle)",hint:"",rows:2}],
     outputs:["TITRE DE SECTION","ÉTAPE 1 — TITRE + 1 PHRASE","ÉTAPE 2 — TITRE + 1 PHRASE","ÉTAPE 3 — TITRE + 1 PHRASE","ÉTAPE 4 — TITRE + 1 PHRASE"] },
   { id:"features", name:"Fonctionnalités", sub:"Features clés", seo:true,
     why:"Langue produit pour l'évaluateur technique.",
+    editorialIntent:"Cible les requêtes de comparaison techniques et les recherches de fonctionnalités spécifiques ('logiciel comptabilité gros volumes', 'automatisation écritures comptables IA'). C'est le bloc lu par les évaluateurs techniques. La feature différenciante doit être mise en avant dès le début — c'est elle qui crée la séparation vs concurrents.",
     questions:[{id:"list",label:"Liste des fonctionnalités principales",hint:"Une par ligne : nom + description courte",rows:5},{id:"diff",label:"Feature différenciante",hint:"Celle que les concurrents font moins bien.",rows:3},{id:"kw",label:"Mots-clés SEO",hint:"Séparés par des virgules",rows:1,kw:true}],
     outputs:["TITRE DE SECTION","FEATURE DIFFÉRENCIANTE — TITRE + 2 PHRASES","LISTE FEATURES"] },
   { id:"comparaison", name:"Comparaison", sub:"Avant / Après", seo:false,
     why:"Retournement narratif sans nommer de concurrent.",
+    editorialIntent:"Cible implicitement les requêtes de comparaison vs la méthode traditionnelle ou vs concurrents. Le toggle avant/après est un dispositif narratif fort qui permet d'adresser les deux états sans nommer de concurrent. Google lit ce bloc comme du contenu comparatif à haute valeur — il peut remonter sur des requêtes 'alternative à' ou 'vs'.",
     questions:[{id:"before_label",label:"Label de l'état 'avant'",hint:"Ex : Sans Inqom",rows:1},{id:"pains",label:"3–4 problèmes de l'état 'avant'",hint:"Titre court + 1 phrase chacun",rows:4},{id:"gains",label:"3–4 bénéfices de l'état 'après'",hint:"Répondent aux problèmes ci-dessus",rows:4}],
     outputs:["LABEL TOGGLE AVANT","PROBLÈME 1 + DESCRIPTION","PROBLÈME 2 + DESCRIPTION","PROBLÈME 3 + DESCRIPTION","GAIN 1 + DESCRIPTION","GAIN 2 + DESCRIPTION","GAIN 3 + DESCRIPTION"] },
+  { id:"pourqui", name:"Pour qui ?", sub:"Profils & personas", seo:true,
+    why:"Crée le sentiment de reconnaissance — l'utilisateur se voit dans la page.",
+    editorialIntent:"Machine à longue traîne par profil. Google remonte cette section sur des requêtes comme 'logiciel comptabilité cabinet solo' ou 'plateforme comptable grand cabinet'. Chaque profil est une micro-cible SEO. Le texte doit nommer explicitement le profil, sa situation et son bénéfice principal. Éligible au rich snippet FAQ si formulé en Q/R implicite.",
+    questions:[
+      {id:"p1",label:"Profil n°1 — qui + situation + bénéfice",hint:"Ex : Cabinet solo de 1-3 collaborateurs qui veut se conformer à la RFE sans tout changer",rows:3},
+      {id:"p2",label:"Profil n°2",hint:"",rows:3},
+      {id:"p3",label:"Profil n°3",hint:"",rows:3},
+      {id:"p4",label:"Profil n°4 (optionnel)",hint:"",rows:2},
+      {id:"kw",label:"Mots-clés SEO par profil",hint:"Séparés par des virgules",rows:1,kw:true}
+    ],
+    outputs:["TITRE DE SECTION","PROFIL 1 — TITRE + 2 PHRASES","PROFIL 2 — TITRE + 2 PHRASES","PROFIL 3 — TITRE + 2 PHRASES","PROFIL 4 — TITRE + 2 PHRASES"]
+  },
   { id:"faq", name:"FAQ", sub:"Questions fréquentes", seo:true,
     why:"Or SEO — questions longue traîne + levée des objections.",
+    editorialIntent:"Bloc SEO longue traîne le plus puissant de la page. Chaque Q/R est une micro-page. Les questions doivent être formulées exactement comme les tape un utilisateur ('peut-on garder son logiciel actuel ?'). Le format est éligible au featured snippet FAQ. Viser des réponses entre 40 et 80 mots par question — ni trop courtes ni trop longues pour Google.",
     questions:[{id:"objections",label:"3 objections les plus fréquentes",hint:"Ce que les prospects disent avant de signer.",rows:4},{id:"practical",label:"Questions pratiques fréquentes",hint:"2–3 questions support / onboarding.",rows:3},{id:"kw",label:"Mots-clés SEO longue traîne",hint:"Séparés par des virgules",rows:1,kw:true}],
     outputs:["FAQ 1 — Q + R","FAQ 2 — Q + R","FAQ 3 — Q + R","FAQ 4 — Q + R","FAQ 5 — Q + R"] }
 ];
@@ -620,6 +653,15 @@ const WF_TEMPLATES = {
   howitworks:(data)=>{const t=data["TITRE DE SECTION"];const steps=["ÉTAPE 1 — TITRE + 1 PHRASE","ÉTAPE 2 — TITRE + 1 PHRASE","ÉTAPE 3 — TITRE + 1 PHRASE","ÉTAPE 4 — TITRE + 1 PHRASE"].map((k,i)=>{const s=data[k];if(s){const p=s.split(/[—\-\n]/,2);return`<div class="wf-step"><div class="wf-step-num">${i+1}</div><div>${txt(p[0]?.trim(),"h3")}${p[1]?txt(p[1].trim(),"muted"):""}</div></div>`;}return`<div class="wf-step"><div class="wf-step-num" style="opacity:.3">${i+1}</div><div>${block("short")}</div></div>`;}).join("");return`<div style="text-align:center;margin-bottom:14px">${t?txt(t,"h2"):block("medium")}</div>${steps}`;},
   features:(data)=>{const t=data["TITRE DE SECTION"],diff=data["FEATURE DIFFÉRENCIANTE — TITRE + 2 PHRASES"],list=data["LISTE FEATURES"];const rows=list?list.split("\n").filter(l=>l.trim()).slice(0,6).map(l=>`<div class="wf-row-item"><div class="wf-icon-box" style="border-radius:50%"></div><div>${txt(l.trim())}</div></div>`).join(""):`${block("short")}<div style="margin-top:4px">${block("xshort")}</div>`;return`<div style="text-align:center;margin-bottom:14px">${t?txt(t,"h2"):block("medium")}</div>${diff?`<div class="wf-card" style="margin-bottom:12px">${txt(diff.split(/[.\n]/)[0]?.trim(),"h3")}${txt(diff.split(/[.\n]/)[1]?.trim()||"","muted")}</div>`:""}<div class="wf-grid-2">${rows}</div>`;},
   comparaison:(data)=>{const bl=data["LABEL TOGGLE AVANT"]||"Sans Inqom",prod=state.config.productName;const pains=[1,2,3].map(i=>data[`PROBLÈME ${i} + DESCRIPTION`]).filter(Boolean);const gains=[1,2,3].map(i=>data[`GAIN ${i} + DESCRIPTION`]).filter(Boolean);const pR=pains.length?pains.map(p=>{const pts=p.split(/[—\-\n:]/,2);return`<div class="wf-row-item"><div style="width:16px;height:16px;border-radius:50%;background:#fee2e2;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#dc2626;">✕</div><div>${txt(pts[0]?.trim(),"h3")}${pts[1]?txt(pts[1].trim(),"muted"):""}</div></div>`;}).join(""):`${block("short")}`;const gR=gains.length?gains.map(g=>{const pts=g.split(/[—\-\n:]/,2);return`<div class="wf-row-item"><div style="width:16px;height:16px;border-radius:50%;background:#dcfce7;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#16a34a;">✓</div><div>${txt(pts[0]?.trim(),"h3")}${pts[1]?txt(pts[1].trim(),"muted"):""}</div></div>`;}).join(""):`${block("short")}`;return`<div style="text-align:center;margin-bottom:14px"><div class="wf-toggle"><div class="wf-toggle-opt active">${bl}</div><div class="wf-toggle-opt" style="color:var(--wf-accent)">${prod}</div></div></div><div class="wf-grid-2"><div class="wf-card">${pR}</div><div class="wf-card" style="border:1px solid #16a34a44;">${gR}</div></div>`;},
+  pourqui:(data)=>{
+    const title=data["TITRE DE SECTION"];
+    const profiles=["PROFIL 1 — TITRE + 2 PHRASES","PROFIL 2 — TITRE + 2 PHRASES","PROFIL 3 — TITRE + 2 PHRASES","PROFIL 4 — TITRE + 2 PHRASES"].map(k=>{
+      const p=data[k];
+      if(p){const parts=p.split(/[.\n]/,2);return`<div class="wf-card"><div style="display:flex;gap:6px;margin-bottom:6px"><div class="wf-icon-box" style="border-radius:50%;width:24px;height:24px;flex-shrink:0"></div><div>${txt(parts[0]?.trim(),"h3")}</div></div>${parts[1]?txt(parts[1].trim(),"muted"):""}</div>`;}
+      return`<div class="wf-card">${block("short")}<div style="margin-top:4px">${block("xshort")}</div></div>`;
+    }).join("");
+    return`<div style="text-align:center;margin-bottom:14px">${title?txt(title,"h2"):block("medium")}</div><div class="wf-grid-2">${profiles}</div>`;
+  },
   faq:(data)=>{const faqs=[1,2,3,4,5].map(i=>data[`FAQ ${i} — Q + R`]).filter(Boolean);const rows=faqs.length?faqs.map(f=>{const p=f.split(/\n|(?<=\?)\s/,2);return`<div class="wf-faq-item">${txt(p[0]?.trim(),"h3")}${p[1]?txt(p[1].trim(),"muted"):""}</div>`;}).join(""):`${block("short")}<div style="margin-top:6px">${block("xshort")}<div style="margin-top:4px">${block("short")}</div></div>`;return`<div style="max-width:360px;margin:0 auto">${rows}</div>`;}
 };
 
@@ -723,7 +765,7 @@ Génère ces outputs dans cet ordre exact :
 ${sec.outputs.join("\n")}`;
 
   try {
-    const response = await fetch("/api/chat", {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
       method:"POST", headers:{"Content-Type":"application/json"},
       body:JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1000, system:masterPrompt, messages:[{role:"user",content:userPrompt}] })
     });
@@ -801,12 +843,12 @@ function setupScrollSpy() {
 }
 
 // ── SETTINGS ──────────────────────────────────────────────────────
-function openSettings(){document.getElementById("settings-modal").classList.remove("hidden");syncSettingsUI();renderSkillsList();}
+function openSettings(){document.getElementById("settings-modal").classList.remove("hidden");syncSettingsUI();renderSkillsList();renderIntentsList();}
 function closeSettings(){document.getElementById("settings-modal").classList.add("hidden");}
 function syncSettingsUI(){const c=state.config;document.getElementById("cfg-product-name").value=c.productName;document.getElementById("cfg-sector").value=c.sector;document.getElementById("cfg-targets").value=c.targets;document.getElementById("cfg-lang").value=c.lang;document.getElementById("cfg-master-prompt").value=c.masterPrompt;document.getElementById("cfg-global-kw").value=c.globalKw;document.getElementById("cfg-competitor").value=c.competitor;}
-function saveSettings(){const c=state.config;c.productName=document.getElementById("cfg-product-name").value;c.sector=document.getElementById("cfg-sector").value;c.targets=document.getElementById("cfg-targets").value;c.lang=document.getElementById("cfg-lang").value;c.masterPrompt=document.getElementById("cfg-master-prompt").value;c.globalKw=document.getElementById("cfg-global-kw").value;c.intent=document.getElementById("cfg-intent").value;c.competitor=document.getElementById("cfg-competitor").value;document.getElementById("product-name-display").textContent=c.productName;closeSettings();}
+function saveSettings(){saveIntents();const c=state.config;c.productName=document.getElementById("cfg-product-name").value;c.sector=document.getElementById("cfg-sector").value;c.targets=document.getElementById("cfg-targets").value;c.lang=document.getElementById("cfg-lang").value;c.masterPrompt=document.getElementById("cfg-master-prompt").value;c.globalKw=document.getElementById("cfg-global-kw").value;c.intent=document.getElementById("cfg-intent").value;c.competitor=document.getElementById("cfg-competitor").value;document.getElementById("product-name-display").textContent=c.productName;closeSettings();}
 function resetPrompt(){if(confirm("Réinitialiser le prompt par défaut ?"))document.getElementById("cfg-master-prompt").value=DEFAULT_MASTER_PROMPT;}
-function switchTab(tab,btn){["general","prompt","seo","skills"].forEach(t=>document.getElementById(`tab-${t}`).classList.add("hidden"));document.getElementById(`tab-${tab}`).classList.remove("hidden");document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");}
+function switchTab(tab,btn){["general","prompt","seo","skills","intents"].forEach(t=>document.getElementById(`tab-${t}`).classList.add("hidden"));document.getElementById(`tab-${tab}`).classList.remove("hidden");document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");}
 
 // ── THEME ─────────────────────────────────────────────────────────
 function toggleDark(){document.documentElement.classList.toggle("dark");const d=document.documentElement.classList.contains("dark");document.getElementById("dark-icon").innerHTML=d?`<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`:``+`<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;}
@@ -870,7 +912,7 @@ async function extractFileContent(file, skillId) {
         reader.readAsDataURL(file);
       });
       if (btn) btn.innerHTML = `<svg class="animate-spin" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Lecture Claude…`;
-      const pdfResp = await fetch("/api/chat", {
+      const pdfResp = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -917,7 +959,7 @@ async function extractPptxViaAPI(file) {
     reader.onerror = rej;
     reader.readAsDataURL(file);
   });
-  const response = await fetch("/api/chat", {
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -945,7 +987,7 @@ async function summarizeAndInjectToSkill(rawText, filename, skillId) {
   const btn = document.querySelector(`#skill-card-${skillId} .skill-upload-btn`);
   if (btn) btn.innerHTML = `<svg class="animate-spin" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Analyse IA…`;
 
-  const response = await fetch("/api/chat", {
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -974,6 +1016,32 @@ Format de sortie : texte structuré avec des titres courts en majuscules suivis 
 }
 
 const uploadBtnHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Importer fichier`;
+
+function renderIntentsList() {
+  const list = document.getElementById("intents-list");
+  if (!list) return;
+  list.innerHTML = "";
+  SECTIONS.forEach(sec => {
+    const el = document.createElement("div");
+    el.className = "space-y-1.5";
+    el.innerHTML = `
+      <div class="flex items-center gap-2">
+        <label class="text-xs font-semibold">${sec.name}</label>
+        <span class="text-xs text-muted-foreground">— ${sec.sub}</span>
+      </div>
+      <textarea class="textarea text-xs" rows="3" id="intent-${sec.id}"
+        style="font-size:11px;line-height:1.6;"
+        onchange="sec && (SECTIONS.find(s=>s.id==='${sec.id}').editorialIntent = this.value)">${(sec.editorialIntent||'').replace(/"/g,'&quot;')}</textarea>`;
+    list.appendChild(el);
+  });
+}
+
+function saveIntents() {
+  SECTIONS.forEach(sec => {
+    const el = document.getElementById(`intent-${sec.id}`);
+    if (el) sec.editorialIntent = el.value;
+  });
+}
 
 function renderSkillsList() {
   const list = document.getElementById("skills-list");
@@ -1099,6 +1167,13 @@ const TEST_DATA = {
     before_label: "Sans Inqom",
     pains: "Captation client : les concurrents demarchent vos clients en direct\nSaisie manuelle chronophage : les collaborateurs passent leur temps sur des taches sans valeur\nConformite FE subie : la RFE impose un changement d'outil non maitrise\nDonnees hors controle : hebergees chez un editeur dont les interets divergent",
     gains: "Relation protegee : le cabinet reste l'interlocuteur unique, Inqom ne contacte jamais vos clients\nProduction automatisee : les ecritures se generent seules, focus sur le conseil\nConformite sans rupture : activez la Plateforme Agreee sans changer votre outil\nSouverainete totale : donnees stockees en Europe, propriete des agents IA au cabinet"
+  },
+  pourqui: {
+    p1: "Cabinet solo 1-3 collaborateurs : active Inqom Connect en 48h pour se conformer a la RFE sans quitter son outil de production actuel.",
+    p2: "Cabinet intermediaire 5-15 collaborateurs : deploie Inqom Expert pour automatiser la production et Inqom Gestion pour etendre son offre client.",
+    p3: "Groupe de cabinets multi-bureaux : centralise la gestion interne, pilote la rentabilite par dossier et consolide les reportings via Finthesis.",
+    p4: "Cabinet specialise (BTP, pharmacie, CHR) : s'appuie sur les verticales metier d'Inqom Expert pour traiter les ecritures specifiques sans parametrage.",
+    kw: "logiciel comptabilite cabinet solo, plateforme comptable grand cabinet, outil comptabilite multi-bureaux"
   },
   faq: {
     objections: "Peut-on garder notre outil de production actuel ? Oui, Connect et Gestion s'activent sans migration.\nEst-ce que ca remplace notre logiciel existant ? Seulement si vous le souhaitez, l'architecture est modulaire.\nQu'arrive-t-il a nos donnees si on resilie ? Vos donnees restent votres, export complet garanti.",
