@@ -234,7 +234,17 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
         <p class="text-sm font-medium">Wireframe</p>
         <span class="text-xs text-muted-foreground" id="wf-page-name"></span>
       </div>
-      <span class="text-xs text-muted-foreground" id="wf-status">En attente…</span>
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-muted-foreground" id="wf-status">En attente…</span>
+        <button class="btn btn-icon" onclick="toggleDebugPanel()" title="Debug outputs" style="width:24px;height:24px;font-size:10px;opacity:.5;">⚙</button>
+      </div>
+    </div>
+    <div id="wf-debug-panel" class="hidden border-b border-border px-4 py-3" style="background:hsl(var(--muted));font-family:monospace;font-size:10px;max-height:200px;overflow-y:auto;">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-medium">Clés parsées — section active</span>
+        <select id="debug-sec-select" class="input" style="height:24px;font-size:10px;width:160px;" onchange="showDebugForSection(this.value)"></select>
+      </div>
+      <div id="debug-keys-output" class="text-xs" style="white-space:pre-wrap;"></div>
     </div>
     <div class="flex-1 overflow-y-auto" id="wireframe-panel" style="background:hsl(var(--muted));padding:24px 20px;">
       <div style="max-width:900px;margin:0 auto;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.10);border:1px solid rgba(0,0,0,.06);">
@@ -1666,6 +1676,37 @@ function patchStateForAutosave() {
     origUpdateProgress();
     saveToStorage();
   };
+}
+
+// ── DEBUG ────────────────────────────────────────────────────────
+function toggleDebugPanel() {
+  const panel = document.getElementById("wf-debug-panel");
+  if (!panel) return;
+  const isHidden = panel.classList.toggle("hidden");
+  if (!isHidden) {
+    // populate section select
+    const sel = document.getElementById("debug-sec-select");
+    sel.innerHTML = "";
+    getSectionsForPage(currentPage()).forEach(sec => {
+      const opt = document.createElement("option");
+      opt.value = sec.id;
+      opt.textContent = sec.name;
+      sel.appendChild(opt);
+    });
+    showDebugForSection(sel.value);
+  }
+}
+
+function showDebugForSection(secId) {
+  const out = document.getElementById("debug-keys-output");
+  if (!out) return;
+  const raw = currentPage().outputs[secId];
+  if (!raw) { out.textContent = "(aucun output généré)"; return; }
+  const data = parsedOutputs(secId);
+  const keys = Object.keys(data);
+  out.textContent = keys.length === 0
+    ? "Aucune clé parsée.\n\nRaw:\n" + raw.substring(0,500)
+    : keys.map(k => `"${k}" → "${(data[k]||"").substring(0,60)}${data[k]?.length>60?"...":""}" `).join("\n") + "\n\n---RAW---\n" + raw.substring(0,800);
 }
 
 // ── INIT ──────────────────────────────────────────────────────────
