@@ -514,7 +514,7 @@ const TEMPLATES_CONFIG = {
   { id:"comparaison", name:"Comparaison", sub:"Avant / Après", seo:false,
     why:"Retournement narratif sans nommer de concurrent.",
     editorialIntent:"Cible implicitement les requêtes de comparaison vs la méthode traditionnelle ou vs concurrents. Le toggle avant/après est un dispositif narratif fort qui permet d'adresser les deux états sans nommer de concurrent. Google lit ce bloc comme du contenu comparatif à haute valeur — il peut remonter sur des requêtes 'alternative à' ou 'vs'.",
-    outputFormats:[{"key":"H2","rule":"Max 8 mots. Ex : Votre cabinet, vos règles"},{"key":"INTRO","rule":"1-2 phrases, max 25 mots."},{"key":"LABEL TOGGLE AVANT","rule":"2-4 mots. Ex : Sans Inqom"},{"key":"H3 PROBLÈME 1 à 4","rule":"STRICT : max 4 mots. Nominatif. Ex : Captation client. Pas de verbe."},{"key":"DESCRIPTION PROBLÈME 1 à 4","rule":"STRICT : 1 phrase, max 15 mots."},{"key":"H3 GAIN 1 à 4","rule":"STRICT : max 4 mots. Miroir exact du problème correspondant. Ex : Relation protégée. IMPÉRATIF : même nombre que les PROBLÈMES."},{"key":"DESCRIPTION GAIN 1 à 4","rule":"STRICT : 1 phrase, max 15 mots."}],
+    outputFormats:[{"key":"H2","rule":"Max 8 mots. Ex : Votre cabinet, vos règles"},{"key":"INTRO","rule":"1-2 phrases, max 25 mots."},{"key":"LABEL TOGGLE AVANT","rule":"2-4 mots. Ex : Sans Inqom"},{"key":"H3 PROBLÈME 1 à 4","rule":"STRICT : EXACTEMENT 4 problèmes, pas plus. Max 4 mots. Nominatif. Ex : Captation client. Pas de verbe."},{"key":"DESCRIPTION PROBLÈME 1 à 4","rule":"STRICT : 1 phrase, max 15 mots."},{"key":"H3 GAIN 1 à 4","rule":"STRICT : EXACTEMENT 4 gains, pas plus. Max 4 mots. Miroir exact du problème correspondant. Ex : Relation protégée."},{"key":"DESCRIPTION GAIN 1 à 4","rule":"STRICT : 1 phrase, max 15 mots."}],
     questions:[{id:"before_label",label:"Label de l'état 'avant'",hint:"Ex : Sans Inqom",rows:1},{id:"pains",label:"4 problèmes de l'état 'avant' (max)",hint:"Titre court + 1 phrase chacun",rows:4},{id:"gains",label:"4 bénéfices miroirs (même nombre que les problèmes)",hint:"Répondent aux problèmes ci-dessus",rows:4}],
     outputs:["H2","INTRO","LABEL TOGGLE AVANT","H3 PROBLÈME 1","DESCRIPTION PROBLÈME 1","H3 PROBLÈME 2","DESCRIPTION PROBLÈME 2","H3 PROBLÈME 3","DESCRIPTION PROBLÈME 3","H3 PROBLÈME 4","DESCRIPTION PROBLÈME 4","H3 GAIN 1","DESCRIPTION GAIN 1","H3 GAIN 2","DESCRIPTION GAIN 2","H3 GAIN 3","DESCRIPTION GAIN 3","H3 GAIN 4","DESCRIPTION GAIN 4"] },
   { id:"pourqui", name:"Pour qui ?", sub:"Profils & personas", seo:true,
@@ -1074,8 +1074,8 @@ function renderWfSection(secId, data) {
 
   // ── COMPARAISON ──
   if (secId === 'comparaison') {
-    const probKeys = keys.filter(k => k.toUpperCase().includes('PROBLÈME') || k.toUpperCase().includes('PROBLEME') || k.toUpperCase().includes('PAIN'));
-    const gainKeys = keys.filter(k => k.toUpperCase().startsWith('GAIN') || k.toUpperCase().startsWith('H3 GAIN'));
+    const probKeys = keys.filter(k => k.toUpperCase().includes('PROBLÈME') || k.toUpperCase().includes('PROBLEME') || k.toUpperCase().includes('PAIN')).slice(0,4);
+    const gainKeys = keys.filter(k => k.toUpperCase().startsWith('GAIN') || k.toUpperCase().startsWith('H3 GAIN')).slice(0,4);
     const pRows = probKeys.length ? probKeys.map((k, i) => {
       const num = (k.match(/\d+/) || [i+1])[0];
       const title = (data[k]||'').trim();
