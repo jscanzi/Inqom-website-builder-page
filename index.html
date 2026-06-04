@@ -1270,7 +1270,7 @@ async function generateAll() {
     const prog = document.getElementById("gen-all-progress");
     if (prog) prog.textContent = `${done}/${total}`;
     // Small delay between calls to avoid rate limiting
-    if (done < total) await new Promise(r => setTimeout(r, 400));
+    if (done < total) await new Promise(r => setTimeout(r, 1500));
   }
 
   btn.disabled = false;
