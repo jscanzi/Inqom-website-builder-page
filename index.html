@@ -99,7 +99,7 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
 .wf-card { background:var(--wf-block);border-radius:8px;padding:14px; }
 .wf-stat { text-align:center; }
 .wf-stat-num { font-size:28px;font-weight:600;color:var(--wf-accent);line-height:1; }
-.wf-stat-label { font-size:9px;color:var(--wf-text);margin-top:4px; }
+.wf-stat-label { font-size:8px;color:var(--wf-text);margin-top:5px;line-height:1.3;max-width:80px;margin-left:auto;margin-right:auto; }
 .wf-toggle { display:inline-flex;background:var(--wf-block);border-radius:20px;padding:3px;margin-bottom:14px; }
 .wf-toggle-opt { font-size:10px;padding:4px 14px;border-radius:16px;color:var(--wf-text);font-weight:500; }
 .wf-toggle-opt.active { background:var(--wf-accent);color:var(--wf-bg); }
@@ -364,12 +364,11 @@ const TEMPLATES_CONFIG = {
     questions:[{id:"stat1",label:"Chiffre clé n°1 — valeur + contexte",hint:"Ex : 2 000 cabinets utilisent Inqom",rows:2},{id:"stat2",label:"Chiffre clé n°2",hint:"",rows:2},{id:"stat3",label:"Chiffre clé n°3",hint:"",rows:2}],
     outputs:["H2 (titre section)", "INTRO (1 phrase contexte)", "CHIFFRE 1 + LIBELLÉ", "CHIFFRE 2 + LIBELLÉ", "CHIFFRE 3 + LIBELLÉ"] },
   { id:"sideshow", name:"Side show", sub:"Démo produit", seo:false,
-    why:"Montrer avant d'expliquer. Réduit l'effort cognitif du reste.",
+    why:"Section définition — la plus importante pour le SEO. Google la remonte en featured snippet sur les requêtes 'qu'est-ce que X'. L'IA structure votre texte libre en 3-4 paragraphes denses.",
     editorialIntent:"Bloc de définition SEO — equivalent du What is X que tapent les utilisateurs, remonte en featured snippet. Pas une section commerciale. Definition factuelle, dense, semantiquement riche. Texte de 150-200 mots minimum, structure en 3-4 paragraphes : (1) definition du produit, (2) contexte marche et probleme resolu, (3) differenciateur cle. Chaque paragraphe 2-3 phrases max. Contenir la requete cible naturellement. Zero superlatif commercial.",
     questions:[
-      {id:"definition",label:"Définition du produit en 1-2 phrases",hint:"Factuel, sans superlatif. Ce que fait le produit concrètement.",rows:3},
-      {id:"keyword",label:"Requête cible de cette section",hint:"Ex : 'plateforme comptable cabinet' — la recherche exacte que tape l'utilisateur.",rows:1},
-      {id:"caption",label:"Ce que l'utilisateur voit dans le visuel produit",hint:"Description courte de l'interface ou de la fonctionnalité montrée.",rows:2}
+      {id:"definition",label:"En vos mots, qu'est-ce que le produit ?",hint:"Expliquez comme à un prospect — ce que c'est, ce que ça fait, pour qui, pourquoi c'est différent. 5-10 lignes libres.",rows:8},
+      {id:"kw",label:"Mots-clés SEO prioritaires",hint:"Séparés par des virgules — la ou les requêtes que doit capter cette section.",rows:1,kw:true}
     ],
     outputs:["H2 (titre section avec mot-clé — format definition)", "INTRO (2-3 paragraphes 150-200 mots — definition + contexte + differenciateur)", "ACCROCHE BENEFICE (1 phrase courte)", "LEGENDE VISUEL PRODUIT"] },
   { id:"avantages", name:"Avantages", sub:"Bénéfices business", seo:true,
@@ -752,9 +751,9 @@ function renderWfSection(secId, data) {
 
   // Extract keys by type
   const keys = Object.keys(data);
-  const h2Key = keys.find(k => k.startsWith('H2') || k === 'TITRE DE SECTION' || k === 'TITRE');
-  const introKey = keys.find(k => k.startsWith('INTRO') || k.startsWith('DÉFINITION') || k.startsWith('DEFINITION'));
-  const h3Keys = keys.filter(k => k.startsWith('H3') || (k.match(/^(AVANTAGE|CAS|ÉTAPE|ETAPE|PROFIL|H3|GAIN|PROBLÈME|PROBLEME|FAQ|QUESTION)\s+\d/) && !k.startsWith('H2') && !k.startsWith('INTRO')));
+  const h2Key = keys.find(k => k.toUpperCase().startsWith('H2') || k === 'TITRE DE SECTION' || k === 'TITRE');
+  const introKey = keys.find(k => k.toUpperCase().startsWith('INTRO') || k.toUpperCase().startsWith('DÉFINITION') || k.toUpperCase().startsWith('DEFINITION'));
+  const h3Keys = keys.filter(k => k.toUpperCase().startsWith('H3') || (k.toUpperCase().match(/^(AVANTAGE|CAS|ÉTAPE|ETAPE|PROFIL|H3|GAIN|PROBLÈME|PROBLEME|FAQ|QUESTION)\s+\d/) && !k.toUpperCase().startsWith('H2') && !k.toUpperCase().startsWith('INTRO')));
   const extraKeys = keys.filter(k => !k.startsWith('H2') && !k.startsWith('INTRO') && !k.startsWith('TITRE') && !k.startsWith('DÉFINITION') && !k.startsWith('DEFINITION') && !h3Keys.includes(k) && k !== 'LABEL TOGGLE AVANT' && k !== 'TEXTE CTA PRINCIPAL' && k !== 'LEGENDE VISUEL PRODUIT' && k !== 'LÉGENDE VISUEL PRODUIT' && k !== 'ACCROCHE' && k !== 'ACCROCHE BÉNÉFICE' && k !== 'ACCROCHE BENEFICE');
 
   const h2Val = h2Key ? data[h2Key] : null;
@@ -945,12 +944,17 @@ function parsedOutputs(secId) {
     const ci = line.indexOf(":");
     if (ci>2) {
       const k = line.substring(0,ci).trim();
-      if (k === k.toUpperCase() && k.length < 80) {
+      // Accept as key if: fully uppercase OR starts with H2/H3/INTRO/known prefixes
+      const isLabel = (k === k.toUpperCase() && k.length < 80) ||
+        /^(H[123]|INTRO|TITRE|CHIFFRE|LEGENDE|ACCROCHE|LABEL|TEXTE CTA|CTA)/i.test(k);
+      if (isLabel && k.length < 100) {
         const val = line.substring(ci+1).trim();
+        const kUp = k.toUpperCase();
         result[k] = val;
+        if (kUp !== k) result[kUp] = val;
         // Also index under short key: "AVANTAGE 1 — TITRE + 1 PHRASE" → "AVANTAGE 1"
-        const shortKey = k.split(/\s*[\u2014\-]\s*/)[0].trim();
-        if (shortKey !== k) result[shortKey] = val;
+        const shortKey = kUp.split(/\s*[\u2014\-]\s*/)[0].trim();
+        if (shortKey !== kUp) result[shortKey] = val;
         return;
       }
     }
