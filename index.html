@@ -419,31 +419,31 @@ const TEMPLATES_CONFIG = {
     editorialIntent:"Cible les requêtes de comparaison et d'évaluation (phase de considération). L'utilisateur se demande 'pourquoi ce produit plutôt qu'un autre ?'. Chaque bénéfice doit être formulé comme une réponse à une objection implicite. Langue du décideur business, pas du technicien.",
     outputFormats:[{"key":"H2","rule":"Max 8 mots. Angle bénéfices. Ex : Trois leviers de rentabilité pour votre cabinet"},{"key":"INTRO","rule":"1-2 phrases, max 30 mots. Introduit les bénéfices."},{"key":"H3 1","rule":"STRICT : max 5 mots. Nominatif. Ex : Productivité augmentée. INTERDIT : tirets, em-dashes, phrases longues."},{"key":"DESCRIPTION 1","rule":"STRICT : 1 phrase, max 15 mots. Résultat concret."},{"key":"H3 2","rule":"STRICT : max 5 mots. Nominatif. Pas de tiret."},{"key":"DESCRIPTION 2","rule":"STRICT : 1 phrase, max 15 mots."},{"key":"H3 3","rule":"STRICT : max 5 mots. Nominatif. Pas de tiret."},{"key":"DESCRIPTION 3","rule":"STRICT : 1 phrase, max 15 mots."}],
     questions:[{id:"b1",label:"Bénéfice business n°1",hint:"Résultat mesurable ou perçu",rows:2},{id:"b2",label:"Bénéfice business n°2",hint:"",rows:2},{id:"b3",label:"Bénéfice business n°3",hint:"",rows:2},{id:"kw",label:"Mots-clés SEO",hint:"Séparés par des virgules",rows:1,kw:true}],
-    outputs:["H2", "INTRO", "H3 1 + DESCRIPTION 1", "H3 2 + DESCRIPTION 2", "H3 3 + DESCRIPTION 3"] },
+    outputs:["H2","INTRO","H3 1","DESCRIPTION 1","H3 2","DESCRIPTION 2","H3 3","DESCRIPTION 3"] },
   { id:"casusage", name:"Cas d'usage", sub:"Use cases", seo:true,
     why:"L'utilisateur se reconnaît dans un scénario concret.",
     editorialIntent:"Cible les requêtes longue traîne par profil et situation ('logiciel comptabilité pour cabinet 50 dossiers', 'outil comptable multi-bureaux'). Chaque cas doit nommer explicitement un profil reconnaissable. C'est aussi le bloc qui crée le sentiment de reconnaissance — 'c'est exactement moi'.",
     outputFormats:[{"key":"H2","rule":"Max 8 mots. Ex : Inqom s\'adapte à votre cabinet"},{"key":"INTRO","rule":"1-2 phrases, max 30 mots."},{"key":"H3 1 à H3 6","rule":"STRICT : max 6 mots. Profil reconnaissable. Ex : Cabinet solo face à la RFE. INTERDIT : tirets, phrases longues."},{"key":"DESCRIPTION 1 à 6","rule":"STRICT : 1 phrase, max 15 mots. Action concrète. Ex : Active Inqom Connect en 48h sans changer son outil."}],
     questions:[{id:"uc1",label:"Cas d'usage n°1 — profil + situation",hint:"Ex : cabinet gérant 50 dossiers",rows:3},{id:"uc2",label:"Cas d'usage n°2",hint:"",rows:3},{id:"uc3",label:"Cas d'usage n°3 (optionnel)",hint:"",rows:2},{id:"kw",label:"Mots-clés SEO",hint:"Séparés par des virgules",rows:1,kw:true}],
-    outputs:["H2", "INTRO", "H3 1 + DESCRIPTION 1", "H3 2 + DESCRIPTION 2", "H3 3 + DESCRIPTION 3", "H3 4 + DESCRIPTION 4", "H3 5 + DESCRIPTION 5", "H3 6 + DESCRIPTION 6"] },
+    outputs:["H2","INTRO","H3 1","DESCRIPTION 1","H3 2","DESCRIPTION 2","H3 3","DESCRIPTION 3","H3 4","DESCRIPTION 4","H3 5","DESCRIPTION 5","H3 6","DESCRIPTION 6"] },
   { id:"howitworks", name:"Comment ça marche", sub:"Mécanisme produit", seo:false,
     why:"Lever l'ambiguïté sur le modèle avant les features.",
     editorialIntent:"Google valorise les pages qui expliquent le processus — c'est un signal d'expertise. Ce bloc cible les requêtes 'comment fonctionne X' et 'comment faire Y avec X'. Les étapes doivent être concrètes, actionnables, avec des verbes d'action. Idéalement éligible au format FAQ/HowTo rich snippet.",
     outputFormats:[{"key":"H2","rule":"Max 8 mots. Ex : Opérationnel en 4 étapes"},{"key":"INTRO","rule":"1-2 phrases, max 25 mots."},{"key":"H3 ÉTAPE 1 à 4","rule":"STRICT : max 6 mots. Verbe + objet. Ex : Activez vos modules. Pas de numéro dans le titre."},{"key":"DESCRIPTION 1 à 4","rule":"STRICT : 1 phrase, max 20 mots. Ce qui se passe à cette étape."}],
     questions:[{id:"s1",label:"Étape 1",hint:"Ex : connectez votre banque",rows:2},{id:"s2",label:"Étape 2",hint:"",rows:2},{id:"s3",label:"Étape 3",hint:"",rows:2},{id:"s4",label:"Étape 4 (optionnelle)",hint:"",rows:2}],
-    outputs:["H2", "INTRO", "H3 ÉTAPE 1 + DESCRIPTION 1", "H3 ÉTAPE 2 + DESCRIPTION 2", "H3 ÉTAPE 3 + DESCRIPTION 3", "H3 ÉTAPE 4 + DESCRIPTION 4"] },
+    outputs:["H2","INTRO","H3 ÉTAPE 1","DESCRIPTION 1","H3 ÉTAPE 2","DESCRIPTION 2","H3 ÉTAPE 3","DESCRIPTION 3","H3 ÉTAPE 4","DESCRIPTION 4"] },
   { id:"features", name:"Fonctionnalités", sub:"Features clés", seo:true,
     why:"Langue produit pour l'évaluateur technique.",
     editorialIntent:"Cible les requêtes de comparaison techniques et les recherches de fonctionnalités spécifiques ('logiciel comptabilité gros volumes', 'automatisation écritures comptables IA'). C'est le bloc lu par les évaluateurs techniques. La feature différenciante doit être mise en avant dès le début — c'est elle qui crée la séparation vs concurrents.",
     outputFormats:[{"key":"H2","rule":"Max 8 mots. Ex : Fonctionnalités avancées pour cabinets exigeants"},{"key":"INTRO","rule":"1-2 phrases, max 30 mots."},{"key":"H3 1 à H3 6","rule":"STRICT : max 5 mots. Nom de la feature. Ex : Génération automatique des écritures. Pas de verbe conjugué."},{"key":"DESCRIPTION 1 à 6","rule":"STRICT : 1 phrase, max 15 mots. Ce que la feature fait. Pas de superlatif."}],
     questions:[{id:"list",label:"Liste des fonctionnalités principales",hint:"Une par ligne : nom + description courte",rows:5},{id:"diff",label:"Feature différenciante",hint:"Celle que les concurrents font moins bien.",rows:3},{id:"kw",label:"Mots-clés SEO",hint:"Séparés par des virgules",rows:1,kw:true}],
-    outputs:["H2", "INTRO", "H3 1 + DESCRIPTION 1", "H3 2 + DESCRIPTION 2", "H3 3 + DESCRIPTION 3", "H3 4 + DESCRIPTION 4", "H3 5 + DESCRIPTION 5", "H3 6 + DESCRIPTION 6"] },
+    outputs:["H2","INTRO","H3 1","DESCRIPTION 1","H3 2","DESCRIPTION 2","H3 3","DESCRIPTION 3","H3 4","DESCRIPTION 4","H3 5","DESCRIPTION 5","H3 6","DESCRIPTION 6"] },
   { id:"comparaison", name:"Comparaison", sub:"Avant / Après", seo:false,
     why:"Retournement narratif sans nommer de concurrent.",
     editorialIntent:"Cible implicitement les requêtes de comparaison vs la méthode traditionnelle ou vs concurrents. Le toggle avant/après est un dispositif narratif fort qui permet d'adresser les deux états sans nommer de concurrent. Google lit ce bloc comme du contenu comparatif à haute valeur — il peut remonter sur des requêtes 'alternative à' ou 'vs'.",
     outputFormats:[{"key":"H2","rule":"Max 8 mots. Ex : Votre cabinet, vos règles"},{"key":"INTRO","rule":"1-2 phrases, max 25 mots."},{"key":"LABEL TOGGLE AVANT","rule":"2-4 mots. Ex : Sans Inqom"},{"key":"H3 PROBLÈME 1 à 3","rule":"STRICT : max 4 mots. Nominatif. Ex : Captation client. Pas de verbe."},{"key":"DESCRIPTION PROBLÈME 1 à 3","rule":"STRICT : 1 phrase, max 15 mots."},{"key":"H3 GAIN 1 à 3","rule":"STRICT : max 4 mots. Miroir du problème. Ex : Relation protégée."},{"key":"DESCRIPTION GAIN 1 à 3","rule":"STRICT : 1 phrase, max 15 mots."}],
     questions:[{id:"before_label",label:"Label de l'état 'avant'",hint:"Ex : Sans Inqom",rows:1},{id:"pains",label:"3–4 problèmes de l'état 'avant'",hint:"Titre court + 1 phrase chacun",rows:4},{id:"gains",label:"3–4 bénéfices de l'état 'après'",hint:"Répondent aux problèmes ci-dessus",rows:4}],
-    outputs:["H2", "INTRO", "LABEL TOGGLE AVANT", "H3 PROBLÈME 1 + DESCRIPTION 1", "H3 PROBLÈME 2 + DESCRIPTION 2", "H3 PROBLÈME 3 + DESCRIPTION 3", "H3 GAIN 1 + DESCRIPTION 1", "H3 GAIN 2 + DESCRIPTION 2", "H3 GAIN 3 + DESCRIPTION 3"] },
+    outputs:["H2","INTRO","LABEL TOGGLE AVANT","H3 PROBLÈME 1","DESCRIPTION PROBLÈME 1","H3 PROBLÈME 2","DESCRIPTION PROBLÈME 2","H3 PROBLÈME 3","DESCRIPTION PROBLÈME 3","H3 GAIN 1","DESCRIPTION GAIN 1","H3 GAIN 2","DESCRIPTION GAIN 2","H3 GAIN 3","DESCRIPTION GAIN 3"] },
   { id:"pourqui", name:"Pour qui ?", sub:"Profils & personas", seo:true,
     why:"Crée le sentiment de reconnaissance — l'utilisateur se voit dans la page.",
     editorialIntent:"Machine à longue traîne par profil. Google remonte cette section sur des requêtes comme 'logiciel comptabilité cabinet solo' ou 'plateforme comptable grand cabinet'. Chaque profil est une micro-cible SEO. Le texte doit nommer explicitement le profil, sa situation et son bénéfice principal. Éligible au rich snippet FAQ si formulé en Q/R implicite.",
@@ -455,14 +455,14 @@ const TEMPLATES_CONFIG = {
       {id:"p4",label:"Profil n°4 (optionnel)",hint:"",rows:2},
       {id:"kw",label:"Mots-clés SEO par profil",hint:"Séparés par des virgules",rows:1,kw:true}
     ],
-    outputs:["H2 (titre section avec mot-clé)", "INTRO (1-2 phrases)", "H3 PROFIL 1 + DESCRIPTION 1", "H3 PROFIL 2 + DESCRIPTION 2", "H3 PROFIL 3 + DESCRIPTION 3", "H3 PROFIL 4 + DESCRIPTION 4"]
+    outputs:["H2","INTRO","H3 PROFIL 1","DESCRIPTION 1","H3 PROFIL 2","DESCRIPTION 2","H3 PROFIL 3","DESCRIPTION 3","H3 PROFIL 4","DESCRIPTION 4"]
   },
   { id:"faq", name:"FAQ", sub:"Questions fréquentes", seo:true,
     why:"Or SEO — questions longue traîne + levée des objections.",
     editorialIntent:"Bloc SEO longue traîne le plus puissant de la page. Chaque Q/R est une micro-page. Les questions doivent être formulées exactement comme les tape un utilisateur ('peut-on garder son logiciel actuel ?'). Le format est éligible au featured snippet FAQ. Viser des réponses entre 40 et 80 mots par question — ni trop courtes ni trop longues pour Google.",
     outputFormats:[{"key":"H2","rule":"Max 6 mots. Ex : Questions fréquentes"},{"key":"INTRO","rule":"1 phrase, max 20 mots."},{"key":"H3 QUESTION 1 à 5","rule":"STRICT : format interrogatif, max 12 mots. Formulation exacte que tape l\'utilisateur dans Google."},{"key":"RÉPONSE 1 à 5","rule":"2-3 phrases, max 60 mots. Directe, factuelle. Éligible featured snippet Google."}],
     questions:[{id:"objections",label:"3 objections les plus fréquentes",hint:"Ce que les prospects disent avant de signer.",rows:4},{id:"practical",label:"Questions pratiques fréquentes",hint:"2–3 questions support / onboarding.",rows:3},{id:"kw",label:"Mots-clés SEO longue traîne",hint:"Séparés par des virgules",rows:1,kw:true}],
-    outputs:["H2 (titre section avec mot-clé)", "INTRO (1-2 phrases)", "H3 QUESTION 1 + RÉPONSE 1", "H3 QUESTION 2 + RÉPONSE 2", "H3 QUESTION 3 + RÉPONSE 3", "H3 QUESTION 4 + RÉPONSE 4", "H3 QUESTION 5 + RÉPONSE 5"] }
+    outputs:["H2","INTRO","H3 QUESTION 1","RÉPONSE 1","H3 QUESTION 2","RÉPONSE 2","H3 QUESTION 3","RÉPONSE 3","H3 QUESTION 4","RÉPONSE 4","H3 QUESTION 5","RÉPONSE 5"] }
 ]
   },
 
@@ -883,9 +883,15 @@ function renderWfSection(secId, data) {
   if (secId === 'comparaison') {
     const probKeys = keys.filter(k => k.toUpperCase().includes('PROBLÈME') || k.toUpperCase().includes('PROBLEME') || k.toUpperCase().includes('PAIN'));
     const gainKeys = keys.filter(k => k.toUpperCase().startsWith('GAIN') || k.toUpperCase().startsWith('H3 GAIN'));
-    const pRows = probKeys.length ? probKeys.map(k => {
-      const p = (data[k]||'').split(/\.\s+|\n/).filter(Boolean);
-      return `<div class="wf-row-item"><div class="wf-dot-bad">✕</div><div><div class="wf-h3">${wfEditable(p[0]?.trim()||data[k], k, secId)}</div>${p[1]?`<div class="wf-body" style="margin-top:2px;">${wfEditable(p[1].trim(), k+'_d', secId)}</div>`:''}</div></div>`;
+    const pRows = probKeys.length ? probKeys.map((k, i) => {
+      const num = (k.match(/\d+/) || [i+1])[0];
+      const title = (data[k]||'').trim();
+      const descKey = keys.find(dk => {
+        const u = dk.toUpperCase();
+        return (u.startsWith('DESCRIPTION PROBLÈME ' + num) || u.startsWith('DESCRIPTION PROBLEME ' + num) || u.startsWith('DESCRIPTION ' + num)) && (u.includes('PROB') || !gainKeys.some(gk => gk === dk));
+      });
+      const desc = descKey ? (data[descKey]||'').trim() : '';
+      return `<div class="wf-row-item"><div class="wf-dot-bad">✕</div><div><div class="wf-h3">${wfEditable(title, k, secId)}</div>${desc?`<div class="wf-body" style="margin-top:2px;">${wfEditable(desc, descKey, secId)}</div>`:''}</div></div>`;
     }).join('') : `${placeholder(2)}`;
     const gRows = gainKeys.length ? gainKeys.map(k => {
       const p = (data[k]||'').split(/\.\s+|\n/).filter(Boolean);
@@ -902,14 +908,14 @@ function renderWfSection(secId, data) {
   // ── FAQ ──
   if (secId === 'faq') {
     const faqKeys = keys.filter(k => k.toUpperCase().startsWith('H3') || k.toUpperCase().startsWith('FAQ') || k.toUpperCase().startsWith('QUESTION'));
-    const items = faqKeys.length ? faqKeys.map(k => {
-      const v = data[k]||'';
-      const qMark = v.indexOf('?');
-      const q = qMark > -1 ? v.substring(0,qMark+1).trim() : v.split(/\n/)[0].trim();
-      const a = qMark > -1 ? v.substring(qMark+1).trim() : v.split(/\n/).slice(1).join(' ').trim();
+    const items = faqKeys.length ? faqKeys.map((k, i) => {
+      const num = (k.match(/\d+/) || [i+1])[0];
+      const q = (data[k]||'').trim();
+      const answerKey = keys.find(dk => dk.toUpperCase().startsWith('RÉPONSE ' + num) || dk.toUpperCase().startsWith('REPONSE ' + num) || dk.toUpperCase().startsWith('ANSWER ' + num));
+      const a = answerKey ? (data[answerKey]||'').trim() : '';
       return `<div class="wf-faq-item">
         <div class="wf-faq-q">${wfEditable(q, k, secId)}</div>
-        ${a ? `<div class="wf-faq-a">${wfEditable(a, k+'_a', secId)}</div>` : ''}
+        ${a ? `<div class="wf-faq-a">${wfEditable(a, answerKey, secId)}</div>` : ''}
       </div>`;
     }).join('') : placeholder(3);
     return `${tag}
@@ -945,17 +951,21 @@ function renderWfSection(secId, data) {
   const gridClass = isGrid4 ? 'wf-grid-4' : h3Keys.length >= 4 ? 'wf-grid-3' : 'wf-grid-3';
   const cardAlt = (secId === 'casusage' || secId === 'pourqui') ? ' alt' : '';
 
-  const cards = h3Keys.length ? h3Keys.map(k => {
-    const v = data[k]||'';
-    const p = v.split(/\.\s+|\n/);
-    const title = p[0]?.trim() || v;
-    const desc = p.slice(1).join(' ').trim();
+  const emptyCards = Array(isGrid4?4:6).fill(0).map(()=>`<div class="wf-card${cardAlt}">${secId==='avantages'?'<div class="wf-card-icon"></div>':''}<div class="wf-block short" style="margin-bottom:6px;"></div><div class="wf-block xshort" style="opacity:.5;"></div></div>`).join('');
+  const cards = h3Keys.length ? h3Keys.map((k, i) => {
+    const num = (k.match(/\d+/) || [i+1])[0];
+    const title = (data[k]||'').trim();
+    const descKey = keys.find(dk => {
+      const u = dk.toUpperCase();
+      return u.startsWith('DESCRIPTION ' + num) || u === ('DESC ' + num) || u === ('DESCRIPTION' + num);
+    });
+    const desc = descKey ? (data[descKey]||'').trim() : '';
     return `<div class="wf-card${cardAlt}">
       ${secId === 'avantages' ? '<div class="wf-card-icon"></div>' : ''}
       <div class="wf-h3">${wfEditable(title, k, secId)}</div>
-      ${desc ? `<div class="wf-body" style="margin-top:4px;">${wfEditable(desc, k+'_d', secId)}</div>` : `<div class="wf-block short" style="margin-top:5px;opacity:.5;"></div>`}
+      ${desc ? `<div class="wf-body" style="margin-top:4px;">${wfEditable(desc, descKey, secId)}</div>` : `<div class="wf-block short" style="margin-top:5px;opacity:.5;"></div>`}
     </div>`;
-  }).join('') : Array(isGrid4?4:6).fill(0).map(()=>`<div class="wf-card${cardAlt}">${secId==='avantages'?'<div class="wf-card-icon"></div>':''}<div class="wf-block short" style="margin-bottom:6px;"></div><div class="wf-block xshort" style="opacity:.5;"></div></div>`).join('');
+  }).join('') : emptyCards;
 
   return `${tag}
     ${h2 ? `<div class="wf-h2">${wfEditable(h2.val,h2.key,secId)}</div>` : ''}
