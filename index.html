@@ -146,6 +146,10 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
     <button class="btn btn-icon" onclick="toggleDark()" title="Mode sombre">
       <svg id="dark-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
     </button>
+    <button class="btn btn-ghost text-xs" onclick="generateAll()" id="generate-all-btn" title="Générer toutes les sections">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/><line x1="19" y1="3" x2="19" y2="21"/></svg>
+      Tout générer
+    </button>
     <button class="btn btn-ghost text-xs" onclick="fillTestData()" title="Remplir avec données Inqom de test">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
       Mode test
@@ -272,9 +276,15 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
       </div>
     </div>
 
-    <div class="flex justify-end gap-3 mt-8 pt-4 border-t border-border">
-      <button class="btn btn-ghost" onclick="closeSettings()">Annuler</button>
-      <button class="btn btn-primary" onclick="saveSettings()">Enregistrer</button>
+    <div class="flex items-center justify-between mt-8 pt-4 border-t border-border">
+      <button class="btn btn-ghost text-xs" style="color:hsl(var(--muted-foreground))" onclick="resetStorage()" title="Efface toutes les données sauvegardées">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        Réinitialiser les données
+      </button>
+      <div class="flex gap-3">
+        <button class="btn btn-ghost" onclick="closeSettings()">Annuler</button>
+        <button class="btn btn-primary" onclick="saveSettings()">Enregistrer</button>
+      </div>
     </div>
   </div>
 </div>
@@ -312,38 +322,24 @@ FORMAT DE SORTIE
 // Add new templates here when ready. Each template defines its own
 // sections array (or references SECTIONS for the default).
 // { id, label, description, icon, sections: [...] }
-const PAGE_TEMPLATES = [
-  {
+// PAGE_TEMPLATES derived from TEMPLATES_CONFIG — single source of truth
+const PAGE_TEMPLATES = Object.values(TEMPLATES_CONFIG);
+
+// ── TEMPLATES CONFIG ─────────────────────────────────────────────
+// Each template defines its own sections with editorial intents.
+// To add a new template: add an entry in TEMPLATES_CONFIG with
+// id, label, description, icon, status, and sections array.
+// sections array format is identical to the old SECTIONS array.
+
+const TEMPLATES_CONFIG = {
+
+  product: {
     id: "product",
     label: "Page produit",
     description: "Page principale d'un produit — hero, bénéfices, features, comparaison, FAQ.",
     icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>`,
-    status: "ready"
-  },
-  {
-    id: "feature",
-    label: "Page feature",
-    description: "Focus sur une fonctionnalité spécifique — use cases techniques, intégrations, démo.",
-    icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`,
-    status: "soon"
-  },
-  {
-    id: "industry",
-    label: "Page industrie",
-    description: "Verticale sectorielle — problèmes métier spécifiques, vocabulaire du secteur, social proof.",
-    icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
-    status: "soon"
-  },
-  {
-    id: "persona",
-    label: "Page persona",
-    description: "Ciblage par type de client — langage adapté, bénéfices spécifiques au profil.",
-    icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
-    status: "soon"
-  }
-];
-
-const SECTIONS = [
+    status: "ready",
+    sections: [
   { id:"hero", name:"Hero", sub:"Proposition de valeur", seo:true,
     why:"Première impression — 3 secondes pour convaincre de scroller.",
     editorialIntent:"Première section indexée par Google. Le H1 doit contenir le mot-clé principal exact. Le sous-titre est le premier signal sémantique — il doit compléter le H1 avec des mots-clés secondaires naturels. L'objectif est d'apparaître sur les requêtes navigationnelles et transactionnelles de la catégorie.",
@@ -405,7 +401,49 @@ const SECTIONS = [
     editorialIntent:"Bloc SEO longue traîne le plus puissant de la page. Chaque Q/R est une micro-page. Les questions doivent être formulées exactement comme les tape un utilisateur ('peut-on garder son logiciel actuel ?'). Le format est éligible au featured snippet FAQ. Viser des réponses entre 40 et 80 mots par question — ni trop courtes ni trop longues pour Google.",
     questions:[{id:"objections",label:"3 objections les plus fréquentes",hint:"Ce que les prospects disent avant de signer.",rows:4},{id:"practical",label:"Questions pratiques fréquentes",hint:"2–3 questions support / onboarding.",rows:3},{id:"kw",label:"Mots-clés SEO longue traîne",hint:"Séparés par des virgules",rows:1,kw:true}],
     outputs:["FAQ 1 — Q + R","FAQ 2 — Q + R","FAQ 3 — Q + R","FAQ 4 — Q + R","FAQ 5 — Q + R"] }
-];
+]
+  },
+
+  feature: {
+    id: "feature",
+    label: "Page feature",
+    description: "Focus sur une fonctionnalité spécifique — use cases techniques, intégrations, démo.",
+    icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`,
+    status: "soon",
+    sections: [] // To be defined
+  },
+
+  industry: {
+    id: "industry",
+    label: "Page industrie",
+    description: "Verticale sectorielle — problèmes métier spécifiques, vocabulaire du secteur, social proof.",
+    icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+    status: "soon",
+    sections: [] // To be defined
+  },
+
+  persona: {
+    id: "persona",
+    label: "Page persona",
+    description: "Ciblage par type de client — langage adapté, bénéfices spécifiques au profil.",
+    icon: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+    status: "soon",
+    sections: [] // To be defined
+  }
+
+};
+
+// Helper: get sections for current page
+function getSectionsForPage(page) {
+  const templateId = page.templateId || "product";
+  const tpl = TEMPLATES_CONFIG[templateId];
+  return (tpl && tpl.sections.length > 0) ? tpl.sections : TEMPLATES_CONFIG.product.sections;
+}
+
+// Legacy alias — used throughout the code, now points to product sections by default
+// Will be replaced by getSectionsForPage(currentPage()) in context-aware calls
+const SECTIONS = TEMPLATES_CONFIG.product.sections;
+
 
 // ── PAGES STATE ──────────────────────────────────────────────────
 let pageIdCounter = 0;
@@ -534,7 +572,7 @@ function renderFormForPage() {
   // repopulate inputs from page state if any
   const page = currentPage();
   if (page._formData) {
-    SECTIONS.forEach(sec => {
+    getSectionsForPage(page).forEach(sec => {
       sec.questions.forEach(q => {
         const el = document.getElementById(`q-${sec.id}-${q.id}`);
         if (el && page._formData[`${sec.id}-${q.id}`]) el.value = page._formData[`${sec.id}-${q.id}`];
@@ -544,7 +582,7 @@ function renderFormForPage() {
   // mark done sections
   page.completed.forEach(secId => { markDone(secId); });
   // restore status labels
-  SECTIONS.forEach(sec => {
+  getSectionsForPage(page).forEach(sec => {
     if (page.completed.has(sec.id)) {
       const statusEl = document.getElementById(`status-${sec.id}`);
       if (statusEl) { statusEl.textContent = "✓ Généré"; statusEl.style.color="#16a34a"; }
@@ -557,7 +595,7 @@ function renderFormForPage() {
 function saveFormData(secId) {
   const page = currentPage();
   if (!page._formData) page._formData = {};
-  SECTIONS.find(s=>s.id===secId)?.questions.forEach(q => {
+  getSectionsForPage(currentPage()).find(s=>s.id===secId)?.questions.forEach(q => {
     const el = document.getElementById(`q-${secId}-${q.id}`);
     if (el) page._formData[`${secId}-${q.id}`] = el.value;
   });
@@ -578,7 +616,8 @@ function clearFocusedSection() {
 
 function buildSidebar() {
   const nav = document.getElementById("sidebar-nav");
-  SECTIONS.forEach(sec => {
+  const sections = getSectionsForPage(currentPage());
+  sections.forEach(sec => {
     const item = document.createElement("div");
     item.className = "nav-item" + (currentPage().completed.has(sec.id)?" done":"");
     item.id = `nav-${sec.id}`;
@@ -590,7 +629,8 @@ function buildSidebar() {
 
 function buildSections() {
   const container = document.getElementById("sections-container");
-  SECTIONS.forEach((sec, idx) => {
+  const sections = getSectionsForPage(currentPage());
+  sections.forEach((sec, idx) => {
     const div = document.createElement("div");
     div.id = `section-${sec.id}`;
     div.className = "section-anchor card p-5 space-y-4";
@@ -675,7 +715,8 @@ function renderWireframeForPage() {
   headerEl.innerHTML = `<div class="wf-logo-box"></div><div class="wf-nav-links"><div class="wf-nav-link"></div><div class="wf-nav-link"></div><div class="wf-nav-link"></div></div><div class="wf-nav-cta"></div>`;
   root.appendChild(headerEl);
 
-  SECTIONS.forEach(sec => {
+  const wfSections = getSectionsForPage(page);
+  wfSections.forEach(sec => {
     const el = document.createElement("div");
     el.id = `wf-${sec.id}`;
     const isDone = page.completed.has(sec.id);
@@ -690,20 +731,20 @@ function renderWireframeForPage() {
   footerEl.innerHTML = `<div style="display:flex;gap:12px">${[80,60,48].map(w=>`<div class="wf-block xshort" style="width:${w}px;margin-bottom:0"></div>`).join("")}</div>`;
   root.appendChild(footerEl);
 
-  document.getElementById("wf-status").textContent = page.completed.size > 0 ? `${page.completed.size}/${SECTIONS.length} sections` : "En attente…";
+  document.getElementById("wf-status").textContent = page.completed.size > 0 ? `${page.completed.size}/${getSectionsForPage(page).length} sections` : "En attente…";
   document.getElementById("wf-page-name").textContent = `— ${page.name}`;
 }
 
 function refreshWireframeSection(secId) {
   const el = document.getElementById(`wf-${secId}`);
   if (!el) return;
-  const sec = SECTIONS.find(s=>s.id===secId);
+  const sec = getSectionsForPage(currentPage()).find(s=>s.id===secId);
   const data = parsedOutputs(secId);
   el.className = "wf-section wf-done";
   el.innerHTML = `<div class="wf-label"><div class="wf-label-dot done"></div>${sec.name}<span style="font-weight:400;opacity:.6"> — ${sec.sub}</span><span style="margin-left:auto;font-size:9px;color:#16a34a;">✓</span></div><div class="animate-in">${WF_TEMPLATES[sec.id](data)}</div>`;
   el.scrollIntoView({behavior:"smooth",block:"center"});
   const page = currentPage();
-  document.getElementById("wf-status").textContent = `${page.completed.size}/${SECTIONS.length} sections`;
+  document.getElementById("wf-status").textContent = `${page.completed.size}/${getSectionsForPage(page).length} sections`;
 }
 
 function highlightWireframeSection(secId) {
@@ -726,7 +767,7 @@ function parsedOutputs(secId) {
 
 // ── GENERATE ─────────────────────────────────────────────────────
 async function generateSection(secId) {
-  const sec = SECTIONS.find(s=>s.id===secId);
+  const sec = getSectionsForPage(currentPage()).find(s=>s.id===secId);
   const btn = document.getElementById(`btn-${secId}`);
   const statusEl = document.getElementById(`status-${secId}`);
   saveFormData(secId);
@@ -789,17 +830,17 @@ ${sec.outputs.join("\n")}`;
 }
 
 function clearSection(secId) {
-  SECTIONS.find(s=>s.id===secId)?.questions.forEach(q=>{const el=document.getElementById(`q-${secId}-${q.id}`);if(el)el.value="";});
+  getSectionsForPage(currentPage()).find(s=>s.id===secId)?.questions.forEach(q=>{const el=document.getElementById(`q-${secId}-${q.id}`);if(el)el.value="";});
   const page = currentPage();
   page.completed.delete(secId);
   delete page.outputs[secId];
-  if (page._formData) SECTIONS.find(s=>s.id===secId)?.questions.forEach(q=>{delete page._formData[`${secId}-${q.id}`];});
+  if (page._formData) getSectionsForPage(currentPage()).find(s=>s.id===secId)?.questions.forEach(q=>{delete page._formData[`${secId}-${q.id}`];});
   unmarkDone(secId);
   updateProgress();
   renderTabs();
   document.getElementById(`status-${secId}`).textContent="";
   document.getElementById(`btn-${secId}`).innerHTML=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 3 14 9-14 9V3z"/></svg> Générer`;
-  const sec = SECTIONS.find(s=>s.id===secId);
+  const sec = getSectionsForPage(currentPage()).find(s=>s.id===secId);
   const wfEl = document.getElementById(`wf-${secId}`);
   if (wfEl) { wfEl.className="wf-section"; wfEl.innerHTML=`<div class="wf-label"><div class="wf-label-dot"></div>${sec.name}<span style="font-weight:400;opacity:.6"> — ${sec.sub}</span></div><div>${WF_TEMPLATES[sec.id]({})}</div>`; }
 }
@@ -813,14 +854,14 @@ function markDone(secId) {
 function unmarkDone(secId) {
   document.getElementById(`dot-${secId}`)?.classList.remove("done");
   document.getElementById(`nav-${secId}`)?.classList.remove("done");
-  const idx=SECTIONS.findIndex(s=>s.id===secId);
+  const idx=getSectionsForPage(currentPage()).findIndex(s=>s.id===secId);
   const num=document.getElementById(`num-${secId}`);
   if(num){num.style.borderColor="";num.style.color="";num.textContent=idx+1;}
 }
 
 function updateProgress() {
   const page = currentPage();
-  const done=page.completed.size, total=SECTIONS.length;
+  const done=page.completed.size, total=getSectionsForPage(page).length;
   document.getElementById("header-progress").textContent=`${done}/${total}`;
   document.getElementById("progress-bar").style.width=`${(done/total)*100}%`;
   const totalAllPages = state.pages.reduce((s,p)=>s+p.completed.size,0);
@@ -839,7 +880,7 @@ function setupScrollSpy() {
       }
     });
   },{rootMargin:"-30% 0px -60% 0px"});
-  SECTIONS.forEach(s=>{const el=document.getElementById(`section-${s.id}`);if(el)observer.observe(el);});
+  getSectionsForPage(currentPage()).forEach(s=>{const el=document.getElementById(`section-${s.id}`);if(el)observer.observe(el);});
 }
 
 // ── SETTINGS ──────────────────────────────────────────────────────
@@ -857,7 +898,7 @@ function toggleDark(){document.documentElement.classList.toggle("dark");const d=
 function exportTxt(){
   const chunks=[];
   state.pages.forEach(page=>{
-    const sections=SECTIONS.filter(s=>page.outputs[s.id]);
+    const sections=getSectionsForPage(page).filter(s=>page.outputs[s.id]);
     if(!sections.length)return;
     chunks.push(`# ${page.name}\n`);
     sections.forEach(s=>chunks.push(`## ${s.name} — ${s.sub}\n\n${page.outputs[s.id]}`));
@@ -871,7 +912,7 @@ function exportHTML(){
   const date=new Date().toLocaleDateString("fr-FR");
   let pagesHTML="";
   state.pages.forEach(page=>{
-    const sections=SECTIONS.filter(s=>page.outputs[s.id]);
+    const sections=getSectionsForPage(page).filter(s=>page.outputs[s.id]);
     if(!sections.length)return;
     const sectionsHTML=sections.map(s=>{
       const lines=page.outputs[s.id].split("\n").filter(l=>l.trim());
@@ -1021,7 +1062,7 @@ function renderIntentsList() {
   const list = document.getElementById("intents-list");
   if (!list) return;
   list.innerHTML = "";
-  SECTIONS.forEach(sec => {
+  getSectionsForPage(currentPage()).forEach(sec => {
     const el = document.createElement("div");
     el.className = "space-y-1.5";
     el.innerHTML = `
@@ -1031,13 +1072,20 @@ function renderIntentsList() {
       </div>
       <textarea class="textarea text-xs" rows="3" id="intent-${sec.id}"
         style="font-size:11px;line-height:1.6;"
-        onchange="sec && (SECTIONS.find(s=>s.id==='${sec.id}').editorialIntent = this.value)">${(sec.editorialIntent||'').replace(/"/g,'&quot;')}</textarea>`;
+        onchange="getSectionsForPage(currentPage()).find(s=>s.id==='${sec.id}') && (getSectionsForPage(currentPage()).find(s=>s.id==='${sec.id}').editorialIntent = this.value)">${(sec.editorialIntent||'').replace(/"/g,'&quot;')}</textarea>`;
     list.appendChild(el);
   });
 }
 
+function resetStorage() {
+  if (!confirm("Réinitialiser toutes les données ? Pages, outputs, skills et settings seront perdus.")) return;
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+  closeSettings();
+  location.reload();
+}
+
 function saveIntents() {
-  SECTIONS.forEach(sec => {
+  getSectionsForPage(currentPage()).forEach(sec => {
     const el = document.getElementById(`intent-${sec.id}`);
     if (el) sec.editorialIntent = el.value;
   });
@@ -1186,7 +1234,7 @@ function fillTestData() {
   const page = currentPage();
   if (!page._formData) page._formData = {};
 
-  SECTIONS.forEach(function(sec) {
+  getSectionsForPage(currentPage()).forEach(function(sec) {
     const data = TEST_DATA[sec.id];
     if (!data) return;
     sec.questions.forEach(function(q) {
@@ -1205,6 +1253,133 @@ function fillTestData() {
     btn.style.color = '#16a34a';
     setTimeout(function() { btn.innerHTML = orig; btn.style.color = ''; }, 2000);
   }
+}
+
+// ── GENERATE ALL ─────────────────────────────────────────────────
+async function generateAll() {
+  const btn = document.getElementById("generate-all-btn");
+  const sections = getSectionsForPage(currentPage());
+  const total = sections.length;
+  let done = 0;
+
+  btn.disabled = true;
+  btn.innerHTML = `<svg class="animate-spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> <span id="gen-all-progress">0/${total}</span>`;
+
+  for (const sec of sections) {
+    await generateSection(sec.id);
+    done++;
+    const prog = document.getElementById("gen-all-progress");
+    if (prog) prog.textContent = `${done}/${total}`;
+    // Small delay between calls to avoid rate limiting
+    if (done < total) await new Promise(r => setTimeout(r, 400));
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/><line x1="19" y1="3" x2="19" y2="21"/></svg> Tout générer`;
+}
+
+// ── LOCAL STORAGE PERSISTENCE ────────────────────────────────────
+const STORAGE_KEY = "inqom-brief-tool-v1";
+
+function saveToStorage() {
+  try {
+    const data = {
+      pages: state.pages.map(p => ({
+        id: p.id,
+        name: p.name,
+        templateId: p.templateId || "product",
+        outputs: p.outputs,
+        completed: Array.from(p.completed),
+        scrollPos: p.scrollPos || 0,
+        _formData: p._formData || {}
+      })),
+      currentPageId: state.currentPageId,
+      config: state.config,
+      // Save editorial intents per template
+      templateIntents: Object.fromEntries(
+        Object.keys(TEMPLATES_CONFIG).map(tplId => [
+          tplId,
+          (TEMPLATES_CONFIG[tplId].sections || []).map(s => ({
+            id: s.id,
+            editorialIntent: s.editorialIntent || ""
+          }))
+        ])
+      ),
+      // Save skills
+      skills: state.skills.map(s => ({
+        id: s.id,
+        name: s.name,
+        content: s.content,
+        active: s.active,
+        createdAt: s.createdAt
+      })),
+      savedAt: new Date().toISOString()
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch(e) {
+    console.warn("Storage save failed:", e);
+  }
+}
+
+function loadFromStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+
+    // Restore config
+    if (data.config) Object.assign(state.config, data.config);
+
+    // Restore skills
+    if (data.skills && data.skills.length > 0) {
+      state.skills = data.skills;
+      skillIdCounter = Math.max(...data.skills.map(s => s.id), 0);
+    }
+
+    // Restore editorial intents
+    if (data.templateIntents) {
+      Object.entries(data.templateIntents).forEach(([tplId, intents]) => {
+        const tpl = TEMPLATES_CONFIG[tplId];
+        if (!tpl) return;
+        intents.forEach(({id, editorialIntent}) => {
+          const sec = tpl.sections.find(s => s.id === id);
+          if (sec) sec.editorialIntent = editorialIntent;
+        });
+      });
+    }
+
+    // Restore pages
+    if (data.pages && data.pages.length > 0) {
+      pageIdCounter = 0;
+      state.pages = data.pages.map(p => {
+        const page = newPageState(p.name);
+        page.id = p.id;
+        if (p.id > pageIdCounter) pageIdCounter = p.id;
+        page.templateId = p.templateId || "product";
+        page.outputs = p.outputs || {};
+        page.completed = new Set(p.completed || []);
+        page.scrollPos = p.scrollPos || 0;
+        page._formData = p._formData || {};
+        return page;
+      });
+      state.currentPageId = data.currentPageId || state.pages[0].id;
+    }
+
+    return true;
+  } catch(e) {
+    console.warn("Storage load failed:", e);
+    return false;
+  }
+}
+
+// Auto-save on key state changes
+function patchStateForAutosave() {
+  // Save after each generation completes — patch updateProgress
+  const origUpdateProgress = updateProgress;
+  window.updateProgress = function() {
+    origUpdateProgress();
+    saveToStorage();
+  };
 }
 
 // ── INIT ──────────────────────────────────────────────────────────
@@ -1233,10 +1408,67 @@ document.getElementById("template-modal").addEventListener("click", e => {
 });
 document.addEventListener("keydown", e => { if (e.key === "Escape") { closeTemplateModal(); closeSettings(); } });
 
-renderTabs();
-renderFormForPage();
-renderWireframeForPage();
-updateProgress();
+// Load persisted state: localStorage first, then config.json fallback
+async function initApp() {
+  const restored = loadFromStorage();
+
+  if (!restored) {
+    // First visit — try to load defaults from config.json
+    try {
+      const resp = await fetch('/config.json');
+      if (resp.ok) {
+        const cfg = await resp.json();
+
+        // Apply config
+        if (cfg.config) Object.assign(state.config, cfg.config);
+
+        // Apply skills
+        if (cfg.skills && cfg.skills.length > 0) {
+          state.skills = cfg.skills.map(s => ({
+            id: s.id,
+            name: s.name,
+            content: s.content || "",
+            active: s.active !== false,
+            createdAt: s.createdAt || new Date().toLocaleDateString('fr-FR')
+          }));
+          skillIdCounter = Math.max(...state.skills.map(s => s.id), 0);
+        }
+
+        // Apply editorial intents per template
+        if (cfg.templateIntents) {
+          Object.entries(cfg.templateIntents).forEach(([tplId, intents]) => {
+            const tpl = TEMPLATES_CONFIG[tplId];
+            if (!tpl) return;
+            intents.forEach(({id, editorialIntent}) => {
+              const sec = tpl.sections.find(s => s.id === id);
+              if (sec && editorialIntent) sec.editorialIntent = editorialIntent;
+            });
+          });
+        }
+
+        console.log("Config loaded from config.json");
+      }
+    } catch(e) {
+      console.log("No config.json found, using defaults");
+    }
+  }
+
+  renderTabs();
+  renderFormForPage();
+  renderWireframeForPage();
+  updateProgress();
+  patchStateForAutosave();
+
+  window.addEventListener("beforeunload", saveToStorage);
+
+  const origSaveSettings = saveSettings;
+  saveSettings = function() {
+    origSaveSettings();
+    saveToStorage();
+  };
+}
+
+initApp();
 </script>
 </body>
 </html>

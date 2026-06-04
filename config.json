@@ -1,0 +1,38 @@
+{
+  "version": "1.0",
+  "config": {
+    "productName": "Inqom",
+    "sector": "SaaS comptabilité B2B",
+    "targets": "Cabinets comptables, DAF, PME",
+    "lang": "français",
+    "globalKw": "plateforme comptable, logiciel cabinet expertise comptable, automatisation comptabilité",
+    "intent": "Commerciale (évaluer)",
+    "competitor": ""
+  },
+  "skills": [
+    {
+      "id": 1,
+      "name": "Présentation commerciale Inqom",
+      "active": true,
+      "content": "POSITIONNEMENT CENTRAL\n\"La plateforme comptable qui place le cabinet au centre.\"\nPromesse : Votre client reste votre client. Votre valeur reste votre valeur. Vos données restent sous votre contrôle.\n\nDIFFÉRENCIATEURS CLÉS\n- Interopérabilité : intégration sans rupture dans l'existant, aucun cabinet forcé à tout changer\n- Souveraineté : la donnée appartient au client, la valeur créée autour de cette donnée au cabinet\n- Robustesse gros volumes : SaaS fiable même au-delà de 15M de lignes d'écriture\n- Relais de croissance : le cabinet enrichit son offre tout en captant une marge récurrente\n- Modèle économique aligné avec les intérêts des experts-comptables\n\n3 PILIERS DU MODÈLE INQOM\n1. Compétitivité du cabinet — faire du cabinet le champion de ses clients\n2. Modularité et adaptabilité — achetez les briques dont vous avez besoin\n3. Pérennité économique — business model aligné avec les experts-comptables\n\nCHIFFRES CLÉS\n- 1 000 cabinets d'expertise comptable\n- 350 000+ entreprises accompagnées\n- 190 collaborateurs\n- Filiale Visma depuis 2022\n\nCLIENTS RÉFÉRENCÉS\nAPL, Acont, Altonéo, COGEP, Cerfrance Bretagne, BakerTilly, BHN\n\nTESTIMONIAL CLÉ\nFrançois Bombereau, Directeur de bureau BHN : la plateforme Inqom offre un avantage distinctif en termes de réactivité, proximité et services. L'aspect collaboratif a séduit nouveaux et anciens clients.\n\nARCHITECTURE PRODUIT\nINQOM CONNECT (Conformité) — 1€/dossier/mois : Plateforme Agréée FE, collaboration client, pré-comptabilité\nINQOM GESTION (Croissance) — 7€/dossier/mois : offres client packagées, facturation, paiements, app mobile\nINQOM EXPERT (Performance) — 10€/dossier/mois : production comptable automatisée, robustesse gros volumes\nAGENTIX (Transformation) : plateforme agents IA pour cabinets\n\nTON DE MARQUE\n- Adresse directe au cabinet (Votre cabinet, vos clients, votre relation)\n- Formulations courtes, nominales, affirmatives\n- Pas de jargon technologique — vocabulaire métier comptable\n- Souveraineté et indépendance comme différenciateurs émotionnels forts\n- Posture : partenaire stratégique, pas fournisseur de logiciel"
+    },
+    {
+      "id": 2,
+      "name": "Personas & cibles",
+      "active": true,
+      "content": ""
+    },
+    {
+      "id": 3,
+      "name": "Competitive brief",
+      "active": false,
+      "content": ""
+    },
+    {
+      "id": 4,
+      "name": "Brand voice",
+      "active": true,
+      "content": ""
+    }
+  ]
+}
