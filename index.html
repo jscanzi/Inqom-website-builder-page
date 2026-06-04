@@ -1462,7 +1462,11 @@ function editorFieldChange(ta) {
     const ci = line.indexOf(':');
     if (ci >= 2) {
       const k = line.substring(0, ci).trim();
-      if (k.toUpperCase() === key.toUpperCase()) {
+      const kU = k.toUpperCase();
+      const keyU = key.toUpperCase();
+      // Match exact OR if key is a shortKey alias (e.g. 'H1' matches 'TITRE H1')
+      const shortK = kU.split(/\s*[\u2014\-]\s*/)[0].trim();
+      if (kU === keyU || shortK === keyU || kU.startsWith(keyU + ' ') || keyU.startsWith(kU + ' ')) {
         found = true;
         return k + ': ' + newVal;
       }
@@ -1738,7 +1742,7 @@ function setupScrollSpy() {
 function openSettings(){document.getElementById("settings-modal").classList.remove("hidden");syncSettingsUI();renderSkillsList();renderIntentsList();}
 function closeSettings(){document.getElementById("settings-modal").classList.add("hidden");}
 function syncSettingsUI(){const c=state.config;document.getElementById("cfg-product-name").value=c.productName;document.getElementById("cfg-sector").value=c.sector;document.getElementById("cfg-targets").value=c.targets;document.getElementById("cfg-lang").value=c.lang;document.getElementById("cfg-master-prompt").value=c.masterPrompt;document.getElementById("cfg-global-kw").value=c.globalKw;document.getElementById("cfg-competitor").value=c.competitor;}
-function saveSettings(){saveIntents();const c=state.config;c.productName=document.getElementById("cfg-product-name").value;c.sector=document.getElementById("cfg-sector").value;c.targets=document.getElementById("cfg-targets").value;c.lang=document.getElementById("cfg-lang").value;c.masterPrompt=document.getElementById("cfg-master-prompt").value;c.globalKw=document.getElementById("cfg-global-kw").value;c.intent=document.getElementById("cfg-intent").value;c.competitor=document.getElementById("cfg-competitor").value;document.getElementById("product-name-display").textContent=c.productName;closeSettings();}
+function saveSettings(){saveIntents();const c=state.config;c.productName=document.getElementById("cfg-product-name").value;c.sector=document.getElementById("cfg-sector").value;c.targets=document.getElementById("cfg-targets").value;c.lang=document.getElementById("cfg-lang").value;c.masterPrompt=document.getElementById("cfg-master-prompt").value;c.globalKw=document.getElementById("cfg-global-kw").value;c.intent=document.getElementById("cfg-intent").value;c.competitor=document.getElementById("cfg-competitor").value;const _pnd=document.getElementById("product-name-display");if(_pnd)_pnd.textContent=c.productName;closeSettings();}
 function resetPrompt(){if(confirm("Réinitialiser le prompt par défaut ?"))document.getElementById("cfg-master-prompt").value=DEFAULT_MASTER_PROMPT;}
 function switchTab(tab,btn){["general","prompt","seo","skills","intents","test"].forEach(t=>document.getElementById(`tab-${t}`).classList.add("hidden"));document.getElementById(`tab-${tab}`).classList.remove("hidden");document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");}
 
