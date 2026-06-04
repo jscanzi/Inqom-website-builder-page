@@ -730,9 +730,9 @@ function renderFormForPage() {
   // restore status labels
   getSectionsForPage(page).forEach(sec => {
     if (page.completed.has(sec.id)) {
-      const statusEl = document.getElementById(`status-${sec.id}`);
+      const statusEl = document.getElementById(`status-${sec.id}`) || (getActiveSectionId()===sec.id?document.getElementById("status-active"):null);
       if (statusEl) { statusEl.textContent = "✓ Généré"; statusEl.style.color="#16a34a"; }
-      const btn = document.getElementById(`btn-${sec.id}`);
+      const btn = document.getElementById(`btn-${sec.id}`) || (getActiveSectionId()===sec.id ? document.getElementById("btn-active-section") : null);
       if (btn) btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg> Régénérer`;
     }
   });
@@ -1327,12 +1327,10 @@ RÈGLES ABSOLUES :
     refreshWireframeSection(secId);
     updateProgress();
     renderTabs();
-    statusEl.textContent = "✓ Généré";
-    statusEl.style.color = "#16a34a";
+    if(statusEl){statusEl.textContent="✓ Généré";statusEl.style.color="#16a34a";}
     updateFooterStatus(secId);
   } catch(err) {
-    statusEl.textContent = `Erreur : ${err.message}`;
-    statusEl.style.color = "#dc2626";
+    if(statusEl){statusEl.textContent=`Erreur : ${err.message}`;statusEl.style.color="#dc2626";}
   }
   btn.disabled = false;
   btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg> Régénérer`;
@@ -1347,7 +1345,8 @@ function clearSection(secId) {
   unmarkDone(secId);
   updateProgress();
   renderTabs();
-  document.getElementById(`status-${secId}`).textContent="";
+  const _sel = document.getElementById(`status-${secId}`) || document.getElementById("status-active");
+  if(_sel) _sel.textContent="";
   updateFooterStatus(secId);
   document.getElementById(`btn-${secId}`).innerHTML=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 3 14 9-14 9V3z"/></svg> Générer`;
   const sec = getSectionsForPage(currentPage()).find(s=>s.id===secId);
@@ -1475,7 +1474,7 @@ function editorFieldChange(ta) {
   saveToStorage();
 
   // Re-render wireframe section live
-  renderWfSection(secId, parsedOutputs(secId));
+  refreshWireframeSection(secId);
 }
 
 function extractKwFromOutput(text) {
