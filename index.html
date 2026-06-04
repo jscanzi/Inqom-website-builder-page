@@ -1266,8 +1266,9 @@ function parsedOutputs(secId) {
 // ── GENERATE ─────────────────────────────────────────────────────
 async function generateSection(secId) {
   const sec = getSectionsForPage(currentPage()).find(s=>s.id===secId);
-  const btn = document.getElementById(`btn-${secId}`);
-  const statusEl = document.getElementById(`status-${secId}`);
+  // Use footer btn/status (active section), fallback to per-section ids
+  const btn = document.getElementById('btn-active-section') || document.getElementById(`btn-${secId}`);
+  const statusEl = document.getElementById('status-active') || document.getElementById(`status-${secId}`);
   saveFormData(secId);
 
   const page = currentPage();
