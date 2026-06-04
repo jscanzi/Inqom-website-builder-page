@@ -659,9 +659,10 @@ function renderFormForPage() {
     });
   }
   // resize all textareas after repopulate
-  requestAnimationFrame(() => {
+  // resize after showCurrentStep reveals the active section
+  requestAnimationFrame(() => requestAnimationFrame(() => {
     document.querySelectorAll('.textarea').forEach(autoResize);
-  });
+  }));
 
   // mark done sections
   page.completed.forEach(secId => { markDone(secId); });
@@ -745,9 +746,11 @@ function showCurrentStep() {
   // Highlight wireframe
   highlightWireframeSection(sec.id);
 
-  // Auto-resize all textareas in active section
+  // Auto-resize all textareas in active section (after display:none is removed)
   const card = document.getElementById(`section-${sec.id}`);
-  if (card) card.querySelectorAll('textarea').forEach(autoResize);
+  if (card) requestAnimationFrame(() => requestAnimationFrame(() => {
+    card.querySelectorAll('textarea').forEach(autoResize);
+  }));
 }
 
 function buildSidebar() {
