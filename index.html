@@ -32,7 +32,7 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
 .card { background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:var(--radius); }
 .input,.textarea { width:100%;background:hsl(var(--background));border:1px solid hsl(var(--input));border-radius:var(--radius);padding:8px 12px;font-size:14px;color:hsl(var(--foreground));font-family:inherit;transition:border-color .15s,box-shadow .15s;outline:none; }
 .input:focus,.textarea:focus { border-color:hsl(var(--ring));box-shadow:0 0 0 2px hsl(var(--ring)/.15); }
-.textarea { resize:vertical;line-height:1.6; }
+.textarea { resize:none;line-height:1.6;overflow:hidden;min-height:60px; }
 .badge { display:inline-flex;align-items:center;gap:4px;border-radius:9999px;font-size:11px;font-weight:500;padding:2px 10px; }
 .badge-blue { background:#dbeafe;color:#1d4ed8;border:1px solid #bfdbfe; }
 .badge-amber { background:#fef3c7;color:#b45309;border:1px solid #fde68a; }
@@ -66,6 +66,13 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
 ::-webkit-scrollbar { width:5px; }
 ::-webkit-scrollbar-track { background:transparent; }
 ::-webkit-scrollbar-thumb { background:hsl(var(--border));border-radius:3px; }
+
+
+/* Stepper nav */
+.stepper-nav { display:flex; align-items:center; justify-content:space-between; padding:10px 0 4px; }
+.stepper-progress { font-size:11px; color:hsl(var(--muted-foreground)); font-weight:500; letter-spacing:.03em; }
+.stepper-btns { display:flex; gap:8px; }
+.stepper-section-hidden { display:none !important; }
 
 /* Page tabs */
 .page-tab { display:inline-flex;align-items:center;gap:7px;padding:0 10px 0 12px;height:32px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;color:hsl(var(--muted-foreground));border:none;background:transparent;white-space:nowrap;transition:all .12s;flex-shrink:0; }
@@ -223,6 +230,13 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
 
   <!-- Center: form -->
   <main class="overflow-y-auto px-6 py-6 shrink-0 border-r border-border" id="form-main" style="width:420px;">
+    <div id="stepper-nav" class="stepper-nav mb-4">
+      <span class="stepper-progress">1 / 1</span>
+      <div class="stepper-btns">
+        <button id="stepper-prev" class="btn btn-secondary text-xs" onclick="goToStep(getStepIdx(currentPage().id)-1)" disabled>← Précédent</button>
+        <button id="stepper-next" class="btn btn-primary text-xs" onclick="stepperNext()">Suivant →</button>
+      </div>
+    </div>
     <div id="sections-container" class="space-y-5 pb-16"></div>
   </main>
 
@@ -522,6 +536,7 @@ function newSkill(name, content='', active=true) {
 
 const state = {
   pages:[ newPageState("Page produit") ],
+  stepperIdx: {},
   skills: [
     newSkill("Messaging & positionnement", "", true),
     newSkill("Personas & cibles", "", true),
@@ -643,6 +658,11 @@ function renderFormForPage() {
       });
     });
   }
+  // resize all textareas after repopulate
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.textarea').forEach(autoResize);
+  });
+
   // mark done sections
   page.completed.forEach(secId => { markDone(secId); });
   // restore status labels
@@ -678,15 +698,67 @@ function clearFocusedSection() {
   document.querySelectorAll('.section-anchor').forEach(el => el.classList.remove('section-focused'));
 }
 
+// ── STEPPER STATE ──
+function getStepIdx(pageId) {
+  return state.stepperIdx[pageId] || 0;
+}
+function setStepIdx(pageId, idx) {
+  const sections = getSectionsForPage(currentPage());
+  idx = Math.max(0, Math.min(idx, sections.length - 1));
+  state.stepperIdx[pageId] = idx;
+}
+function goToStep(idx) {
+  const page = currentPage();
+  setStepIdx(page.id, idx);
+  showCurrentStep();
+}
+function showCurrentStep() {
+  const page = currentPage();
+  const sections = getSectionsForPage(page);
+  const idx = getStepIdx(page.id);
+  const sec = sections[idx];
+
+  // Show/hide section cards
+  sections.forEach((s, i) => {
+    const el = document.getElementById(`section-${s.id}`);
+    if (el) el.classList.toggle('stepper-section-hidden', i !== idx);
+  });
+
+  // Update sidebar active
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`nav-${sec.id}`)?.classList.add('active');
+
+  // Update stepper nav
+  const total = sections.length;
+  const stepperNav = document.getElementById('stepper-nav');
+  if (stepperNav) {
+    stepperNav.querySelector('.stepper-progress').textContent = `${idx + 1} / ${total} — ${sec.name}`;
+    stepperNav.querySelector('#stepper-prev').disabled = idx === 0;
+    stepperNav.querySelector('#stepper-next').textContent = idx === total - 1 ? 'Fin' : 'Suivant →';
+    stepperNav.querySelector('#stepper-next').disabled = false;
+  }
+
+  // Scroll form to top
+  const formMain = document.getElementById('form-main');
+  formMain.scrollTop = 0;
+
+  // Highlight wireframe
+  highlightWireframeSection(sec.id);
+
+  // Auto-resize all textareas in active section
+  const card = document.getElementById(`section-${sec.id}`);
+  if (card) card.querySelectorAll('textarea').forEach(autoResize);
+}
+
 function buildSidebar() {
   const nav = document.getElementById("sidebar-nav");
   const sections = getSectionsForPage(currentPage());
-  sections.forEach(sec => {
+  sections.forEach((sec, i) => {
     const item = document.createElement("div");
     item.className = "nav-item" + (currentPage().completed.has(sec.id)?" done":"");
     item.id = `nav-${sec.id}`;
     item.innerHTML = `<div class="nav-dot" id="dot-${sec.id}"></div><div><div class="text-xs font-medium leading-tight">${sec.name}</div><div class="text-xs leading-tight" style="color:hsl(var(--muted-foreground))">${sec.sub}</div></div>`;
-    item.onclick = () => { document.getElementById(`section-${sec.id}`).scrollIntoView({behavior:"smooth"}); highlightWireframeSection(sec.id); };
+    item.onclick = () => goToStep(i);
     nav.appendChild(item);
   });
 }
@@ -732,6 +804,12 @@ function buildSections() {
       </div>`;
     container.appendChild(div);
 
+    // Auto-resize textareas
+    div.querySelectorAll('textarea').forEach(ta => {
+      ta.addEventListener('input', () => autoResize(ta));
+      // Initial size after repopulate will be handled in showCurrentStep
+    });
+
     // Focus dimming
     div.addEventListener('focusin', () => setFocusedSection(sec.id));
     div.addEventListener('focusout', (e) => {
@@ -742,6 +820,9 @@ function buildSections() {
       if (!div.contains(e.relatedTarget)) clearFocusedSection();
     });
   });
+
+  // Init stepper
+  showCurrentStep();
 }
 
 // ── WIREFRAME ────────────────────────────────────────────────────
@@ -1184,6 +1265,20 @@ function updateProgress() {
   const totalAllPages = state.pages.reduce((s,p)=>s+p.completed.size,0);
   document.getElementById("export-btn").disabled=totalAllPages===0;
   document.getElementById("export-txt-btn").disabled=totalAllPages===0;
+}
+
+function autoResize(ta) {
+  ta.style.height = 'auto';
+  ta.style.height = Math.max(60, ta.scrollHeight) + 'px';
+}
+
+function stepperNext() {
+  const page = currentPage();
+  const sections = getSectionsForPage(page);
+  const idx = getStepIdx(page.id);
+  if (idx < sections.length - 1) {
+    goToStep(idx + 1);
+  }
 }
 
 function setupScrollSpy() {
