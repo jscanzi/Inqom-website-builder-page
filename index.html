@@ -322,9 +322,6 @@ FORMAT DE SORTIE
 // Add new templates here when ready. Each template defines its own
 // sections array (or references SECTIONS for the default).
 // { id, label, description, icon, sections: [...] }
-// PAGE_TEMPLATES derived from TEMPLATES_CONFIG — single source of truth
-const PAGE_TEMPLATES = Object.values(TEMPLATES_CONFIG);
-
 // ── TEMPLATES CONFIG ─────────────────────────────────────────────
 // Each template defines its own sections with editorial intents.
 // To add a new template: add an entry in TEMPLATES_CONFIG with
@@ -440,8 +437,10 @@ function getSectionsForPage(page) {
   return (tpl && tpl.sections.length > 0) ? tpl.sections : TEMPLATES_CONFIG.product.sections;
 }
 
+// PAGE_TEMPLATES derived from TEMPLATES_CONFIG — single source of truth
+const PAGE_TEMPLATES = Object.values(TEMPLATES_CONFIG);
+
 // Legacy alias — used throughout the code, now points to product sections by default
-// Will be replaced by getSectionsForPage(currentPage()) in context-aware calls
 const SECTIONS = TEMPLATES_CONFIG.product.sections;
 
 
