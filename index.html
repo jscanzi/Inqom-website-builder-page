@@ -14,14 +14,15 @@ tailwind.config = {
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <style>
 :root { --background:0 0% 100%; --foreground:240 10% 3.9%; --card:0 0% 100%; --card-foreground:240 10% 3.9%; --border:240 5.9% 90%; --input:240 5.9% 90%; --ring:240 10% 3.9%; --primary:240 5.9% 10%; --primary-foreground:0 0% 98%; --secondary:240 4.8% 95.9%; --secondary-foreground:240 5.9% 10%; --muted:240 4.8% 95.9%; --muted-foreground:240 3.8% 46.1%; --accent:240 4.8% 95.9%; --accent-foreground:240 5.9% 10%; --radius:0.5rem; --wf-bg:#f9f9f8; --wf-block:#e6e6e3; --wf-text:#a8a8a2; --wf-accent:#2a2a28; }
 .dark { --background:240 10% 3.9%; --foreground:0 0% 98%; --card:240 10% 3.9%; --card-foreground:0 0% 98%; --border:240 3.7% 15.9%; --input:240 3.7% 15.9%; --ring:240 4.9% 83.9%; --primary:0 0% 98%; --primary-foreground:240 5.9% 10%; --secondary:240 3.7% 15.9%; --secondary-foreground:0 0% 98%; --muted:240 3.7% 15.9%; --muted-foreground:240 5% 64.9%; --accent:240 3.7% 15.9%; --accent-foreground:0 0% 98%; --wf-bg:#1c1c1a; --wf-block:#2c2c2a; --wf-text:#505048; --wf-accent:#e0e0d8; }
 * { box-sizing:border-box; }
 body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background)); color:hsl(var(--foreground)); }
 .btn { display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:var(--radius);font-size:14px;font-weight:500;transition:all .15s;cursor:pointer;border:none;outline:none; }
-.btn-primary { background:hsl(var(--primary));color:hsl(var(--primary-foreground));padding:8px 16px; }
-.btn-primary:hover { opacity:.9; }
+.btn-primary { background:#2A0F2E;color:#fff;padding:8px 16px; }
+.btn-primary:hover { background:#3d1844;opacity:1; }
 .btn-secondary { background:hsl(var(--secondary));color:hsl(var(--secondary-foreground));padding:8px 16px;border:1px solid hsl(var(--border)); }
 .btn-secondary:hover { background:hsl(var(--accent)); }
 .btn-ghost { background:transparent;color:hsl(var(--foreground));padding:8px 16px; }
@@ -39,11 +40,12 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
 .dark .badge-blue { background:#1e3a5f;color:#93c5fd;border-color:#2563eb44; }
 .dark .badge-amber { background:#451a03;color:#fcd34d;border-color:#d9770644; }
 .separator { height:1px;background:hsl(var(--border)); }
-.nav-item { display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:var(--radius);cursor:pointer;transition:background .12s;font-size:13px;color:hsl(var(--muted-foreground)); }
+.nav-item { display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--radius);cursor:pointer;transition:background .12s,color .12s;font-size:13px;font-weight:500;color:hsl(var(--muted-foreground)); }
 .nav-item:hover { background:hsl(var(--accent));color:hsl(var(--foreground)); }
-.nav-item.active { background:hsl(var(--accent));color:hsl(var(--foreground));font-weight:500; }
-.nav-item.done .nav-dot { background:#16a34a; }
-.nav-dot { width:7px;height:7px;border-radius:50%;background:hsl(var(--border));flex-shrink:0;transition:background .3s; }
+.nav-item.active { background:hsl(var(--accent));color:hsl(var(--foreground)); }
+.nav-item.done .nav-icon { color:#16a34a; }
+.nav-icon { width:18px;height:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center; }
+.nav-dot { width:5px;height:5px;border-radius:50%;background:hsl(var(--border));position:absolute;top:4px;right:4px;transition:background .3s; }
 .section-anchor { scroll-margin-top:24px; transition:opacity .25s ease, filter .25s ease; }
 #sections-container.has-focus .section-anchor { opacity:.3; filter:blur(0.3px); pointer-events:none; }
 #sections-container.has-focus .section-anchor.section-focused { opacity:1; filter:none; pointer-events:all; }
@@ -68,11 +70,49 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
 ::-webkit-scrollbar-thumb { background:hsl(var(--border));border-radius:3px; }
 
 
-/* Stepper nav */
-.stepper-nav { display:flex; align-items:center; justify-content:space-between; padding:12px 24px; background:hsl(var(--background)); border-top:1px solid hsl(var(--border)); position:sticky; bottom:0; left:0; right:0; z-index:10; margin:0 -24px; }
-.stepper-progress { font-size:11px; color:hsl(var(--muted-foreground)); font-weight:500; letter-spacing:.03em; }
-.stepper-btns { display:flex; gap:8px; }
 .stepper-section-hidden { display:none !important; }
+/* Section header */
+.section-header { padding:16px 24px 14px; border-bottom:1px solid hsl(var(--border)); position:sticky; top:0; background:hsl(var(--background)); z-index:5; }
+
+
+
+/* Editor panel */
+.wf-toggle-btn { padding:0 4px; padding-bottom:10px; font-size:13px; font-weight:500; border:none; border-bottom:2px solid transparent; background:transparent; color:hsl(var(--muted-foreground)); cursor:pointer; transition:color .15s, border-color .15s; margin-bottom:-1px; }
+.wf-toggle-btn.active { color:#2A0F2E; border-bottom-color:#2A0F2E; }
+.wf-toggle-btn:hover:not(.active) { color:hsl(var(--foreground)); }
+.editor-section { border-bottom:1px solid hsl(var(--border)); padding:16px 20px; }
+.editor-section-header { display:flex; align-items:center; gap:8px; margin-bottom:12px; cursor:pointer; }
+.editor-section-title { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:hsl(var(--muted-foreground)); flex:1; }
+.editor-section-badge { font-size:10px; font-weight:500; padding:1px 8px; border-radius:20px; background:#dcfce7; color:#16a34a; }
+.editor-field { margin-bottom:10px; }
+.editor-field-label { font-size:11px; font-weight:500; color:hsl(var(--muted-foreground)); margin-bottom:4px; text-transform:uppercase; letter-spacing:.04em; }
+.editor-field-input { width:100%; background:hsl(var(--background)); border:1px solid hsl(var(--input)); border-radius:var(--radius); padding:7px 10px; font-size:13px; color:hsl(var(--foreground)); font-family:inherit; line-height:1.5; resize:none; overflow:hidden; outline:none; transition:border-color .15s; }
+.editor-field-input:focus { border-color:hsl(var(--ring)); }
+.editor-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:8px; color:hsl(var(--muted-foreground)); font-size:13px; }
+
+
+/* SEO tag modal */
+.seo-kw-wrap { display:flex; flex-wrap:wrap; gap:5px; align-items:center; min-height:32px; }
+.seo-kw-chip { display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:500; padding:3px 8px 3px 10px; border-radius:20px; background:#2A0F2E; color:#fff; border:none; }
+.seo-kw-chip-del { font-size:11px; opacity:.6; cursor:pointer; line-height:1; transition:opacity .12s; }
+.seo-kw-chip-del:hover { opacity:1; }
+.seo-kw-add-btn { display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:500; padding:3px 10px; border-radius:20px; border:1px dashed hsl(var(--border)); background:transparent; color:hsl(var(--muted-foreground)); cursor:pointer; transition:all .12s; }
+.seo-kw-add-btn:hover { border-color:#2A0F2E; color:#2A0F2E; }
+/* SEO modal */
+.seo-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:100; display:flex; align-items:center; justify-content:center; padding:16px; }
+.seo-modal { background:hsl(var(--card)); border:1px solid hsl(var(--border)); border-radius:calc(var(--radius)+4px); padding:20px; width:100%; max-width:400px; max-height:80vh; display:flex; flex-direction:column; gap:12px; box-shadow:0 8px 32px rgba(0,0,0,.15); }
+.seo-modal-header { display:flex; align-items:center; justify-content:space-between; }
+.seo-modal-title { font-size:14px; font-weight:600; }
+.seo-modal-tags { display:flex; flex-wrap:wrap; gap:6px; overflow-y:auto; flex:1; }
+.seo-modal-tag { display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:500; padding:5px 12px; border-radius:20px; border:1px solid hsl(var(--border)); background:transparent; color:hsl(var(--muted-foreground)); cursor:pointer; transition:all .12s; user-select:none; }
+.seo-modal-tag:hover { border-color:hsl(var(--foreground)); color:hsl(var(--foreground)); }
+.seo-modal-tag.active { background:#2A0F2E; color:#fff; border-color:#2A0F2E; }
+.seo-modal-tag .del { font-size:10px; opacity:.5; margin-left:2px; }
+.seo-modal-tag .del:hover { opacity:1; }
+.seo-modal-empty { font-size:13px; color:hsl(var(--muted-foreground)); opacity:.5; font-style:italic; }
+.seo-modal-footer { display:flex; gap:8px; align-items:center; border-top:1px solid hsl(var(--border)); padding-top:12px; }
+.seo-modal-new { flex:1; background:hsl(var(--background)); border:1px solid hsl(var(--input)); border-radius:var(--radius); padding:6px 10px; font-size:13px; color:hsl(var(--foreground)); font-family:inherit; outline:none; }
+.seo-modal-new:focus { border-color:#2A0F2E; }
 
 /* Page tabs */
 .page-tab { display:inline-flex;align-items:center;gap:7px;padding:0 10px 0 12px;height:32px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;color:hsl(var(--muted-foreground));border:none;background:transparent;white-space:nowrap;transition:all .12s;flex-shrink:0; }
@@ -171,35 +211,16 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
 <!-- Top bar -->
 <header class="flex items-center justify-between px-5 py-3 border-b border-border shrink-0">
   <div class="flex items-center gap-3">
-    <div class="w-7 h-7 rounded-md bg-foreground flex items-center justify-center">
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="hsl(var(--primary-foreground))" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
-    <span class="font-semibold text-sm tracking-tight">Page Brief Tool</span>
-    <span class="text-muted-foreground text-xs">—</span>
-    <span class="text-muted-foreground text-xs" id="product-name-display">Inqom</span>
+    <svg height="20" viewBox="0 0 1027 270" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M151.237 106.071H290L283.233 135C210.733 155.25 174.967 190.929 145 270H116L138.763 163.929H0L6.7666 135C79.2666 114.75 115.033 79.0714 145 0H174L151.237 106.071ZM601.707 102.853C609.442 102.853 616.613 104.303 623.221 107.204C629.989 110.105 635.871 114.053 640.867 119.049V105.995H666.975V269.648H640.867V211.149C635.871 216.145 629.989 220.093 623.221 222.994C616.614 225.895 609.442 227.346 601.707 227.346C590.426 227.346 580.273 224.686 571.248 219.368C562.385 213.889 555.294 206.476 549.976 197.129C544.819 187.621 542.24 176.823 542.24 164.736C542.24 155.712 543.691 147.412 546.592 139.838C549.654 132.264 553.843 125.737 559.161 120.258C564.64 114.617 571.007 110.346 578.259 107.445C585.511 104.383 593.327 102.853 601.707 102.853ZM752.841 102.853C764.444 102.853 774.92 105.673 784.267 111.313C793.613 116.954 801.107 124.448 806.747 133.795C812.387 143.142 815.208 153.617 815.208 165.22C815.208 173.922 813.596 182.06 810.373 189.635C807.15 197.048 802.638 203.655 796.836 209.457C791.196 215.097 784.589 219.529 777.015 222.752C769.602 225.814 761.543 227.345 752.841 227.345C741.399 227.345 730.924 224.605 721.416 219.126C712.069 213.647 704.575 206.234 698.935 196.887C693.455 187.379 690.716 176.823 690.716 165.22C690.716 156.517 692.247 148.46 695.309 141.047C698.532 133.473 702.963 126.865 708.604 121.225C714.405 115.423 721.094 110.911 728.668 107.688C736.242 104.464 744.3 102.853 752.841 102.853ZM380.832 224.202H354.726V105.995H380.832V224.202ZM472.522 102.853C482.031 102.853 490.25 105.028 497.18 109.379C504.27 113.569 509.749 119.693 513.617 127.751C517.646 135.648 519.661 145.156 519.661 156.275V224.202H493.554V157.001C493.554 151.2 492.506 146.043 490.411 141.53C488.316 137.018 485.254 133.472 481.226 130.894C477.358 128.315 472.523 127.026 466.722 127.026C461.242 127.026 456.327 128.315 451.976 130.894C447.624 133.311 444.16 136.937 441.581 141.771C439.164 146.445 437.955 152.005 437.955 158.451V224.202H412.09V105.995H437.472V118.714C440.338 115.549 443.56 112.76 447.141 110.347C454.715 105.351 463.176 102.853 472.522 102.853ZM976.446 102.853C985.471 102.853 993.287 104.867 999.895 108.896C1006.5 112.763 1011.58 118.243 1015.12 125.334C1018.83 132.425 1020.68 140.885 1020.68 150.716V224.202H994.817V156.759C994.817 147.412 992.642 140.16 988.291 135.003C983.94 129.685 977.896 127.026 970.161 127.026C965.649 127.026 961.297 128.073 957.107 130.168C952.917 132.263 949.453 135.567 946.713 140.079C944.134 144.43 942.845 150.071 942.845 157.001V224.202H916.979V156.759C916.979 147.412 914.643 140.16 909.97 135.003C905.457 129.685 899.172 127.026 891.114 127.026C886.763 127.026 882.493 128.154 878.303 130.41C874.274 132.505 870.97 135.889 868.392 140.562C865.974 145.236 864.766 151.28 864.766 158.693V224.202H838.899V105.995H866.699V116.986C867.48 116.178 868.285 115.414 869.116 114.697C873.951 110.507 879.028 107.526 884.346 105.753C889.825 103.819 894.902 102.853 899.575 102.853C908.116 102.853 915.529 104.948 921.814 109.138C927.022 112.392 931.281 116.699 934.596 122.057C939.139 116.359 944.791 111.892 951.548 108.654C959.444 104.787 967.744 102.853 976.446 102.853ZM752.841 127.026C747.684 127.026 742.849 127.993 738.337 129.927C733.825 131.861 729.876 134.6 726.492 138.146C723.269 141.53 720.691 145.559 718.757 150.232C716.984 154.906 716.098 159.902 716.098 165.22C716.098 172.311 717.71 178.757 720.933 184.559C724.156 190.36 728.506 194.953 733.985 198.337C739.626 201.56 745.911 203.172 752.841 203.172C758.159 203.172 762.994 202.205 767.345 200.271C771.696 198.338 775.564 195.678 778.948 192.294C782.333 188.749 784.992 184.719 786.926 180.207C788.86 175.534 789.826 170.538 789.826 165.22C789.826 157.968 788.134 151.521 784.75 145.881C781.527 140.079 777.094 135.487 771.454 132.103C765.975 128.718 759.77 127.026 752.841 127.026ZM604.124 127.993C598.967 127.993 594.132 128.96 589.62 130.894C585.269 132.666 581.401 135.245 578.017 138.629C574.794 141.852 572.296 145.72 570.523 150.232C568.751 154.745 567.864 159.74 567.864 165.22C567.864 172.149 569.475 178.515 572.698 184.316C575.921 189.957 580.193 194.469 585.511 197.854C590.99 201.077 597.194 202.688 604.124 202.688C611.215 202.688 617.5 201.077 622.979 197.854C628.458 194.63 632.809 190.199 636.032 184.559C639.255 178.757 640.867 172.311 640.867 165.22C640.867 157.807 639.255 151.36 636.032 145.881C632.809 140.241 628.459 135.889 622.979 132.827C617.5 129.604 611.215 127.993 604.124 127.993ZM381.558 88.1064H354V57.6484H381.558V88.1064Z" fill="#2A0F2E"/></svg>
+    <span class="text-muted-foreground text-xs" style="opacity:.4;">—</span>
+    <span class="text-muted-foreground text-xs font-medium">Page Brief Tool</span>
   </div>
   <div class="flex items-center gap-3">
-    <div class="flex items-center gap-1.5 text-xs text-muted-foreground">
-      <span id="header-progress">0/9</span><span>sections</span>
-    </div>
-    <div class="w-24 h-1.5 bg-secondary rounded-full overflow-hidden">
-      <div id="progress-bar" class="h-full bg-foreground rounded-full transition-all duration-500" style="width:0%"></div>
-    </div>
-    <div style="width:1px;height:16px;background:hsl(var(--border))"></div>
+
     <button class="btn btn-icon" onclick="openSettings()" title="Paramètres">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
     </button>
-    <button class="btn btn-icon" onclick="toggleDark()" title="Mode sombre">
-      <svg id="dark-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-    </button>
-    <button class="btn btn-ghost text-xs" onclick="generateAll()" id="generate-all-btn" title="Générer toutes les sections">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/><line x1="19" y1="3" x2="19" y2="21"/></svg>
-      Tout générer
-    </button>
-    <button class="btn btn-ghost text-xs" onclick="fillTestData()" title="Remplir avec données Inqom de test">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-      Mode test
-    </button>
+
     <button class="btn btn-secondary text-xs" onclick="exportTxt()" id="export-txt-btn" disabled>
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
       .txt
@@ -224,48 +245,63 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
 <div class="flex flex-1 overflow-hidden">
   <!-- Sidebar nav -->
   <aside class="w-48 border-r border-border flex flex-col shrink-0 overflow-y-auto py-4 px-3">
-    <p class="text-xs font-medium text-muted-foreground px-2 mb-3 uppercase tracking-widest">Structure</p>
-    <nav id="sidebar-nav" class="flex flex-col gap-0.5"></nav>
+    <nav id="sidebar-nav" class="flex flex-col gap-0.5 pt-2"></nav>
   </aside>
 
-  <!-- Center: form -->
-  <main class="overflow-y-auto px-6 py-6 shrink-0 border-r border-border" id="form-main" style="width:420px;">
-    <div id="sections-container" class="space-y-5" style="padding-bottom:80px;"></div>
-    <div id="stepper-nav" class="stepper-nav">
-      <span class="stepper-progress">1 / 1</span>
-      <div class="stepper-btns">
-        <button id="stepper-prev" class="btn btn-secondary text-xs" onclick="goToStep(getStepIdx(currentPage().id)-1)" disabled>← Précédent</button>
-        <button id="stepper-next" class="btn btn-primary text-xs" onclick="stepperNext()">Suivant →</button>
-      </div>
+  <!-- Center: form + stepper footer -->
+  <div class="flex flex-col shrink-0 border-r border-border overflow-hidden" style="width:420px;">
+    <main class="overflow-y-auto flex-1" id="form-main">
+      <div id="sections-container" class="space-y-5" style="padding-bottom:80px;"></div>
+    </main>
+    <div class="flex items-center gap-3 px-6 py-4 border-t border-border shrink-0 bg-background" id="section-footer">
+      <button class="btn btn-primary text-sm" id="btn-active-section" onclick="generateActiveSection()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 3 14 9-14 9V3z"/></svg>
+        Générer
+      </button>
+      <button class="btn btn-ghost text-sm" style="color:hsl(var(--muted-foreground))" onclick="clearActiveSection()">Effacer</button>
+      <span class="text-xs ml-auto" id="status-active" style="color:hsl(var(--muted-foreground))"></span>
     </div>
-  </main>
 
-  <!-- Right: wireframe -->
+  </div>
+
+  <!-- Right: wireframe + editor -->
   <aside class="flex flex-col overflow-hidden" style="flex:1;min-width:0;">
-    <div class="px-4 py-2.5 border-b border-border flex items-center justify-between shrink-0">
-      <div class="flex items-center gap-2">
-        <div class="w-2 h-2 rounded-full bg-foreground"></div>
-        <p class="text-sm font-medium">Wireframe</p>
-        <span class="text-xs text-muted-foreground" id="wf-page-name"></span>
+    <div class="px-4 border-b border-border flex items-center shrink-0" style="height:42px;">
+      <span class="text-xs text-muted-foreground shrink-0" id="wf-status">En attente…</span>
+      <div class="flex items-center gap-5 flex-1 justify-center" style="height:100%;">
+        <button class="wf-toggle-btn active" id="btn-view-wireframe" onclick="switchRightPanel('wireframe')">Wireframe</button>
+        <button class="wf-toggle-btn" id="btn-view-editor" onclick="switchRightPanel('editor')">Éditer</button>
       </div>
-      <div class="flex items-center gap-2">
-        <span class="text-xs text-muted-foreground" id="wf-status">En attente…</span>
-        <button class="btn btn-icon" onclick="toggleDebugPanel()" title="Debug outputs" style="width:24px;height:24px;font-size:10px;opacity:.5;">⚙</button>
-      </div>
-    </div>
-    <div id="wf-debug-panel" class="hidden border-b border-border px-4 py-3" style="background:hsl(var(--muted));font-family:monospace;font-size:10px;max-height:200px;overflow-y:auto;">
-      <div class="flex items-center justify-between mb-2">
-        <span class="text-xs font-medium">Clés parsées — section active</span>
-        <select id="debug-sec-select" class="input" style="height:24px;font-size:10px;width:160px;" onchange="showDebugForSection(this.value)"></select>
-      </div>
-      <div id="debug-keys-output" class="text-xs" style="white-space:pre-wrap;"></div>
+      <span class="text-xs text-muted-foreground shrink-0" id="wf-page-name"></span>
     </div>
     <div class="flex-1 overflow-y-auto" id="wireframe-panel" style="background:hsl(var(--muted));padding:24px 20px;">
       <div style="max-width:900px;margin:0 auto;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.10);border:1px solid rgba(0,0,0,.06);">
         <div class="wf-root" id="wf-root"></div>
       </div>
     </div>
+    <div class="flex-1 overflow-y-auto hidden" id="editor-panel">
+      <div id="editor-content"></div>
+    </div>
   </aside>
+</div>
+
+
+<!-- SEO tag modal -->
+<div id="seo-tag-modal" class="seo-modal-overlay hidden" onclick="if(event.target===this)closeSeoModal()">
+  <div class="seo-modal">
+    <div class="seo-modal-header">
+      <span class="seo-modal-title">Tags SEO de la page</span>
+      <button class="btn btn-icon" onclick="closeSeoModal()" style="width:28px;height:28px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="seo-modal-tags" id="seo-modal-tags"></div>
+    <div class="seo-modal-footer">
+      <input type="text" class="seo-modal-new" id="seo-modal-input" placeholder="Nouveau tag…" onkeydown="if(event.key==='Enter')addTagFromModalInput()">
+      <button class="btn btn-primary text-xs" onclick="addTagFromModalInput()">Ajouter</button>
+      <button class="btn btn-primary text-xs" onclick="closeSeoModal()">OK</button>
+    </div>
+  </div>
 </div>
 
 <!-- Template picker modal -->
@@ -299,6 +335,7 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
       <button class="tab-btn" onclick="switchTab('skills',this)">
         <span class="flex items-center gap-1.5">Knowledge base <span class="skill-badge" id="skills-count-badge">0</span></span>
       </button>
+      <button class="tab-btn" onclick="switchTab('test',this)">Test</button>
     </div>
     <div id="tab-general">
       <div class="space-y-5">
@@ -326,6 +363,28 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
       <div class="space-y-3">
         <p class="text-xs text-muted-foreground leading-relaxed">Ces intentions expliquent à l'IA le rôle SEO et éditorial de chaque section. Elles sont injectées dans chaque prompt de génération. Modifiez-les selon votre stratégie.</p>
         <div id="intents-list" class="space-y-3"></div>
+      </div>
+    </div>
+
+    <div id="tab-test" class="hidden">
+      <div class="space-y-5">
+        <div>
+          <h3 class="text-sm font-semibold mb-1">Données de test</h3>
+          <p class="text-xs text-muted-foreground mb-3">Remplit les champs de la page courante avec des données Inqom pré-remplies pour tester rapidement le rendu.</p>
+          <button class="btn btn-secondary text-sm" onclick="fillTestData()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Charger données test
+          </button>
+        </div>
+        <div class="separator"></div>
+        <div>
+          <h3 class="text-sm font-semibold mb-1">Tout générer</h3>
+          <p class="text-xs text-muted-foreground mb-3">Lance la génération de toutes les sections en séquence. Utile pour un rendu complet en une passe.</p>
+          <button class="btn btn-secondary text-sm" onclick="generateAll(); closeSettings();">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/><line x1="19" y1="3" x2="19" y2="21"/></svg>
+            Tout générer
+          </button>
+        </div>
       </div>
     </div>
 
@@ -526,7 +585,7 @@ const SECTIONS = TEMPLATES_CONFIG.product.sections;
 // ── PAGES STATE ──────────────────────────────────────────────────
 let pageIdCounter = 0;
 function newPageState(name) {
-  return { id:++pageIdCounter, name, outputs:{}, completed:new Set(), scrollPos:0 };
+  return { id:++pageIdCounter, name, outputs:{}, completed:new Set(), scrollPos:0, seoPool:[] };
 }
 // ── SKILLS STATE ──────────────────────────────────────────────────
 let skillIdCounter = 0;
@@ -659,9 +718,11 @@ function renderFormForPage() {
     });
   }
   // resize all textareas after repopulate
-  // resize after showCurrentStep reveals the active section
+  // resize + refresh SEO pool after showCurrentStep reveals the active section
   requestAnimationFrame(() => requestAnimationFrame(() => {
     document.querySelectorAll('.textarea').forEach(autoResize);
+    syncAllKwToPool();
+    refreshAllKwPools();
   }));
 
   // mark done sections
@@ -729,15 +790,84 @@ function showCurrentStep() {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById(`nav-${sec.id}`)?.classList.add('active');
 
-  // Update stepper nav
-  const total = sections.length;
-  const stepperNav = document.getElementById('stepper-nav');
-  if (stepperNav) {
-    stepperNav.querySelector('.stepper-progress').textContent = `${idx + 1} / ${total} — ${sec.name}`;
-    stepperNav.querySelector('#stepper-prev').disabled = idx === 0;
-    stepperNav.querySelector('#stepper-next').textContent = idx === total - 1 ? 'Fin' : 'Suivant →';
-    stepperNav.querySelector('#stepper-next').disabled = false;
-  }
+
+
+  // Scroll form to top
+  const formMain = document.getElementById('form-main');
+  formMain.scrollTop = 0;
+
+  // Highlight wireframe
+  highlightWireframeSection(sec.id);
+  // Update footer
+  updateFooterStatus(sec.id);
+
+  // Auto-resize all textareas in active section (after display:none is removed)
+  const card = document.getElementById(`section-${sec.id}`);
+  if (card) requestAnimationFrame(() => requestAnimationFrame(() => {
+    card.querySelectorAll('textarea').forEach(autoResize);
+    refreshAllKwPools();
+  }));
+}
+
+function buildSidebar() {
+  const nav = document.getElementById("sidebar-nav");
+  const sections = getSectionsForPage(currentPage());
+  const iconMap = {
+    'hero': 'layout-template',
+    'keydatas': 'bar-chart-2',
+    'sideshow': 'monitor-play',
+    'advantages': 'zap',
+    'usecases': 'users',
+    'howitworks': 'list-ordered',
+    'features': 'layout-grid',
+    'comparaison': 'columns-2',
+    'pourqui': 'target',
+    'faq': 'circle-help'
+  };
+  sections.forEach((sec, i) => {
+    const item = document.createElement("div");
+    item.className = "nav-item" + (currentPage().completed.has(sec.id)?" done":"");
+    item.id = `nav-${sec.id}`;
+    const iconName = iconMap[sec.id] || 'circle';
+    item.innerHTML = `<span class="nav-icon" id="dot-${sec.id}"><i data-lucide="${iconName}" style="width:16px;height:16px;stroke-width:1.75;"></i></span><span>${sec.name}</span>`;
+    item.onclick = () => goToStep(i);
+    nav.appendChild(item);
+  });
+  // Render lucide icons in sidebar
+  if (window.lucide) lucide.createIcons({ nameAttr: 'data-lucide', attrs: { 'stroke-width': '1.75' } });
+}
+
+// ── STEPPER STATE ──
+function getStepIdx(pageId) {
+  return state.stepperIdx[pageId] || 0;
+}
+function setStepIdx(pageId, idx) {
+  const sections = getSectionsForPage(currentPage());
+  idx = Math.max(0, Math.min(idx, sections.length - 1));
+  state.stepperIdx[pageId] = idx;
+}
+function goToStep(idx) {
+  const page = currentPage();
+  setStepIdx(page.id, idx);
+  showCurrentStep();
+}
+function showCurrentStep() {
+  const page = currentPage();
+  const sections = getSectionsForPage(page);
+  const idx = getStepIdx(page.id);
+  const sec = sections[idx];
+
+  // Show/hide section cards
+  sections.forEach((s, i) => {
+    const el = document.getElementById(`section-${s.id}`);
+    if (el) el.classList.toggle('stepper-section-hidden', i !== idx);
+  });
+
+  // Update sidebar active
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`nav-${sec.id}`)?.classList.add('active');
+
+
 
   // Scroll form to top
   const formMain = document.getElementById('form-main');
@@ -750,17 +880,32 @@ function showCurrentStep() {
   const card = document.getElementById(`section-${sec.id}`);
   if (card) requestAnimationFrame(() => requestAnimationFrame(() => {
     card.querySelectorAll('textarea').forEach(autoResize);
+    refreshAllKwPools();
   }));
 }
 
 function buildSidebar() {
   const nav = document.getElementById("sidebar-nav");
   const sections = getSectionsForPage(currentPage());
+  const iconMap = {
+    'hero': `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 9.5L12 4L21 9.5V20C21 20.5523 20.5523 21 20 21H15V16H9V21H4C3.44772 21 3 20.5523 3 20V9.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
+    'keydatas': `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 8H17M7 12H12M3 6C3 4.34315 4.34315 3 6 3H18C19.6569 3 21 4.34315 21 6V18C21 19.6569 19.6569 21 18 21H6C4.34315 21 3 19.6569 3 18V6Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+    'sideshow': `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 8C2 6.34315 3.34315 5 5 5H19C20.6569 5 22 6.34315 22 8V16C22 17.6569 20.6569 19 19 19H5C3.34315 19 2 17.6569 2 16V8Z" stroke="currentColor" stroke-width="1.5"/><path d="M10 9.5L15 12L10 14.5V9.5Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
+    'advantages': `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>`,
+    'usecases': `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 21H7C5.34315 21 4 19.6569 4 18V8.94427C4 8.0829 4.44587 7.28459 5.17929 6.83205L10.1793 3.83205C11.0468 3.30949 12.1468 3.30949 13.0143 3.83205L18.8207 7.33205C19.5541 7.78459 20 8.5829 20 9.44427V18C20 19.6569 18.6569 21 17 21Z" stroke="currentColor" stroke-width="1.5"/><path d="M9 21V13H15V21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+    'howitworks': `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6H21M3 12H21M3 18H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M18 15L21 18L18 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    'features': `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 3H5C3.89543 3 3 3.89543 3 5V9C3 10.1046 3.89543 11 5 11H9C10.1046 11 11 10.1046 11 9V5C11 3.89543 10.1046 3 9 3Z" stroke="currentColor" stroke-width="1.5"/><path d="M19 3H15C13.8954 3 13 3.89543 13 5V9C13 10.1046 13.8954 11 15 11H19C20.1046 11 21 10.1046 21 9V5C21 3.89543 20.1046 3 19 3Z" stroke="currentColor" stroke-width="1.5"/><path d="M9 13H5C3.89543 13 3 13.8954 3 15V19C3 20.1046 3.89543 21 5 21H9C10.1046 21 11 20.1046 11 19V15C11 13.8954 10.1046 13 9 13Z" stroke="currentColor" stroke-width="1.5"/><path d="M13 17H21M17 13V21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+    'comparaison': `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 7H21M3 12H21M3 17H21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M7 3L7 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+    'pourqui': `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 11C17.6569 11 19 9.65685 19 8C19 6.34315 17.6569 5 16 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M8 11C6.34315 11 5 9.65685 5 8C5 6.34315 6.34315 5 8 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M12 14C15.3137 14 18 12.2091 18 10C18 7.79086 15.3137 6 12 6C8.68629 6 6 7.79086 6 10C6 12.2091 8.68629 14 12 14Z" stroke="currentColor" stroke-width="1.5"/><path d="M4 20C5.33 17.33 8.33 16 12 16C15.67 16 18.67 17.33 20 20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+    'faq': `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="1.5"/><path d="M9 9C9 7.34315 10.3431 6 12 6C13.6569 6 15 7.34315 15 9C15 10.6569 13.6569 12 12 12V13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M12 17V17.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`
+  };
+  const fallback = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.5"/></svg>`;
   sections.forEach((sec, i) => {
     const item = document.createElement("div");
     item.className = "nav-item" + (currentPage().completed.has(sec.id)?" done":"");
     item.id = `nav-${sec.id}`;
-    item.innerHTML = `<div class="nav-dot" id="dot-${sec.id}"></div><div><div class="text-xs font-medium leading-tight">${sec.name}</div><div class="text-xs leading-tight" style="color:hsl(var(--muted-foreground))">${sec.sub}</div></div>`;
+    const icon = iconMap[sec.id] || fallback;
+    item.innerHTML = `<span class="nav-icon" id="dot-${sec.id}">${icon}</span><span>${sec.name}</span>`;
     item.onclick = () => goToStep(i);
     nav.appendChild(item);
   });
@@ -772,45 +917,49 @@ function buildSections() {
   sections.forEach((sec, idx) => {
     const div = document.createElement("div");
     div.id = `section-${sec.id}`;
-    div.className = "section-anchor card p-5 space-y-4";
+    div.className = "section-anchor space-y-5";
     const badge = sec.seo ? `<span class="badge badge-blue">SEO</span>` : "";
-    const qHtml = sec.questions.map(q => `
-      <div class="space-y-1.5">
+    const qHtml = sec.questions.map(q => {
+    if (q.kw) {
+      return `<div class="space-y-1.5">
         <div class="flex items-center gap-2">
           <label class="text-sm font-medium">${q.label}</label>
-          ${q.kw?'<span class="badge badge-amber">Mots-clés</span>':''}
+          <span class="badge badge-amber">Mots-clés</span>
         </div>
-        ${q.hint?`<p class="text-xs" style="color:hsl(var(--muted-foreground))">${q.hint}</p>`:''}
-        <textarea class="textarea text-sm" id="q-${sec.id}-${q.id}" rows="${q.rows}" placeholder="${q.hint||''}"></textarea>
-      </div>`).join("");
-    div.innerHTML = `
-      <div class="flex items-start gap-3">
-        <div class="flex items-center justify-center w-7 h-7 rounded-full border text-xs font-semibold shrink-0 mt-0.5" style="border-color:hsl(var(--border));color:hsl(var(--muted-foreground))" id="num-${sec.id}">${idx+1}</div>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 flex-wrap">
-            <h3 class="text-sm font-semibold">${sec.name}</h3>
-            <span class="text-xs" style="color:hsl(var(--muted-foreground))">— ${sec.sub}</span>
-            ${badge}
-          </div>
-          <p class="text-xs mt-0.5 leading-relaxed" style="color:hsl(var(--muted-foreground))">${sec.why}</p>
+        <div class="seo-kw-wrap" id="seo-wrap-${sec.id}-${q.id}" data-sec="${sec.id}" data-q="${q.id}">
+          <button class="seo-kw-add-btn" onclick="openSeoModal('${sec.id}','${q.id}')">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Tags SEO
+          </button>
         </div>
-      </div>
-      <div class="separator"></div>
-      <div class="space-y-4">${qHtml}</div>
-      <div class="flex items-center gap-3 pt-1">
-        <button class="btn btn-primary text-xs" id="btn-${sec.id}" onclick="generateSection('${sec.id}')">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 3 14 9-14 9V3z"/></svg>
-          Générer
-        </button>
-        <button class="btn btn-ghost text-xs" style="color:hsl(var(--muted-foreground))" onclick="clearSection('${sec.id}')">Effacer</button>
-        <span class="text-xs ml-auto" id="status-${sec.id}" style="color:hsl(var(--muted-foreground))"></span>
+        <textarea class="textarea text-sm" id="q-${sec.id}-${q.id}" rows="${q.rows}" style="display:none;" placeholder="${q.hint||''}"></textarea>
       </div>`;
+    }
+    return `<div class="space-y-1.5">
+      <div class="flex items-center gap-2">
+        <label class="text-sm font-medium">${q.label}</label>
+      </div>
+      ${q.hint?`<p class="text-xs" style="color:hsl(var(--muted-foreground))">${q.hint}</p>`:''}
+      <textarea class="textarea text-sm" id="q-${sec.id}-${q.id}" rows="${q.rows}" placeholder="${q.hint||''}"></textarea>
+    </div>`;
+  }).join("");
+    div.innerHTML = `
+      <div class="section-header" id="sheader-${sec.id}">
+        <div style="display:flex;align-items:baseline;gap:8px;">
+          <h2 style="font-size:15px;font-weight:600;line-height:1.3;">${sec.name}</h2>
+          <span style="font-size:13px;color:hsl(var(--muted-foreground));">— ${sec.sub}</span>
+          ${badge}
+        </div>
+        <p style="font-size:12px;margin-top:4px;color:hsl(var(--muted-foreground));line-height:1.5;">${sec.why}</p>
+      </div>
+      <div class="space-y-5 px-6">${qHtml}</div>
+`;
     container.appendChild(div);
 
-    // Auto-resize textareas
+    // Auto-resize + SEO dropdown
     div.querySelectorAll('textarea').forEach(ta => {
       ta.addEventListener('input', () => autoResize(ta));
-      // Initial size after repopulate will be handled in showCurrentStep
+
     });
 
     // Focus dimming
@@ -835,7 +984,7 @@ function block(cls="medium") { return `<div class="wf-block ${cls}"></div>`; }
 // ── WIREFRAME RENDERER — LANDING SOBRE ──────────────────────────
 function wfEditable(text, outputKey, secId, cls="") {
   const safe = (text||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  return `<span class="wf-editable ${cls}" onclick="startWfEdit(this,'${secId}','${(outputKey||"").replace(/'/g,"\\'")}',event)">${safe}</span>`;
+  return `<span class="wf-editable ${cls}">${safe}</span>`;
 }
 
 function startWfEdit(el, secId, outputKey, e) {
@@ -1213,11 +1362,13 @@ RÈGLES ABSOLUES :
     page.outputs[secId] = text;
     page.completed.add(secId);
     markDone(secId);
+    updateSeoPool(secId, text);
     refreshWireframeSection(secId);
     updateProgress();
     renderTabs();
     statusEl.textContent = "✓ Généré";
     statusEl.style.color = "#16a34a";
+    updateFooterStatus(secId);
   } catch(err) {
     statusEl.textContent = `Erreur : ${err.message}`;
     statusEl.style.color = "#dc2626";
@@ -1236,6 +1387,7 @@ function clearSection(secId) {
   updateProgress();
   renderTabs();
   document.getElementById(`status-${secId}`).textContent="";
+  updateFooterStatus(secId);
   document.getElementById(`btn-${secId}`).innerHTML=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 3 14 9-14 9V3z"/></svg> Générer`;
   const sec = getSectionsForPage(currentPage()).find(s=>s.id===secId);
   const wfEl = document.getElementById(`wf-${secId}`);
@@ -1270,18 +1422,342 @@ function updateProgress() {
   document.getElementById("export-txt-btn").disabled=totalAllPages===0;
 }
 
-function autoResize(ta) {
-  ta.style.height = 'auto';
-  ta.style.height = Math.max(60, ta.scrollHeight) + 'px';
+function switchRightPanel(mode) {
+  const isWf = mode === 'wireframe';
+  document.getElementById('wireframe-panel').classList.toggle('hidden', !isWf);
+  document.getElementById('editor-panel').classList.toggle('hidden', isWf);
+  document.getElementById('btn-view-wireframe').classList.toggle('active', isWf);
+  document.getElementById('btn-view-editor').classList.toggle('active', !isWf);
+  if (!isWf) renderEditorPanel();
 }
 
-function stepperNext() {
+function renderEditorPanel() {
+  const page = currentPage();
+  const sections = getSectionsForPage(page);
+  const container = document.getElementById('editor-content');
+  const doneSections = sections.filter(s => page.outputs[s.id]);
+
+  if (!doneSections.length) {
+    container.innerHTML = `<div class="editor-empty"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".3"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg><span>Aucune section générée</span><span style="font-size:11px;opacity:.6;">Générez des sections pour les éditer ici</span></div>`;
+    return;
+  }
+
+  container.innerHTML = doneSections.map(sec => {
+    const data = parsedOutputs(sec.id);
+    const keys = Object.keys(data).filter(k => k === k.toUpperCase() || /^(H[123]|INTRO|TITRE|LABEL|CTA|LÉGENDE|LEGENDE|ACCROCHE)/i.test(k));
+    // Deduplicate: keep only original-case keys (not the uppercased copies)
+    const raw = page.outputs[sec.id] || '';
+    const originalKeys = [];
+    raw.split('\n').filter(l => l.trim()).forEach(line => {
+      const ci = line.indexOf(':');
+      if (ci >= 2) {
+        const k = line.substring(0, ci).trim();
+        if (k.length < 100 && (k === k.toUpperCase() || /^(H[123]|INTRO|TITRE|LABEL|CTA)/i.test(k))) {
+          originalKeys.push(k);
+        }
+      }
+    });
+
+    const fields = originalKeys.map(k => {
+      const val = data[k] || '';
+      const isLong = val.length > 80;
+      return `<div class="editor-field">
+        <div class="editor-field-label">${k}</div>
+        <textarea class="editor-field-input" rows="1"
+          data-sec="${sec.id}" data-key="${k.replace(/"/g,'&quot;')}"
+          oninput="editorFieldChange(this)"
+        >${val.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea>
+      </div>`;
+    }).join('');
+
+    return `<div class="editor-section">
+      <div class="editor-section-header">
+        <span class="editor-section-title">${sec.name}</span>
+        <span class="editor-section-badge">✓ généré</span>
+      </div>
+      ${fields || '<p style="font-size:12px;opacity:.5;">Aucun champ parsé</p>'}
+    </div>`;
+  }).join('');
+
+  // Auto-resize all editor textareas
+  requestAnimationFrame(() => {
+    container.querySelectorAll('textarea').forEach(ta => {
+      autoResize(ta);
+      ta.addEventListener('input', () => autoResize(ta));
+    });
+  });
+}
+
+function editorFieldChange(ta) {
+  const secId = ta.dataset.sec;
+  const key = ta.dataset.key;
+  const newVal = ta.value.trim();
+  const page = currentPage();
+  if (!page.outputs[secId]) return;
+
+  // Update the raw output string
+  const lines = page.outputs[secId].split('\n');
+  let found = false;
+  const updated = lines.map(line => {
+    const ci = line.indexOf(':');
+    if (ci >= 2) {
+      const k = line.substring(0, ci).trim();
+      if (k.toUpperCase() === key.toUpperCase()) {
+        found = true;
+        return k + ': ' + newVal;
+      }
+    }
+    return line;
+  });
+  if (!found) updated.push(key + ': ' + newVal);
+  page.outputs[secId] = updated.join('\n');
+  saveToStorage();
+
+  // Re-render wireframe section live
+  renderWfSection(secId, parsedOutputs(secId));
+}
+
+function extractKwFromOutput(text) {
+  // Find lines like "MOTS-CLÉS SEO : ..." or parse KW output keys
+  const tags = new Set();
+  text.split('\n').forEach(line => {
+    const ci = line.indexOf(':');
+    if (ci >= 2) {
+      const k = line.substring(0,ci).trim().toUpperCase();
+      if (k.includes('MOT') || k.includes('KW') || k.includes('KEYWORD') || k.includes('CLÉ') || k.includes('CLE')) {
+        const val = line.substring(ci+1).trim();
+        val.split(/,|;/).map(t=>t.trim()).filter(t=>t.length>1 && t.length<60).forEach(t=>tags.add(t.toLowerCase()));
+      }
+    }
+  });
+  return [...tags];
+}
+
+function updateSeoPool(secId, outputText) {
+  const page = currentPage();
+  if (!page.seoPool) page.seoPool = [];
+  const newTags = extractKwFromOutput(outputText);
+  // Always grab from the kw field directly (most reliable source)
+  const sec = getSectionsForPage(page).find(s=>s.id===secId);
+  if (sec) {
+    const kwQ = sec.questions.find(q=>q.kw);
+    if (kwQ) {
+      const el = document.getElementById(`q-${secId}-${kwQ.id}`);
+      if (el && el.value.trim()) {
+        el.value.split(/,|;/).map(t=>t.trim().toLowerCase()).filter(t=>t.length>1 && t.length<60).forEach(t=>{
+          if(!newTags.includes(t)) newTags.push(t);
+        });
+      }
+      // Also from saved formData
+      const saved = (page._formData||{})[`${secId}-${kwQ.id}`]||'';
+      saved.split(/,|;/).map(t=>t.trim().toLowerCase()).filter(t=>t.length>1 && t.length<60).forEach(t=>{
+        if(!newTags.includes(t)) newTags.push(t);
+      });
+    }
+  }
+  newTags.forEach(tag => {
+    if (!page.seoPool.includes(tag)) page.seoPool.push(tag);
+  });
+  saveToStorage();
+  refreshAllKwPools();
+}
+
+function syncAllKwToPool() {
+  const page = currentPage();
+  if (!page.seoPool) page.seoPool = [];
+  getSectionsForPage(page).forEach(sec => {
+    const kwQ = sec.questions.find(q=>q.kw);
+    if (!kwQ) return;
+    // From DOM field
+    const el = document.getElementById(`q-${sec.id}-${kwQ.id}`);
+    const fieldVal = (el ? el.value : '') || (page._formData||{})[`${sec.id}-${kwQ.id}`] || '';
+    fieldVal.split(/,|;/).map(t=>t.trim().toLowerCase()).filter(t=>t.length>1 && t.length<60).forEach(tag=>{
+      if(!page.seoPool.includes(tag)) page.seoPool.push(tag);
+    });
+    // From generated outputs
+    if (page.outputs[sec.id]) {
+      extractKwFromOutput(page.outputs[sec.id]).forEach(tag=>{
+        if(!page.seoPool.includes(tag)) page.seoPool.push(tag);
+      });
+    }
+  });
+  saveToStorage();
+  refreshAllKwPools();
+}
+
+// ── SEO MODAL ────────────────────────────────────────────────────
+let _seoModalSec = null, _seoModalQ = null;
+
+function openSeoModal(secId, qId) {
+  _seoModalSec = secId; _seoModalQ = qId;
+  renderSeoModalTags();
+  document.getElementById('seo-tag-modal').classList.remove('hidden');
+  document.getElementById('seo-modal-input').value = '';
+  setTimeout(() => document.getElementById('seo-modal-input').focus(), 50);
+}
+
+function closeSeoModal() {
+  document.getElementById('seo-tag-modal').classList.add('hidden');
+  refreshKwChips(_seoModalSec, _seoModalQ);
+  _seoModalSec = null; _seoModalQ = null;
+}
+
+function renderSeoModalTags() {
+  const page = currentPage();
+  const pool = page.seoPool || [];
+  const tagsEl = document.getElementById('seo-modal-tags');
+  if (!pool.length) {
+    tagsEl.innerHTML = '<span class="seo-modal-empty">Aucun tag — générez une section ou ajoutez manuellement</span>';
+    return;
+  }
+  const ta = document.getElementById(`q-${_seoModalSec}-${_seoModalQ}`);
+  const current = ta ? ta.value.split(/,|;/).map(t=>t.trim().toLowerCase()).filter(Boolean) : [];
+  tagsEl.innerHTML = pool.map(tag => {
+    const safe = tag.replace(/'/g,"\'");
+    const isActive = current.includes(tag.toLowerCase());
+    return `<span class="seo-modal-tag${isActive?' active':''}" onclick="toggleSeoTag('${_seoModalSec}','${_seoModalQ}','${safe}');renderSeoModalTags()">
+      ${tag}
+      <span class="del" onclick="event.stopPropagation();removeFromPool('${safe}');renderSeoModalTags()">×</span>
+    </span>`;
+  }).join('');
+}
+
+function addTagFromModalInput() {
+  const inp = document.getElementById('seo-modal-input');
+  const val = inp.value.trim();
+  if (!val) return;
+  inp.value = '';
+  const page = currentPage();
+  if (!page.seoPool) page.seoPool = [];
+  val.split(/,|;/).map(t=>t.trim().toLowerCase()).filter(t=>t.length>1).forEach(t => {
+    if (!page.seoPool.includes(t)) page.seoPool.push(t);
+    // Also toggle into field
+    const ta = document.getElementById(`q-${_seoModalSec}-${_seoModalQ}`);
+    if (ta) {
+      const parts = ta.value.split(/,\s*/).map(p=>p.trim()).filter(Boolean);
+      if (!parts.find(p=>p.toLowerCase()===t)) parts.push(t);
+      ta.value = parts.join(', ');
+      if (!ta.style || ta.style.display !== 'none') autoResize(ta);
+    }
+  });
+  saveToStorage();
+  renderSeoModalTags();
+}
+
+function refreshKwChips(secId, qId) {
+  if (!secId || !qId) return;
+  const wrap = document.getElementById(`seo-wrap-${secId}-${qId}`);
+  if (!wrap) return;
+  const ta = document.getElementById(`q-${secId}-${qId}`);
+  const current = ta ? ta.value.split(/,|;/).map(t=>t.trim()).filter(Boolean) : [];
+  // Rebuild chips + add button
+  const chips = current.map(tag => {
+    const safe = tag.replace(/'/g,"\'");
+    return `<span class="seo-kw-chip">${tag}<span class="seo-kw-chip-del" onclick="removeKwChip('${secId}','${qId}','${safe}')">×</span></span>`;
+  }).join('');
+  wrap.innerHTML = chips + `<button class="seo-kw-add-btn" onclick="openSeoModal('${secId}','${qId}')">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    ${current.length ? 'Modifier' : 'Tags SEO'}
+  </button>`;
+}
+
+function removeKwChip(secId, qId, tag) {
+  const ta = document.getElementById(`q-${secId}-${qId}`);
+  if (!ta) return;
+  const parts = ta.value.split(/,\s*/).map(t=>t.trim()).filter(t=>t.toLowerCase()!==tag.toLowerCase());
+  ta.value = parts.join(', ');
+  const page = currentPage();
+  if (!page._formData) page._formData = {};
+  page._formData[`${secId}-${qId}`] = ta.value;
+  refreshKwChips(secId, qId);
+}
+
+function refreshAllKwPools() {
+  // Refresh chips for all visible kw wraps
+  document.querySelectorAll('.seo-kw-wrap[data-sec]').forEach(wrap => {
+    refreshKwChips(wrap.dataset.sec, wrap.dataset.q);
+  });
+}
+
+function toggleSeoTag(secId, qId, tag) {
+  const ta = document.getElementById(`q-${secId}-${qId}`);
+  if (!ta) return;
+  const parts = ta.value.split(/,\s*/).map(t=>t.trim()).filter(Boolean);
+  const idx = parts.findIndex(t=>t.toLowerCase()===tag.toLowerCase());
+  if (idx >= 0) parts.splice(idx,1); else parts.push(tag);
+  ta.value = parts.join(', ');
+  const page = currentPage();
+  if (!page._formData) page._formData = {};
+  page._formData[`${secId}-${qId}`] = ta.value;
+}
+
+function removeFromPool(tag) {
+  const page = currentPage();
+  if (!page.seoPool) return;
+  page.seoPool = page.seoPool.filter(t => t.toLowerCase() !== tag.toLowerCase());
+  saveToStorage();
+  refreshAllKwPools();
+}
+
+function addTagToPool(secId, qId) {
+  const tag = prompt('Nouveau tag SEO :');
+  if (!tag || !tag.trim()) return;
+  const page = currentPage();
+  if (!page.seoPool) page.seoPool = [];
+  const clean = tag.trim().toLowerCase();
+  if (!page.seoPool.includes(clean)) {
+    page.seoPool.push(clean);
+    saveToStorage();
+  }
+  // Also add to the current field
+  const ta = document.getElementById(`q-${secId}-${qId}`);
+  if (ta) {
+    const parts = ta.value.split(/,\s*/).map(t=>t.trim()).filter(Boolean);
+    if (!parts.find(t=>t.toLowerCase()===clean)) parts.push(tag.trim());
+    ta.value = parts.join(', ');
+    autoResize(ta);
+    const pg = currentPage();
+    if (!pg._formData) pg._formData = {};
+    pg._formData[`${secId}-${qId}`] = ta.value;
+  }
+  refreshAllKwPools();
+}
+
+function getActiveSectionId() {
   const page = currentPage();
   const sections = getSectionsForPage(page);
   const idx = getStepIdx(page.id);
-  if (idx < sections.length - 1) {
-    goToStep(idx + 1);
+  return sections[idx]?.id || null;
+}
+
+function generateActiveSection() {
+  const secId = getActiveSectionId();
+  if (secId) generateSection(secId);
+}
+
+function clearActiveSection() {
+  const secId = getActiveSectionId();
+  if (secId) clearSection(secId);
+}
+
+function updateFooterStatus(secId) {
+  const page = currentPage();
+  const statusEl = document.getElementById('status-active');
+  const btnEl = document.getElementById('btn-active-section');
+  if (!statusEl || !btnEl) return;
+  if (page.completed.has(secId)) {
+    statusEl.textContent = '✓ Généré';
+    statusEl.style.color = '#16a34a';
+    btnEl.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg> Régénérer`;
+  } else {
+    statusEl.textContent = '';
+    btnEl.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 3 14 9-14 9V3z"/></svg> Générer`;
   }
+}
+
+function autoResize(ta) {
+  ta.style.height = 'auto';
+  ta.style.height = Math.max(60, ta.scrollHeight) + 'px';
 }
 
 function setupScrollSpy() {
@@ -1304,7 +1780,7 @@ function closeSettings(){document.getElementById("settings-modal").classList.add
 function syncSettingsUI(){const c=state.config;document.getElementById("cfg-product-name").value=c.productName;document.getElementById("cfg-sector").value=c.sector;document.getElementById("cfg-targets").value=c.targets;document.getElementById("cfg-lang").value=c.lang;document.getElementById("cfg-master-prompt").value=c.masterPrompt;document.getElementById("cfg-global-kw").value=c.globalKw;document.getElementById("cfg-competitor").value=c.competitor;}
 function saveSettings(){saveIntents();const c=state.config;c.productName=document.getElementById("cfg-product-name").value;c.sector=document.getElementById("cfg-sector").value;c.targets=document.getElementById("cfg-targets").value;c.lang=document.getElementById("cfg-lang").value;c.masterPrompt=document.getElementById("cfg-master-prompt").value;c.globalKw=document.getElementById("cfg-global-kw").value;c.intent=document.getElementById("cfg-intent").value;c.competitor=document.getElementById("cfg-competitor").value;document.getElementById("product-name-display").textContent=c.productName;closeSettings();}
 function resetPrompt(){if(confirm("Réinitialiser le prompt par défaut ?"))document.getElementById("cfg-master-prompt").value=DEFAULT_MASTER_PROMPT;}
-function switchTab(tab,btn){["general","prompt","seo","skills","intents"].forEach(t=>document.getElementById(`tab-${t}`).classList.add("hidden"));document.getElementById(`tab-${tab}`).classList.remove("hidden");document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");}
+function switchTab(tab,btn){["general","prompt","seo","skills","intents","test"].forEach(t=>document.getElementById(`tab-${t}`).classList.add("hidden"));document.getElementById(`tab-${tab}`).classList.remove("hidden");document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");}
 
 // ── THEME ─────────────────────────────────────────────────────────
 function toggleDark(){document.documentElement.classList.toggle("dark");const d=document.documentElement.classList.contains("dark");document.getElementById("dark-icon").innerHTML=d?`<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`:``+`<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;}
@@ -1776,6 +2252,7 @@ function loadFromStorage() {
         if (p.id > pageIdCounter) pageIdCounter = p.id;
         page.templateId = p.templateId || "product";
         page.outputs = p.outputs || {};
+    page.seoPool = p.seoPool || [];
         page.completed = new Set(p.completed || []);
         page.scrollPos = p.scrollPos || 0;
         page._formData = p._formData || {};
