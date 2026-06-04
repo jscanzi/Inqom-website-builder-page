@@ -43,7 +43,7 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
 .nav-item { display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--radius);cursor:pointer;transition:background .12s,color .12s;font-size:13px;font-weight:500;color:hsl(var(--muted-foreground)); }
 .nav-item:hover { background:hsl(var(--accent));color:hsl(var(--foreground)); }
 .nav-item.active { background:hsl(var(--accent));color:hsl(var(--foreground)); }
-.nav-item.done .nav-icon { color:#16a34a; }
+.nav-item.done .nav-icon { color:#16a34a !important; }
 .nav-icon { width:18px;height:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center; }
 .nav-dot { width:5px;height:5px;border-radius:50%;background:hsl(var(--border));position:absolute;top:4px;right:4px;transition:background .3s; }
 .section-anchor { scroll-margin-top:24px; transition:opacity .25s ease, filter .25s ease; }
@@ -812,29 +812,14 @@ function showCurrentStep() {
 function buildSidebar() {
   const nav = document.getElementById("sidebar-nav");
   const sections = getSectionsForPage(currentPage());
-  const iconMap = {
-    'hero': 'layout-template',
-    'keydatas': 'bar-chart-2',
-    'sideshow': 'monitor-play',
-    'advantages': 'zap',
-    'usecases': 'users',
-    'howitworks': 'list-ordered',
-    'features': 'layout-grid',
-    'comparaison': 'columns-2',
-    'pourqui': 'target',
-    'faq': 'circle-help'
-  };
   sections.forEach((sec, i) => {
     const item = document.createElement("div");
     item.className = "nav-item" + (currentPage().completed.has(sec.id)?" done":"");
     item.id = `nav-${sec.id}`;
-    const iconName = iconMap[sec.id] || 'circle';
-    item.innerHTML = `<span class="nav-icon" id="dot-${sec.id}"><i data-lucide="${iconName}" style="width:16px;height:16px;stroke-width:1.75;"></i></span><span>${sec.name}</span>`;
+    item.innerHTML = `<span class="nav-icon" id="dot-${sec.id}" style="font-size:11px;font-weight:600;color:hsl(var(--muted-foreground));min-width:18px;text-align:center;">${i+1}</span><span>${sec.name}</span>`;
     item.onclick = () => goToStep(i);
     nav.appendChild(item);
   });
-  // Render lucide icons in sidebar
-  if (window.lucide) lucide.createIcons({ nameAttr: 'data-lucide', attrs: { 'stroke-width': '1.75' } });
 }
 
 // ── STEPPER STATE ──
