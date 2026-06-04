@@ -1023,7 +1023,7 @@ function parsedOutputs(secId) {
   const result = {};
   raw.split("\n").filter(l=>l.trim()).forEach(line => {
     const ci = line.indexOf(":");
-    if (ci>2) {
+    if (ci >= 2) {
       const k = line.substring(0,ci).trim();
       // Accept as key if: fully uppercase OR starts with H2/H3/INTRO/known prefixes
       const isLabel = (k === k.toUpperCase() && k.length < 80) ||
