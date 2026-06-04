@@ -29,4 +29,4 @@ Vercel déploie automatiquement.
 │   └── index.html       # L'outil complet
 ├── vercel.json          # Config rewrites
 └── README.md
-``` 
+```

@@ -12,6 +12,7 @@ tailwind.config = {
 }
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <style>
 :root { --background:0 0% 100%; --foreground:240 10% 3.9%; --card:0 0% 100%; --card-foreground:240 10% 3.9%; --border:240 5.9% 90%; --input:240 5.9% 90%; --ring:240 10% 3.9%; --primary:240 5.9% 10%; --primary-foreground:0 0% 98%; --secondary:240 4.8% 95.9%; --secondary-foreground:240 5.9% 10%; --muted:240 4.8% 95.9%; --muted-foreground:240 3.8% 46.1%; --accent:240 4.8% 95.9%; --accent-foreground:240 5.9% 10%; --radius:0.5rem; --wf-bg:#f9f9f8; --wf-block:#e6e6e3; --wf-text:#a8a8a2; --wf-accent:#2a2a28; }
@@ -77,47 +78,76 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
 .page-tab .tab-close:hover { background:hsl(var(--border)); }
 .tab-name-input { background:transparent;border:none;outline:none;font-size:12px;font-weight:500;color:hsl(var(--foreground));font-family:inherit;min-width:50px;max-width:160px;cursor:text; }
 
-/* Wireframe */
-.wf-root { background:var(--wf-bg);padding:0;font-family:'Geist',system-ui,sans-serif; }
-.wf-section { padding:24px 32px;border-bottom:1px dashed var(--wf-block);position:relative;transition:background .2s,border-left .2s; }
-.wf-section.wf-active { background:hsl(var(--accent)/.4);border-left:2px solid hsl(var(--foreground)); }
+/* Wireframe — landing sobre Inter */
+.wf-root { background:var(--wf-bg);font-family:"Inter",system-ui,sans-serif;color:var(--wf-accent); }
+.wf-section { padding:44px 36px;border-bottom:0.5px solid var(--wf-block);background:#fff;position:relative;transition:background .2s; }
+.dark .wf-section { background:#1a1a1a; }
+.wf-section.wf-alt { background:var(--wf-bg); }
+.wf-section.wf-active { border-left:2px solid hsl(var(--foreground)); }
 .wf-section.wf-done { border-left:2px solid #16a34a55; }
-.wf-label { font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--wf-text);margin-bottom:12px;display:flex;align-items:center;gap:6px; }
-.wf-label-dot { width:5px;height:5px;border-radius:50%;background:var(--wf-text);flex-shrink:0; }
-.wf-label-dot.done { background:#16a34a; }
+.wf-label { font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--wf-text);margin-bottom:14px;display:flex;align-items:center;gap:8px; }
+.wf-label::before { content:"";display:block;width:14px;height:1px;background:var(--wf-block); }
+.wf-label .done-mark { margin-left:auto;font-size:9px;color:#16a34a;font-weight:500; }
+.wf-label-dot { width:5px;height:5px;border-radius:50%;background:var(--wf-text);flex-shrink:0;display:none; }
 .wf-block { background:var(--wf-block);border-radius:3px;margin-bottom:6px; }
-.wf-block.tall { height:64px; } .wf-block.medium { height:32px; } .wf-block.short { height:18px; } .wf-block.xshort { height:10px; }
-.wf-block.btn-shape { height:32px;width:120px;border-radius:16px;margin-bottom:0; }
-.wf-text-line { font-size:11px;color:var(--wf-accent);line-height:1.5;margin-bottom:3px;font-weight:400; }
-.wf-text-line.h1 { font-size:22px;font-weight:600;line-height:1.3;margin-bottom:6px; }
-.wf-text-line.h2 { font-size:15px;font-weight:600;margin-bottom:5px; }
-.wf-text-line.h3 { font-size:12px;font-weight:500;margin-bottom:3px; }
-.wf-text-line.muted { color:var(--wf-text);font-size:11px; }
-.wf-text-line.wf-placeholder { color:var(--wf-text);opacity:.5; }
-.wf-grid-3 { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px; }
-.wf-grid-2 { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px; }
-.wf-card { background:var(--wf-block);border-radius:8px;padding:14px; }
-.wf-stat { text-align:center; }
-.wf-stat-num { font-size:28px;font-weight:600;color:var(--wf-accent);line-height:1; }
-.wf-stat-label { font-size:8px;color:var(--wf-text);margin-top:5px;line-height:1.3;max-width:80px;margin-left:auto;margin-right:auto; }
-.wf-toggle { display:inline-flex;background:var(--wf-block);border-radius:20px;padding:3px;margin-bottom:14px; }
-.wf-toggle-opt { font-size:10px;padding:4px 14px;border-radius:16px;color:var(--wf-text);font-weight:500; }
-.wf-toggle-opt.active { background:var(--wf-accent);color:var(--wf-bg); }
-.wf-row-item { display:flex;gap:8px;align-items:flex-start;margin-bottom:8px; }
-.wf-icon-box { width:20px;height:20px;border-radius:4px;background:var(--wf-block);flex-shrink:0;margin-top:1px; }
-.wf-faq-item { border-bottom:1px solid var(--wf-block);padding:8px 0; }
-.wf-step { display:flex;gap:10px;align-items:flex-start;margin-bottom:10px; }
-.wf-step-num { width:22px;height:22px;border-radius:50%;background:var(--wf-accent);color:var(--wf-bg);font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0; }
-.wf-header-bar { background:var(--wf-block);height:44px;display:flex;align-items:center;padding:0 20px;gap:8px; }
-.wf-logo-box { width:70px;height:18px;background:var(--wf-accent);border-radius:2px;opacity:.6; }
-.wf-nav-links { display:flex;gap:12px;margin-left:20px; }
-.wf-nav-link { width:40px;height:7px;background:var(--wf-text);border-radius:2px;opacity:.5; }
-.wf-nav-cta { margin-left:auto;width:64px;height:24px;background:var(--wf-accent);border-radius:12px;opacity:.7; }
-.wf-footer-bar { background:var(--wf-block);padding:16px 32px; }
+.wf-block.tall { height:48px; } .wf-block.medium { height:28px; } .wf-block.short { height:14px; } .wf-block.xshort { height:8px; }
+.wf-h1 { font-size:30px;font-weight:300;line-height:1.15;letter-spacing:-.025em;color:var(--wf-accent);margin-bottom:12px; }
+.wf-h2 { font-size:20px;font-weight:300;line-height:1.2;letter-spacing:-.02em;color:var(--wf-accent);margin-bottom:9px; }
+.wf-h3 { font-size:12px;font-weight:600;color:var(--wf-accent);margin-bottom:3px;letter-spacing:-.01em; }
+.wf-body { font-size:11px;line-height:1.7;color:var(--wf-text); }
+.wf-intro { font-size:11px;line-height:1.65;color:var(--wf-text);margin-bottom:18px;max-width:440px; }
+.wf-cta { display:inline-block;background:var(--wf-accent);color:var(--wf-bg);font-size:10px;font-weight:500;padding:7px 16px;border-radius:20px;margin-top:14px; }
+.wf-cta-g { display:inline-block;border:0.5px solid var(--wf-block);color:var(--wf-text);font-size:10px;padding:7px 16px;border-radius:20px;margin-top:14px;margin-left:8px; }
+.wf-stats-grid { display:grid;grid-template-columns:repeat(3,1fr);border:0.5px solid var(--wf-block);border-radius:8px;overflow:hidden;background:#fff; }
+.dark .wf-stats-grid { background:#1a1a1a; }
+.wf-stat { padding:20px;text-align:center;border-right:0.5px solid var(--wf-block); }
+.wf-stat:last-child { border-right:none; }
+.wf-stat-num { font-size:24px;font-weight:300;letter-spacing:-.03em;color:var(--wf-accent);line-height:1;margin-bottom:5px; }
+.wf-stat-label { font-size:9px;color:var(--wf-text);line-height:1.4; }
+.wf-2col { display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start; }
+.wf-screen { background:var(--wf-bg);border-radius:6px;height:150px;border:0.5px solid var(--wf-block);display:flex;align-items:center;justify-content:center; }
+.wf-screen-inner { width:76%;height:65%;background:#fff;border-radius:4px;border:0.5px solid var(--wf-block); }
+.dark .wf-screen-inner { background:#2a2a2a; }
+.wf-caption-lbl { font-size:9px;color:var(--wf-text);margin-top:6px;font-style:italic; }
+.wf-grid-3 { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:20px; }
+.wf-grid-2 { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:20px; }
+.wf-grid-4 { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:20px; }
+.wf-card { background:#fff;border:0.5px solid var(--wf-block);border-radius:8px;padding:14px; }
+.dark .wf-card { background:#1a1a1a; }
+.wf-card.alt { background:var(--wf-bg); }
+.wf-card-icon { width:22px;height:22px;background:var(--wf-block);border-radius:5px;margin-bottom:9px; }
+.wf-steps { display:flex;flex-direction:column;gap:11px;margin-top:18px;max-width:460px; }
+.wf-step { display:flex;gap:11px;align-items:flex-start; }
+.wf-step-num { width:24px;height:24px;border-radius:50%;background:var(--wf-accent);color:var(--wf-bg);font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px; }
+.wf-toggle { display:inline-flex;background:var(--wf-block);border-radius:18px;padding:3px;margin-bottom:16px; }
+.wf-tog { font-size:10px;font-weight:500;padding:4px 13px;border-radius:14px;color:var(--wf-text); }
+.wf-tog.on { background:var(--wf-accent);color:var(--wf-bg); }
+.wf-cmp-grid { display:grid;grid-template-columns:1fr 1fr;gap:10px; }
+.wf-cmp-col { border:0.5px solid var(--wf-block);border-radius:8px;padding:14px;background:#fff; }
+.dark .wf-cmp-col { background:#1a1a1a; }
+.wf-cmp-col.good { border-color:#b8d4b8;background:#f8fcf8; }
+.dark .wf-cmp-col.good { background:#0a1a0a;border-color:#2a4a2a; }
+.wf-row-item { display:flex;gap:8px;align-items:flex-start;margin-bottom:9px; }
+.wf-dot-bad { width:14px;height:14px;border-radius:50%;background:#f7c1c1;display:flex;align-items:center;justify-content:center;font-size:8px;color:#a32d2d;flex-shrink:0;margin-top:1px; }
+.wf-dot-good { width:14px;height:14px;border-radius:50%;background:#c0dd97;display:flex;align-items:center;justify-content:center;font-size:8px;color:#3b6d11;flex-shrink:0;margin-top:1px; }
+.wf-faq-item { padding:11px 0;border-bottom:0.5px solid var(--wf-block); }
+.wf-faq-item:last-child { border-bottom:none; }
+.wf-faq-q { font-size:12px;font-weight:500;color:var(--wf-accent);margin-bottom:4px; }
+.wf-faq-a { font-size:11px;color:var(--wf-text);line-height:1.6; }
+.wf-nav-bar { background:#fff;border-bottom:0.5px solid var(--wf-block);height:42px;display:flex;align-items:center;padding:0 28px;gap:14px; }
+.dark .wf-nav-bar { background:#1a1a1a; }
+.wf-nav-logo { width:60px;height:14px;background:var(--wf-accent);border-radius:2px;opacity:.7; }
+.wf-nav-link { width:36px;height:6px;background:var(--wf-text);border-radius:2px;opacity:.4; }
+.wf-nav-cta-btn { margin-left:auto;background:var(--wf-accent);color:var(--wf-bg);font-size:9px;font-weight:600;padding:5px 12px;border-radius:14px;opacity:.8; }
+.wf-footer-bar { background:#111;padding:18px 36px;display:flex;justify-content:space-between;align-items:center; }
+.wf-footer-logo { width:50px;height:12px;background:rgba(255,255,255,.2);border-radius:2px; }
+.wf-footer-links { display:flex;gap:12px; }
+.wf-footer-link { width:38px;height:6px;background:rgba(255,255,255,.12);border-radius:2px; }
 .animate-in { animation:fadeIn .25s ease forwards; }
-.wf-editable { cursor:text; border-radius:3px; transition:background .15s; position:relative; }
-.wf-editable:hover { background:rgba(0,0,0,0.04); }
-.dark .wf-editable:hover { background:rgba(255,255,255,0.06); }
+.wf-editable { cursor:text;border-radius:2px;transition:background .12s; }
+.wf-editable:hover { background:rgba(0,0,0,.05);outline:1px dashed rgba(0,0,0,.12); }
+.dark .wf-editable:hover { background:rgba(255,255,255,.07);outline:1px dashed rgba(255,255,255,.12); }
+.wf-editing { outline:1.5px solid hsl(var(--ring));background:hsl(var(--background));color:hsl(var(--foreground));border-radius:3px;padding:2px 4px;font-family:"Inter",sans-serif;resize:none;width:100%;line-height:inherit;font-size:inherit;font-weight:inherit; }
 .wf-editable:hover::after { content:'✎'; position:absolute; right:-16px; top:50%; transform:translateY(-50%); font-size:10px; opacity:.4; color:var(--wf-accent); }
 .wf-editing { outline:1.5px solid hsl(var(--ring)); background:hsl(var(--background)); color:hsl(var(--foreground)); border-radius:3px; padding:2px 4px; min-width:40px; font-family:inherit; resize:none; width:100%; line-height:inherit; font-size:inherit; font-weight:inherit; }
 .wf-intro { font-size:11px; color:var(--wf-text); line-height:1.6; margin-bottom:10px; }
@@ -326,10 +356,10 @@ FORMAT DE SORTIE
 - Chaque output précédé de son label EXACT en MAJUSCULES suivi de ":"
 - Un output par ligne
 - Structure attendue pour toutes les sections : H2, INTRO, puis H3 numérotés
-- Pour les H3 : format "H3 1 + DESCRIPTION 1 : titre. Description en 1-2 phrases."
-  Le titre et la description sont séparés par un point dans la même valeur.
-- H2 : max 10 mots, contient le mot-clé principal
-- INTRO : 1-3 phrases, pose le contexte et contient les mots-clés secondaires
+- H2 : max 10 mots, contient le mot-clé principal de la section
+- INTRO : 1-3 phrases, pose le contexte, contient les mots-clés secondaires
+- H3 X : titre court max 6 mots nominatifs
+- DESCRIPTION X : 1-2 phrases max 25 mots, suit immédiatement son H3 sur la même ligne séparée par ' — '
 - H3 titres : max 6 mots nominatifs
 - Descriptions H3 : 1-2 phrases max 25 mots chacune
 - Aucun texte supplémentaire autour des outputs`;
@@ -357,7 +387,7 @@ const TEMPLATES_CONFIG = {
     why:"Première impression — 3 secondes pour convaincre de scroller.",
     editorialIntent:"Première section indexée par Google. Le H1 doit contenir le mot-clé principal exact. Le sous-titre est le premier signal sémantique — il doit compléter le H1 avec des mots-clés secondaires naturels. L'objectif est d'apparaître sur les requêtes navigationnelles et transactionnelles de la catégorie.",
     questions:[{id:"target",label:"Cible principale",hint:"Ex : cabinet comptable, PME, DAF…",rows:2},{id:"pain",label:"Problème principal que résout le produit",hint:"La douleur avant, pas la solution.",rows:3},{id:"promise",label:"Promesse centrale",hint:"Ce que l'utilisateur obtient concrètement.",rows:3},{id:"kw",label:"Mots-clés SEO prioritaires",hint:"Séparés par des virgules",rows:1,kw:true}],
-    outputs:["H2 (titre page avec mot-clé principal)", "INTRO (1-2 phrases — promesse centrale)", "TEXTE CTA PRINCIPAL"] },
+    outputs:["TITRE H1", "INTRO", "TEXTE CTA PRINCIPAL"] },
   { id:"keydatas", name:"Chiffres clés", sub:"Key datas", seo:false,
     why:"3 métriques fortes pour ancrer la crédibilité immédiatement.",
     editorialIntent:"Signaux de crédibilité immédiats. Google les lit comme des données structurées. Ces chiffres doivent être vrais, sourcés, et refléter l'autorité du produit. Leur rôle est de réduire le taux de rebond — l'utilisateur comprend en 3 secondes qu'il est au bon endroit.",
@@ -370,32 +400,32 @@ const TEMPLATES_CONFIG = {
       {id:"definition",label:"En vos mots, qu'est-ce que le produit ?",hint:"Expliquez comme à un prospect — ce que c'est, ce que ça fait, pour qui, pourquoi c'est différent. 5-10 lignes libres.",rows:8},
       {id:"kw",label:"Mots-clés SEO prioritaires",hint:"Séparés par des virgules — la ou les requêtes que doit capter cette section.",rows:1,kw:true}
     ],
-    outputs:["H2 (titre section avec mot-clé — format definition)", "INTRO (2-3 paragraphes 150-200 mots — definition + contexte + differenciateur)", "ACCROCHE BENEFICE (1 phrase courte)", "LEGENDE VISUEL PRODUIT"] },
+    outputs:["H2", "INTRO", "ACCROCHE BENEFICE (1 phrase courte)", "LEGENDE VISUEL PRODUIT"] },
   { id:"avantages", name:"Avantages", sub:"Bénéfices business", seo:true,
     why:"Langue du décideur. ROI, gain de temps, réduction de risque.",
     editorialIntent:"Cible les requêtes de comparaison et d'évaluation (phase de considération). L'utilisateur se demande 'pourquoi ce produit plutôt qu'un autre ?'. Chaque bénéfice doit être formulé comme une réponse à une objection implicite. Langue du décideur business, pas du technicien.",
     questions:[{id:"b1",label:"Bénéfice business n°1",hint:"Résultat mesurable ou perçu",rows:2},{id:"b2",label:"Bénéfice business n°2",hint:"",rows:2},{id:"b3",label:"Bénéfice business n°3",hint:"",rows:2},{id:"kw",label:"Mots-clés SEO",hint:"Séparés par des virgules",rows:1,kw:true}],
-    outputs:["H2 (titre section avec mot-clé)", "INTRO (1-2 phrases — angle bénéfices business)", "H3 1 + DESCRIPTION 1", "H3 2 + DESCRIPTION 2", "H3 3 + DESCRIPTION 3"] },
+    outputs:["H2", "INTRO", "H3 1 + DESCRIPTION 1", "H3 2 + DESCRIPTION 2", "H3 3 + DESCRIPTION 3"] },
   { id:"casusage", name:"Cas d'usage", sub:"Use cases", seo:true,
     why:"L'utilisateur se reconnaît dans un scénario concret.",
     editorialIntent:"Cible les requêtes longue traîne par profil et situation ('logiciel comptabilité pour cabinet 50 dossiers', 'outil comptable multi-bureaux'). Chaque cas doit nommer explicitement un profil reconnaissable. C'est aussi le bloc qui crée le sentiment de reconnaissance — 'c'est exactement moi'.",
     questions:[{id:"uc1",label:"Cas d'usage n°1 — profil + situation",hint:"Ex : cabinet gérant 50 dossiers",rows:3},{id:"uc2",label:"Cas d'usage n°2",hint:"",rows:3},{id:"uc3",label:"Cas d'usage n°3 (optionnel)",hint:"",rows:2},{id:"kw",label:"Mots-clés SEO",hint:"Séparés par des virgules",rows:1,kw:true}],
-    outputs:["H2 (titre section avec mot-clé)", "INTRO (1-2 phrases — angle use cases)", "H3 1 + DESCRIPTION 1", "H3 2 + DESCRIPTION 2", "H3 3 + DESCRIPTION 3", "H3 4 + DESCRIPTION 4", "H3 5 + DESCRIPTION 5", "H3 6 + DESCRIPTION 6"] },
+    outputs:["H2", "INTRO", "H3 1 + DESCRIPTION 1", "H3 2 + DESCRIPTION 2", "H3 3 + DESCRIPTION 3", "H3 4 + DESCRIPTION 4", "H3 5 + DESCRIPTION 5", "H3 6 + DESCRIPTION 6"] },
   { id:"howitworks", name:"Comment ça marche", sub:"Mécanisme produit", seo:false,
     why:"Lever l'ambiguïté sur le modèle avant les features.",
     editorialIntent:"Google valorise les pages qui expliquent le processus — c'est un signal d'expertise. Ce bloc cible les requêtes 'comment fonctionne X' et 'comment faire Y avec X'. Les étapes doivent être concrètes, actionnables, avec des verbes d'action. Idéalement éligible au format FAQ/HowTo rich snippet.",
     questions:[{id:"s1",label:"Étape 1",hint:"Ex : connectez votre banque",rows:2},{id:"s2",label:"Étape 2",hint:"",rows:2},{id:"s3",label:"Étape 3",hint:"",rows:2},{id:"s4",label:"Étape 4 (optionnelle)",hint:"",rows:2}],
-    outputs:["H2 (titre section avec mot-clé)", "INTRO (1-2 phrases)", "H3 ÉTAPE 1 + DESCRIPTION 1", "H3 ÉTAPE 2 + DESCRIPTION 2", "H3 ÉTAPE 3 + DESCRIPTION 3", "H3 ÉTAPE 4 + DESCRIPTION 4"] },
+    outputs:["H2", "INTRO", "H3 ÉTAPE 1 + DESCRIPTION 1", "H3 ÉTAPE 2 + DESCRIPTION 2", "H3 ÉTAPE 3 + DESCRIPTION 3", "H3 ÉTAPE 4 + DESCRIPTION 4"] },
   { id:"features", name:"Fonctionnalités", sub:"Features clés", seo:true,
     why:"Langue produit pour l'évaluateur technique.",
     editorialIntent:"Cible les requêtes de comparaison techniques et les recherches de fonctionnalités spécifiques ('logiciel comptabilité gros volumes', 'automatisation écritures comptables IA'). C'est le bloc lu par les évaluateurs techniques. La feature différenciante doit être mise en avant dès le début — c'est elle qui crée la séparation vs concurrents.",
     questions:[{id:"list",label:"Liste des fonctionnalités principales",hint:"Une par ligne : nom + description courte",rows:5},{id:"diff",label:"Feature différenciante",hint:"Celle que les concurrents font moins bien.",rows:3},{id:"kw",label:"Mots-clés SEO",hint:"Séparés par des virgules",rows:1,kw:true}],
-    outputs:["H2 (titre section avec mot-clé)", "INTRO (1-2 phrases — angle features techniques)", "H3 1 + DESCRIPTION 1", "H3 2 + DESCRIPTION 2", "H3 3 + DESCRIPTION 3", "H3 4 + DESCRIPTION 4", "H3 5 + DESCRIPTION 5", "H3 6 + DESCRIPTION 6"] },
+    outputs:["H2", "INTRO", "H3 1 + DESCRIPTION 1", "H3 2 + DESCRIPTION 2", "H3 3 + DESCRIPTION 3", "H3 4 + DESCRIPTION 4", "H3 5 + DESCRIPTION 5", "H3 6 + DESCRIPTION 6"] },
   { id:"comparaison", name:"Comparaison", sub:"Avant / Après", seo:false,
     why:"Retournement narratif sans nommer de concurrent.",
     editorialIntent:"Cible implicitement les requêtes de comparaison vs la méthode traditionnelle ou vs concurrents. Le toggle avant/après est un dispositif narratif fort qui permet d'adresser les deux états sans nommer de concurrent. Google lit ce bloc comme du contenu comparatif à haute valeur — il peut remonter sur des requêtes 'alternative à' ou 'vs'.",
     questions:[{id:"before_label",label:"Label de l'état 'avant'",hint:"Ex : Sans Inqom",rows:1},{id:"pains",label:"3–4 problèmes de l'état 'avant'",hint:"Titre court + 1 phrase chacun",rows:4},{id:"gains",label:"3–4 bénéfices de l'état 'après'",hint:"Répondent aux problèmes ci-dessus",rows:4}],
-    outputs:["H2 (titre section)", "INTRO (1-2 phrases)", "LABEL TOGGLE AVANT", "H3 PROBLÈME 1 + DESCRIPTION 1", "H3 PROBLÈME 2 + DESCRIPTION 2", "H3 PROBLÈME 3 + DESCRIPTION 3", "H3 GAIN 1 + DESCRIPTION 1", "H3 GAIN 2 + DESCRIPTION 2", "H3 GAIN 3 + DESCRIPTION 3"] },
+    outputs:["H2", "INTRO", "LABEL TOGGLE AVANT", "H3 PROBLÈME 1 + DESCRIPTION 1", "H3 PROBLÈME 2 + DESCRIPTION 2", "H3 PROBLÈME 3 + DESCRIPTION 3", "H3 GAIN 1 + DESCRIPTION 1", "H3 GAIN 2 + DESCRIPTION 2", "H3 GAIN 3 + DESCRIPTION 3"] },
   { id:"pourqui", name:"Pour qui ?", sub:"Profils & personas", seo:true,
     why:"Crée le sentiment de reconnaissance — l'utilisateur se voit dans la page.",
     editorialIntent:"Machine à longue traîne par profil. Google remonte cette section sur des requêtes comme 'logiciel comptabilité cabinet solo' ou 'plateforme comptable grand cabinet'. Chaque profil est une micro-cible SEO. Le texte doit nommer explicitement le profil, sa situation et son bénéfice principal. Éligible au rich snippet FAQ si formulé en Q/R implicite.",
@@ -698,42 +728,37 @@ function buildSections() {
 function txt(text, cls="") { return `<div class="wf-text-line ${cls}">${text}</div>`; }
 function block(cls="medium") { return `<div class="wf-block ${cls}"></div>`; }
 
-// ── WIREFRAME RENDERER ───────────────────────────────────────────
-// Generic renderer that understands the H2 / INTRO / H3+DESC pattern
-// All sections use the same structure — no more per-section templates needed
-
+// ── WIREFRAME RENDERER — LANDING SOBRE ──────────────────────────
 function wfEditable(text, outputKey, secId, cls="") {
-  const safeText = (text||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  return `<span class="wf-editable ${cls}" onclick="startWfEdit(this,'${secId}','${outputKey.replace(/'/g,"\\'")}',event)">${safeText}</span>`;
+  const safe = (text||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  return `<span class="wf-editable ${cls}" onclick="startWfEdit(this,'${secId}','${(outputKey||"").replace(/'/g,"\\'")}',event)">${safe}</span>`;
 }
 
 function startWfEdit(el, secId, outputKey, e) {
   e.stopPropagation();
-  if (el.querySelector('textarea')) return;
+  if (el.querySelector('textarea,input')) return;
   const current = el.textContent;
   const ta = document.createElement('textarea');
   ta.className = 'wf-editing';
   ta.value = current;
-  ta.rows = Math.max(1, Math.ceil(current.length / 60));
+  ta.rows = Math.max(1, Math.ceil(current.length / 55));
   el.innerHTML = '';
   el.appendChild(ta);
-  ta.focus();
-  ta.select();
+  ta.focus(); ta.select();
   ta.addEventListener('blur', () => {
-    const newVal = ta.value.trim();
-    el.innerHTML = newVal || current;
-    // Persist to outputs
+    const v = ta.value.trim();
+    el.innerHTML = v || current;
     const page = currentPage();
     if (page.outputs[secId]) {
-      // Replace the value for this key in raw output
       const lines = page.outputs[secId].split('\n');
       const updated = lines.map(line => {
         const ci = line.indexOf(':');
         if (ci > 2) {
           const k = line.substring(0,ci).trim();
-          const shortKey = k.split(/\s*[\u2014\-]\s*/)[0].trim();
-          if (k === outputKey || shortKey === outputKey || k.startsWith(outputKey)) {
-            return k + ': ' + newVal;
+          const kU = k.toUpperCase();
+          const oU = (outputKey||"").toUpperCase();
+          if (kU === oU || kU.startsWith(oU) || oU.startsWith(kU.split(/\s*[\u2014\-]\s*/)[0])) {
+            return k + ': ' + v;
           }
         }
         return line;
@@ -742,151 +767,169 @@ function startWfEdit(el, secId, outputKey, e) {
       saveToStorage();
     }
   });
-  ta.addEventListener('keydown', e => { if (e.key === 'Escape') { el.innerHTML = current; } });
+  ta.addEventListener('keydown', e => { if(e.key==='Escape') el.innerHTML = current; });
 }
 
 function renderWfSection(secId, data) {
-  const sec = getSectionsForPage(currentPage()).find(s => s.id === secId);
-  if (!sec) return '<div></div>';
-
-  // Extract keys by type
   const keys = Object.keys(data);
-  const h2Key = keys.find(k => k.toUpperCase().startsWith('H2') || k === 'TITRE DE SECTION' || k === 'TITRE');
-  const introKey = keys.find(k => k.toUpperCase().startsWith('INTRO') || k.toUpperCase().startsWith('DÉFINITION') || k.toUpperCase().startsWith('DEFINITION'));
-  const h3Keys = keys.filter(k => k.toUpperCase().startsWith('H3') || (k.toUpperCase().match(/^(AVANTAGE|CAS|ÉTAPE|ETAPE|PROFIL|H3|GAIN|PROBLÈME|PROBLEME|FAQ|QUESTION)\s+\d/) && !k.toUpperCase().startsWith('H2') && !k.toUpperCase().startsWith('INTRO')));
-  const extraKeys = keys.filter(k => !k.startsWith('H2') && !k.startsWith('INTRO') && !k.startsWith('TITRE') && !k.startsWith('DÉFINITION') && !k.startsWith('DEFINITION') && !h3Keys.includes(k) && k !== 'LABEL TOGGLE AVANT' && k !== 'TEXTE CTA PRINCIPAL' && k !== 'LEGENDE VISUEL PRODUIT' && k !== 'LÉGENDE VISUEL PRODUIT' && k !== 'ACCROCHE' && k !== 'ACCROCHE BÉNÉFICE' && k !== 'ACCROCHE BENEFICE');
+  const get = (prefix) => {
+    const k = keys.find(k => k.toUpperCase().startsWith(prefix.toUpperCase()));
+    return k ? { key: k, val: data[k] } : null;
+  };
+  const getN = (prefix, n) => {
+    const k = keys.find(k => k.toUpperCase().startsWith(prefix.toUpperCase() + ' ' + n) || k.toUpperCase().startsWith('H3 ' + n));
+    return k ? { key: k, val: data[k] } : null;
+  };
 
-  const h2Val = h2Key ? data[h2Key] : null;
-  const introVal = introKey ? data[introKey] : null;
-  const ctaKey = keys.find(k => k.startsWith('TEXTE CTA') || k.startsWith('CTA'));
-  const captionKey = keys.find(k => k.includes('LÉGENDE') || k.includes('LEGENDE') || k.includes('CAPTION'));
-  const accrocheKey = keys.find(k => k.startsWith('ACCROCHE'));
-  const labelToggle = data['LABEL TOGGLE AVANT'];
+  const h1 = get('TITRE H1') || get('H1');
+  const h2 = get('H2') || get('TITRE DE SECTION') || get('TITRE');
+  const intro = get('INTRO') || get('DÉFINITION') || get('DEFINITION');
+  const cta = get('TEXTE CTA') || get('CTA');
+  const caption = get('LÉGENDE') || get('LEGENDE') || get('CAPTION');
+  const accroche = get('ACCROCHE');
+  const labelToggle = get('LABEL TOGGLE');
 
-  let html = '';
+  const secTag = (label, isDone) => `<div class="wf-label">${label}${isDone?'<span class="done-mark">✓ généré</span>':''}</div>`;
+  const isDone = currentPage().completed.has(secId);
+  const sec = getSectionsForPage(currentPage()).find(s=>s.id===secId);
+  const tag = secTag(sec ? sec.name + ' — ' + sec.sub : secId, isDone);
 
-  // H2
-  if (h2Val) {
-    html += `<div class="wf-h2">${wfEditable(h2Val, h2Key, secId)}</div>`;
-  } else {
-    html += `<div class="wf-block medium" style="margin-bottom:8px"></div>`;
-  }
+  const placeholder = (lines=2) => Array(lines).fill(0).map((_,i) => `<div class="wf-block ${i===0?'medium':'short'}" style="margin-bottom:5px;${i>0?'opacity:.5':''}"></div>`).join('');
 
-  // For sideshow: two-column layout
-  if (secId === 'sideshow') {
-    html = `<div style="display:grid;grid-template-columns:1.3fr 1fr;gap:20px;align-items:start;">
-      <div>
-        ${h2Val ? `<div class="wf-h2">${wfEditable(h2Val, h2Key, secId)}</div>` : '<div class="wf-block medium" style="margin-bottom:8px"></div>'}
-        ${introVal ? `<div class="wf-intro">${wfEditable(introVal, introKey, secId)}</div>` : `<div class="wf-block short" style="margin-bottom:4px"></div><div class="wf-block xshort" style="margin-bottom:4px"></div><div class="wf-block short" style="margin-bottom:8px"></div>`}
-        ${accrocheKey && data[accrocheKey] ? `<div class="wf-h3">${wfEditable(data[accrocheKey], accrocheKey, secId)}</div>` : ''}
-        ${ctaKey && data[ctaKey] ? `<div class="wf-block btn-shape" style="display:inline-flex;align-items:center;justify-content:center;margin-top:8px"><span style="font-size:10px;font-weight:600;color:var(--wf-bg)">${wfEditable(data[ctaKey], ctaKey, secId)}</span></div>` : ''}
-      </div>
-      <div>
-        <div class="wf-block" style="height:130px;border-radius:6px;margin-bottom:6px;"></div>
-        ${captionKey && data[captionKey] ? `<div class="wf-intro">${wfEditable(data[captionKey], captionKey, secId)}</div>` : ''}
+  // ── HERO ──
+  if (secId === 'hero') {
+    const title = h1 || h2;
+    return `${tag}<div style="text-align:center;padding:8px 0 12px;">
+      ${title ? `<div class="wf-h1">${wfEditable(title.val, title.key, secId)}</div>` : `<div class="wf-block medium" style="max-width:400px;margin:0 auto 10px;height:36px;"></div>`}
+      ${intro ? `<div class="wf-intro" style="max-width:420px;margin:0 auto;">${wfEditable(intro.val, intro.key, secId)}</div>` : `<div style="max-width:340px;margin:0 auto;">${placeholder(2)}</div>`}
+      <div style="margin-top:14px;">
+        ${cta ? `<span class="wf-cta">${wfEditable(cta.val, cta.key, secId)}</span>` : '<span class="wf-cta" style="opacity:.3">Call to action</span>'}
+        <span class="wf-cta-g">Voir la démo</span>
       </div>
     </div>`;
-    return html;
   }
 
-  // For comparaison: toggle layout
-  if (secId === 'comparaison') {
-    const gains = h3Keys.filter(k => k.toUpperCase().includes('GAIN'));
-    const probs = h3Keys.filter(k => k.toUpperCase().includes('PROB') || k.toUpperCase().includes('PROBLÈME'));
-    const pR = probs.map(k => {
-      const parts = (data[k]||'').split(/[.\n]/,2);
-      return `<div class="wf-row-item"><div style="width:16px;height:16px;border-radius:50%;background:#fee2e2;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#dc2626;">✕</div><div><div class="wf-h3">${wfEditable(parts[0]?.trim(), k, secId)}</div>${parts[1]?`<div class="wf-desc">${wfEditable(parts[1].trim(), k+'_desc', secId)}</div>`:''}</div></div>`;
-    }).join('');
-    const gR = gains.map(k => {
-      const parts = (data[k]||'').split(/[.\n]/,2);
-      return `<div class="wf-row-item"><div style="width:16px;height:16px;border-radius:50%;background:#dcfce7;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#16a34a;">✓</div><div><div class="wf-h3">${wfEditable(parts[0]?.trim(), k, secId)}</div>${parts[1]?`<div class="wf-desc">${wfEditable(parts[1].trim(), k+'_desc', secId)}</div>`:''}</div></div>`;
-    }).join('');
-    const h2Block = h2Val ? `<div class="wf-h2" style="text-align:center;margin-bottom:6px">${wfEditable(h2Val, h2Key, secId)}</div>` : '';
-    const introBlock = introVal ? `<div class="wf-intro" style="text-align:center;margin-bottom:10px">${wfEditable(introVal, introKey, secId)}</div>` : '';
-    const toggleLabel = labelToggle || 'Sans ' + (state.config.productName||'Inqom');
-    return `${h2Block}${introBlock}
-      <div style="text-align:center;margin-bottom:14px"><div class="wf-toggle"><div class="wf-toggle-opt active">${toggleLabel}</div><div class="wf-toggle-opt" style="color:var(--wf-accent)">${state.config.productName||'Inqom'}</div></div></div>
-      <div class="wf-grid-2"><div class="wf-card">${pR||'<div class="wf-block short"></div>'}</div><div class="wf-card" style="border:1px solid #16a34a44;">${gR||'<div class="wf-block short"></div>'}</div></div>`;
-  }
-
-  // INTRO
-  if (introVal) {
-    html += `<div class="wf-intro">${wfEditable(introVal, introKey, secId)}</div>`;
-  } else {
-    html += `<div class="wf-block short" style="margin-bottom:4px"></div><div class="wf-block xshort" style="margin-bottom:8px"></div>`;
-  }
-
-  // Special: keydatas stats
+  // ── CHIFFRES CLÉS ──
   if (secId === 'keydatas') {
-    const statKeys = keys.filter(k => k.startsWith('CHIFFRE'));
-    const cells = [1,2,3].map(n => {
-      const k = statKeys.find(k => k.includes(String(n)));
-      if (k && data[k]) {
-        const p = data[k].split(/[:—\-\n]/);
-        return `<div class="wf-stat"><div class="wf-stat-num">${wfEditable(p[0]?.trim(), k, secId)}</div><div class="wf-stat-label">${wfEditable(p[1]?.trim()||'', k+'_label', secId)}</div></div>`;
+    const stats = [1,2,3].map(n => {
+      const s = getN('CHIFFRE', n) || keys.filter(k=>k.toUpperCase().includes('CHIFFRE')).map(k=>({key:k,val:data[k]})).find((_,i)=>i===n-1);
+      if (s && s.val) {
+        const p = s.val.split(/[:—\u2014\-\n]/);
+        return `<div class="wf-stat">
+          <div class="wf-stat-num">${wfEditable(p[0]?.trim()||s.val, s.key, secId)}</div>
+          <div class="wf-stat-label">${wfEditable(p.slice(1).join(' ').trim()||'', s.key+'_lbl', secId)}</div>
+        </div>`;
       }
-      return `<div class="wf-stat"><div class="wf-block tall"></div></div>`;
+      return `<div class="wf-stat"><div class="wf-block tall" style="margin:0 auto;width:60px;"></div></div>`;
     }).join('');
-    return html + `<div class="wf-grid-3" style="margin-top:8px">${cells}</div>`;
+    return `${tag}
+      ${h2 ? `<div class="wf-h2" style="text-align:center;margin-bottom:6px;">${wfEditable(h2.val,h2.key,secId)}</div>` : ''}
+      ${intro ? `<div class="wf-intro" style="text-align:center;margin:0 auto 16px;max-width:400px;">${wfEditable(intro.val,intro.key,secId)}</div>` : ''}
+      <div class="wf-stats-grid">${stats}</div>`;
   }
 
-  // Special: hero CTA
-  if (secId === 'hero') {
-    const cta = ctaKey ? data[ctaKey] : null;
-    html += cta ? `<div style="margin-top:10px"><div class="wf-block btn-shape" style="display:inline-flex;align-items:center;justify-content:center;"><span style="font-size:10px;font-weight:600;color:var(--wf-bg)">${wfEditable(cta, ctaKey, secId)}</span></div></div>` : '';
-    return `<div style="text-align:center">${html}</div>`;
+  // ── SIDESHOW ──
+  if (secId === 'sideshow') {
+    return `${tag}<div class="wf-2col">
+      <div>
+        ${h2 ? `<div class="wf-h2">${wfEditable(h2.val,h2.key,secId)}</div>` : `<div class="wf-block medium" style="margin-bottom:8px;"></div>`}
+        ${intro ? `<div class="wf-intro">${wfEditable(intro.val,intro.key,secId)}</div>` : placeholder(3)}
+        ${accroche ? `<div class="wf-h3" style="margin-top:6px;">${wfEditable(accroche.val,accroche.key,secId)}</div>` : ''}
+        <span class="wf-cta">${cta ? wfEditable(cta.val,cta.key,secId) : 'En savoir plus'}</span>
+      </div>
+      <div>
+        <div class="wf-screen"><div class="wf-screen-inner"></div></div>
+        ${caption ? `<div class="wf-caption-lbl">${wfEditable(caption.val,caption.key,secId)}</div>` : ''}
+      </div>
+    </div>`;
   }
 
-  // Special: FAQ
+  // ── COMPARAISON ──
+  if (secId === 'comparaison') {
+    const probKeys = keys.filter(k => k.toUpperCase().includes('PROBLÈME') || k.toUpperCase().includes('PROBLEME') || k.toUpperCase().includes('PAIN'));
+    const gainKeys = keys.filter(k => k.toUpperCase().startsWith('GAIN') || k.toUpperCase().startsWith('H3 GAIN'));
+    const pRows = probKeys.length ? probKeys.map(k => {
+      const p = (data[k]||'').split(/\.\s+|\n/).filter(Boolean);
+      return `<div class="wf-row-item"><div class="wf-dot-bad">✕</div><div><div class="wf-h3">${wfEditable(p[0]?.trim()||data[k], k, secId)}</div>${p[1]?`<div class="wf-body" style="margin-top:2px;">${wfEditable(p[1].trim(), k+'_d', secId)}</div>`:''}</div></div>`;
+    }).join('') : `${placeholder(2)}`;
+    const gRows = gainKeys.length ? gainKeys.map(k => {
+      const p = (data[k]||'').split(/\.\s+|\n/).filter(Boolean);
+      return `<div class="wf-row-item"><div class="wf-dot-good">✓</div><div><div class="wf-h3">${wfEditable(p[0]?.trim()||data[k], k, secId)}</div>${p[1]?`<div class="wf-body" style="margin-top:2px;">${wfEditable(p[1].trim(), k+'_d', secId)}</div>`:''}</div></div>`;
+    }).join('') : `${placeholder(2)}`;
+    const toggleLabel = labelToggle ? labelToggle.val : 'Sans ' + state.config.productName;
+    return `${tag}
+      ${h2 ? `<div class="wf-h2" style="margin-bottom:8px;">${wfEditable(h2.val,h2.key,secId)}</div>` : ''}
+      ${intro ? `<div class="wf-intro">${wfEditable(intro.val,intro.key,secId)}</div>` : ''}
+      <div class="wf-toggle"><div class="wf-tog on">${toggleLabel}</div><div class="wf-tog">${state.config.productName||'Inqom'}</div></div>
+      <div class="wf-cmp-grid"><div class="wf-cmp-col">${pRows}</div><div class="wf-cmp-col good">${gRows}</div></div>`;
+  }
+
+  // ── FAQ ──
   if (secId === 'faq') {
-    const faqItems = h3Keys.map(k => {
-      const val = data[k] || '';
-      const sep = val.indexOf('?');
-      const q = sep > -1 ? val.substring(0, sep+1).trim() : val.split(/[.\n]/)[0].trim();
-      const a = sep > -1 ? val.substring(sep+1).trim() : (val.split(/[.\n]/)[1]||'').trim();
-      return `<div class="wf-faq-item"><div class="wf-h3">${wfEditable(q, k, secId)}</div>${a?`<div class="wf-desc">${wfEditable(a, k+'_a', secId)}</div>`:''}</div>`;
-    }).join('');
-    return `<div style="max-width:500px;margin:0 auto">${html}${faqItems||'<div class="wf-block short"></div>'}</div>`;
-  }
-
-  // Generic H3 + description grid
-  if (h3Keys.length > 0) {
-    const useGrid = h3Keys.length >= 3;
-    const items = h3Keys.map(k => {
-      const val = data[k] || '';
-      // Split on first sentence boundary or dash
-      const parts = val.split(/(?<=[.!?])\s+|\s*—\s*|\n/);
-      const title = parts[0]?.trim() || val;
-      const desc = parts.slice(1).join(' ').trim();
-      return `<div class="wf-card">
-        <div class="wf-h3">${wfEditable(title, k, secId)}</div>
-        ${desc ? `<div class="wf-desc">${wfEditable(desc, k+'_desc', secId)}</div>` : '<div class="wf-block xshort" style="margin-top:4px"></div>'}
+    const faqKeys = keys.filter(k => k.toUpperCase().startsWith('H3') || k.toUpperCase().startsWith('FAQ') || k.toUpperCase().startsWith('QUESTION'));
+    const items = faqKeys.length ? faqKeys.map(k => {
+      const v = data[k]||'';
+      const qMark = v.indexOf('?');
+      const q = qMark > -1 ? v.substring(0,qMark+1).trim() : v.split(/\n/)[0].trim();
+      const a = qMark > -1 ? v.substring(qMark+1).trim() : v.split(/\n/).slice(1).join(' ').trim();
+      return `<div class="wf-faq-item">
+        <div class="wf-faq-q">${wfEditable(q, k, secId)}</div>
+        ${a ? `<div class="wf-faq-a">${wfEditable(a, k+'_a', secId)}</div>` : ''}
       </div>`;
-    }).join('');
-    html += `<div class="${useGrid ? 'wf-grid-3' : 'wf-grid-2'}" style="margin-top:8px">${items}</div>`;
+    }).join('') : placeholder(3);
+    return `${tag}
+      ${h2 ? `<div class="wf-h2" style="margin-bottom:6px;">${wfEditable(h2.val,h2.key,secId)}</div>` : ''}
+      ${intro ? `<div class="wf-intro">${wfEditable(intro.val,intro.key,secId)}</div>` : ''}
+      <div style="max-width:540px;">${items}</div>`;
   }
 
-  // Howitworks: numbered steps
+  // ── HOWITWORKS ──
   if (secId === 'howitworks') {
-    const stepKeys = h3Keys.filter(k => k.toUpperCase().includes('ÉTAPE') || k.toUpperCase().includes('ETAPE') || k.toUpperCase().includes('STEP'));
-    if (stepKeys.length > 0) {
-      html = (h2Val ? `<div class="wf-h2">${wfEditable(h2Val, h2Key, secId)}</div>` : '') +
-             (introVal ? `<div class="wf-intro">${wfEditable(introVal, introKey, secId)}</div>` : '');
-      stepKeys.forEach((k, i) => {
-        const val = data[k] || '';
-        const parts = val.split(/(?<=[.!?])\s+|\s*—\s*|\n/);
-        const title = parts[0]?.trim() || val;
-        const desc = parts.slice(1).join(' ').trim();
-        html += `<div class="wf-step"><div class="wf-step-num">${i+1}</div><div><div class="wf-h3">${wfEditable(title, k, secId)}</div>${desc?`<div class="wf-desc">${wfEditable(desc, k+'_desc', secId)}</div>`:''}</div></div>`;
-      });
-      return html;
-    }
+    const stepKeys = keys.filter(k => k.toUpperCase().includes('ÉTAPE') || k.toUpperCase().includes('ETAPE') || k.toUpperCase().includes('STEP') || (k.toUpperCase().startsWith('H3') && k.match(/\d/)));
+    const steps = stepKeys.length ? stepKeys.map((k,i) => {
+      const v = data[k]||'';
+      const p = v.split(/\.\s+|\n/);
+      return `<div class="wf-step">
+        <div class="wf-step-num">${i+1}</div>
+        <div><div class="wf-h3">${wfEditable(p[0]?.trim()||v, k, secId)}</div>${p[1]?`<div class="wf-body" style="margin-top:2px;">${wfEditable(p.slice(1).join(' ').trim(), k+'_d', secId)}</div>`:''}</div>
+      </div>`;
+    }).join('') : [1,2,3,4].map(n=>`<div class="wf-step"><div class="wf-step-num" style="opacity:.25;">${n}</div><div>${placeholder(1)}</div></div>`).join('');
+    return `${tag}
+      ${h2 ? `<div class="wf-h2" style="margin-bottom:6px;">${wfEditable(h2.val,h2.key,secId)}</div>` : ''}
+      ${intro ? `<div class="wf-intro">${wfEditable(intro.val,intro.key,secId)}</div>` : ''}
+      <div class="wf-steps">${steps}</div>`;
   }
 
-  return html;
+  // ── GENERIC — avantages, casusage, features, pourqui ──
+  const h3Keys = keys.filter(k => {
+    const u = k.toUpperCase();
+    return u.startsWith('H3') || u.match(/^(AVANTAGE|CAS|PROFIL|FEAT|FONCT)\s+\d/i);
+  });
+
+  const isGrid4 = secId === 'pourqui';
+  const gridClass = isGrid4 ? 'wf-grid-4' : h3Keys.length >= 4 ? 'wf-grid-3' : 'wf-grid-3';
+  const cardAlt = (secId === 'casusage' || secId === 'pourqui') ? ' alt' : '';
+
+  const cards = h3Keys.length ? h3Keys.map(k => {
+    const v = data[k]||'';
+    const p = v.split(/\.\s+|\n/);
+    const title = p[0]?.trim() || v;
+    const desc = p.slice(1).join(' ').trim();
+    return `<div class="wf-card${cardAlt}">
+      ${secId === 'avantages' ? '<div class="wf-card-icon"></div>' : ''}
+      <div class="wf-h3">${wfEditable(title, k, secId)}</div>
+      ${desc ? `<div class="wf-body" style="margin-top:4px;">${wfEditable(desc, k+'_d', secId)}</div>` : `<div class="wf-block short" style="margin-top:5px;opacity:.5;"></div>`}
+    </div>`;
+  }).join('') : Array(isGrid4?4:6).fill(0).map(()=>`<div class="wf-card${cardAlt}">${secId==='avantages'?'<div class="wf-card-icon"></div>':''}<div class="wf-block short" style="margin-bottom:6px;"></div><div class="wf-block xshort" style="opacity:.5;"></div></div>`).join('');
+
+  return `${tag}
+    ${h2 ? `<div class="wf-h2">${wfEditable(h2.val,h2.key,secId)}</div>` : ''}
+    ${intro ? `<div class="wf-intro">${wfEditable(intro.val,intro.key,secId)}</div>` : ''}
+    <div class="${gridClass}">${cards}</div>`;
 }
 
 const WF_TEMPLATES = {};
+
 
 function renderWireframeForPage() {
   const root = document.getElementById("wf-root");
@@ -903,15 +946,17 @@ function renderWireframeForPage() {
     const el = document.createElement("div");
     el.id = `wf-${sec.id}`;
     const isDone = page.completed.has(sec.id);
-    el.className = "wf-section" + (isDone?" wf-done":"");
+    const altSections = ['keydatas','avantages','howitworks','pourqui','faq'];
+    const isAlt = altSections.includes(sec.id);
+    el.className = "wf-section" + (isAlt?" wf-alt":"") + (isDone?" wf-done":"");
     const data = parsedOutputs(sec.id);
-    el.innerHTML = `<div class="wf-label"><div class="wf-label-dot ${isDone?'done':''}"></div>${sec.name}<span style="font-weight:400;opacity:.6"> — ${sec.sub}</span>${isDone?'<span style="margin-left:auto;font-size:9px;color:#16a34a;">✓</span>':''}</div><div class="animate-in">${renderWfSection(sec.id, data)}</div>`;
+    el.innerHTML = `<div class="animate-in">${renderWfSection(sec.id, data)}</div>`;
     root.appendChild(el);
   });
 
   const footerEl = document.createElement("div");
   footerEl.className = "wf-footer-bar";
-  footerEl.innerHTML = `<div style="display:flex;gap:12px">${[80,60,48].map(w=>`<div class="wf-block xshort" style="width:${w}px;margin-bottom:0"></div>`).join("")}</div>`;
+  footerEl.innerHTML = `<div class="wf-footer-logo"></div><div class="wf-footer-links"><div class="wf-footer-link"></div><div class="wf-footer-link"></div><div class="wf-footer-link"></div></div>`;
   root.appendChild(footerEl);
 
   document.getElementById("wf-status").textContent = page.completed.size > 0 ? `${page.completed.size}/${getSectionsForPage(page).length} sections` : "En attente…";
@@ -923,8 +968,9 @@ function refreshWireframeSection(secId) {
   if (!el) return;
   const sec = getSectionsForPage(currentPage()).find(s=>s.id===secId);
   const data = parsedOutputs(secId);
-  el.className = "wf-section wf-done";
-  el.innerHTML = `<div class="wf-label"><div class="wf-label-dot done"></div>${sec.name}<span style="font-weight:400;opacity:.6"> — ${sec.sub}</span><span style="margin-left:auto;font-size:9px;color:#16a34a;">✓</span></div><div class="animate-in">${renderWfSection(sec.id, data)}</div>`;
+  const altSecs = ['keydatas','avantages','howitworks','pourqui','faq'];
+  el.className = "wf-section" + (altSecs.includes(secId)?" wf-alt":"") + " wf-done";
+  el.innerHTML = `<div class="animate-in">${renderWfSection(secId, data)}</div>`;
   el.scrollIntoView({behavior:"smooth",block:"center"});
   const page = currentPage();
   document.getElementById("wf-status").textContent = `${page.completed.size}/${getSectionsForPage(page).length} sections`;
@@ -1041,7 +1087,11 @@ function clearSection(secId) {
   document.getElementById(`btn-${secId}`).innerHTML=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 3 14 9-14 9V3z"/></svg> Générer`;
   const sec = getSectionsForPage(currentPage()).find(s=>s.id===secId);
   const wfEl = document.getElementById(`wf-${secId}`);
-  if (wfEl) { wfEl.className="wf-section"; wfEl.innerHTML=`<div class="wf-label"><div class="wf-label-dot"></div>${sec.name}<span style="font-weight:400;opacity:.6"> — ${sec.sub}</span></div><div>${renderWfSection(sec.id, {})}</div>`; }
+  if (wfEl) {
+    const altSecs2 = ['keydatas','avantages','howitworks','pourqui','faq'];
+    wfEl.className = "wf-section" + (altSecs2.includes(secId)?" wf-alt":"");
+    wfEl.innerHTML = `<div>${renderWfSection(sec.id, {})}</div>`;
+  }
 }
 
 function markDone(secId) {
