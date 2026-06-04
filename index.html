@@ -1106,17 +1106,18 @@ function renderWfSection(secId, data) {
 
   // ── FAQ ──
   if (secId === 'faq') {
-    const faqKeys = keys.filter(k => k.toUpperCase().startsWith('H3') || k.toUpperCase().startsWith('FAQ') || k.toUpperCase().startsWith('QUESTION'));
-    const items = faqKeys.length ? faqKeys.map((k, i) => {
-      const num = (k.match(/\d+/) || [i+1])[0];
-      const q = (data[k]||'').trim();
-      const answerKey = keys.find(dk => dk.toUpperCase().startsWith('RÉPONSE ' + num) || dk.toUpperCase().startsWith('REPONSE ' + num) || dk.toUpperCase().startsWith('ANSWER ' + num));
-      const a = answerKey ? (data[answerKey]||'').trim() : '';
+    // Build Q/R pairs from numbered outputs: H3 QUESTION 1..5 + RÉPONSE 1..5
+    const items = [1,2,3,4,5].map(num => {
+      const qKey = keys.find(k => k.toUpperCase().match(new RegExp('(H3 QUESTION|QUESTION) ' + num + '$')));
+      const aKey = keys.find(k => k.toUpperCase().match(new RegExp('(R[ÉE]PONSE|ANSWER) ' + num + '$')));
+      if (!qKey && !aKey) return '';
+      const q = qKey ? (data[qKey]||'').trim() : '';
+      const a = aKey ? (data[aKey]||'').trim() : '';
       return `<div class="wf-faq-item">
-        <div class="wf-faq-q">${wfEditable(q, k, secId)}</div>
-        ${a ? `<div class="wf-faq-a">${wfEditable(a, answerKey, secId)}</div>` : ''}
+        <div class="wf-faq-q">${q ? wfEditable(q, qKey, secId) : '<div class="wf-block medium" style="height:14px;"></div>'}</div>
+        ${a ? `<div class="wf-faq-a">${wfEditable(a, aKey, secId)}</div>` : '<div class="wf-block short" style="opacity:.4;margin-top:4px;"></div>'}
       </div>`;
-    }).join('') : placeholder(3);
+    }).filter(Boolean).join('') || placeholder(3);
     return `${tag}
       ${h2 ? `<div class="wf-h2" style="margin-bottom:6px;">${wfEditable(h2.val,h2.key,secId)}</div>` : ''}
       ${intro ? `<div class="wf-intro">${wfEditable(intro.val,intro.key,secId)}</div>` : ''}
