@@ -221,13 +221,9 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
     </button>
 
-    <button class="btn btn-secondary text-xs" onclick="exportTxt()" id="export-txt-btn" disabled>
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      .txt
-    </button>
-    <button class="btn btn-primary text-xs" onclick="exportHTML()" id="export-btn" disabled>
+    <button class="btn btn-primary text-xs" onclick="exportTxt()" id="export-txt-btn" disabled>
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      Exporter
+      Exporter .txt
     </button>
   </div>
 </header>
@@ -514,8 +510,8 @@ const TEMPLATES_CONFIG = {
   { id:"comparaison", name:"Comparaison", sub:"Avant / Après", seo:false,
     why:"Retournement narratif sans nommer de concurrent.",
     editorialIntent:"Cible implicitement les requêtes de comparaison vs la méthode traditionnelle ou vs concurrents. Le toggle avant/après est un dispositif narratif fort qui permet d'adresser les deux états sans nommer de concurrent. Google lit ce bloc comme du contenu comparatif à haute valeur — il peut remonter sur des requêtes 'alternative à' ou 'vs'.",
-    outputFormats:[{"key":"H2","rule":"Max 8 mots. Ex : Votre cabinet, vos règles"},{"key":"INTRO","rule":"1-2 phrases, max 25 mots."},{"key":"LABEL TOGGLE AVANT","rule":"2-4 mots. Ex : Sans Inqom"},{"key":"H3 PROBLÈME 1 à 4","rule":"STRICT : EXACTEMENT 4 problèmes, pas plus. Max 4 mots. Nominatif. Ex : Captation client. Pas de verbe."},{"key":"DESCRIPTION PROBLÈME 1 à 4","rule":"STRICT : 1 phrase, max 15 mots."},{"key":"H3 GAIN 1 à 4","rule":"STRICT : EXACTEMENT 4 gains, pas plus. Max 4 mots. Miroir exact du problème correspondant. Ex : Relation protégée."},{"key":"DESCRIPTION GAIN 1 à 4","rule":"STRICT : 1 phrase, max 15 mots."}],
-    questions:[{id:"before_label",label:"Label de l'état 'avant'",hint:"Ex : Sans Inqom",rows:1},{id:"pains",label:"4 problèmes de l'état 'avant' (max)",hint:"Titre court + 1 phrase chacun",rows:4},{id:"gains",label:"4 bénéfices miroirs (même nombre que les problèmes)",hint:"Répondent aux problèmes ci-dessus",rows:4}],
+    outputFormats:[{"key":"H2","rule":"Max 8 mots. Ex : Votre cabinet, vos règles"},{"key":"INTRO","rule":"1-2 phrases, max 25 mots."},{"key":"H3 PROBLÈME 1 à 4","rule":"STRICT : EXACTEMENT 4 problèmes, pas plus. Max 4 mots. Nominatif. Ex : Captation client. Pas de verbe."},{"key":"DESCRIPTION PROBLÈME 1 à 4","rule":"STRICT : 1 phrase, max 15 mots."},{"key":"H3 GAIN 1 à 4","rule":"STRICT : EXACTEMENT 4 gains, pas plus. Max 4 mots. Miroir exact du problème correspondant. Ex : Relation protégée."},{"key":"DESCRIPTION GAIN 1 à 4","rule":"STRICT : 1 phrase, max 15 mots."}],
+    questions:[{id:"pains",label:"4 problèmes de l'état 'avant' (max)",hint:"Titre court + 1 phrase chacun",rows:4},{id:"gains",label:"4 bénéfices miroirs (même nombre que les problèmes)",hint:"Répondent aux problèmes ci-dessus",rows:4}],
     outputs:["H2","INTRO","LABEL TOGGLE AVANT","H3 PROBLÈME 1","DESCRIPTION PROBLÈME 1","H3 PROBLÈME 2","DESCRIPTION PROBLÈME 2","H3 PROBLÈME 3","DESCRIPTION PROBLÈME 3","H3 PROBLÈME 4","DESCRIPTION PROBLÈME 4","H3 GAIN 1","DESCRIPTION GAIN 1","H3 GAIN 2","DESCRIPTION GAIN 2","H3 GAIN 3","DESCRIPTION GAIN 3","H3 GAIN 4","DESCRIPTION GAIN 4"] },
   { id:"pourqui", name:"Pour qui ?", sub:"Profils & personas", seo:true,
     why:"Crée le sentiment de reconnaissance — l'utilisateur se voit dans la page.",
@@ -1100,8 +1096,8 @@ function renderWfSection(secId, data) {
     return `${tag}
       ${h2 ? `<div class="wf-h2" style="margin-bottom:8px;">${wfEditable(h2.val,h2.key,secId)}</div>` : ''}
       ${intro ? `<div class="wf-intro">${wfEditable(intro.val,intro.key,secId)}</div>` : ''}
-      <div class="wf-toggle"><div class="wf-tog on">${toggleLabel}</div><div class="wf-tog">${state.config.productName||'Inqom'}</div></div>
-      <div class="wf-cmp-grid"><div class="wf-cmp-col">${pRows}</div><div class="wf-cmp-col good">${gRows}</div></div>`;
+
+      <div class="wf-cmp-grid"><div class="wf-cmp-col"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;opacity:.4;">Sans ${state.config.productName||'Inqom'}</div>${pRows}</div><div class="wf-cmp-col good"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;color:#16a34a;">${state.config.productName||'Inqom'}</div>${gRows}</div></div>`;
   }
 
   // ── FAQ ──
@@ -1379,7 +1375,7 @@ function updateProgress() {
   const _hp=document.getElementById("header-progress");if(_hp)_hp.textContent=`${done}/${total}`;
   const _pb=document.getElementById("progress-bar");if(_pb)_pb.style.width=`${(done/total)*100}%`;
   const totalAllPages = state.pages.reduce((s,p)=>s+p.completed.size,0);
-  document.getElementById("export-btn").disabled=totalAllPages===0;
+  document.getElementById("export-txt-btn").disabled=totalAllPages===0;
   document.getElementById("export-txt-btn").disabled=totalAllPages===0;
 }
 
