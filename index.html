@@ -2186,8 +2186,14 @@ function loadFromStorage() {
     // Restore config
     if (data.config) Object.assign(state.config, data.config);
 
-    // Restore skills
+    // Restore skills — merge with defaults
     if (data.skills && data.skills.length > 0) {
+      // Check if brand reference skill is missing (added in new version)
+      const hasBrandRef = data.skills.find(s => s.name === "Messaging & positionnement Inqom");
+      if (!hasBrandRef) {
+        const brandSkill = state.skills.find(s => s.name === "Messaging & positionnement Inqom");
+        if (brandSkill) data.skills.unshift(brandSkill);
+      }
       state.skills = data.skills;
       skillIdCounter = Math.max(...data.skills.map(s => s.id), 0);
     }
