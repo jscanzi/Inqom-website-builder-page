@@ -120,6 +120,20 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
 .variant-pill:hover { border-color:#2A0F2E; color:#2A0F2E; }
 .variant-pill.active { background:#2A0F2E; color:#fff; border-color:#2A0F2E; }
 
+
+/* Prefill progress modal */
+.prefill-overlay { position:fixed; inset:0; background:rgba(20,8,22,.55); backdrop-filter:blur(3px); z-index:300; display:flex; align-items:center; justify-content:center; padding:16px; }
+.prefill-modal { background:hsl(var(--card)); border:1px solid hsl(var(--border)); border-radius:18px; padding:32px 30px; width:100%; max-width:380px; box-shadow:0 12px 48px rgba(0,0,0,.25); text-align:center; }
+.prefill-orb { width:56px; height:56px; margin:0 auto 18px; border-radius:50%; background:linear-gradient(135deg,#2A0F2E,#B28FE0); display:flex; align-items:center; justify-content:center; animation:prefill-pulse 1.8s ease-in-out infinite; }
+.prefill-orb svg { animation:prefill-spin 2s linear infinite; }
+@keyframes prefill-pulse { 0%,100%{ transform:scale(1); box-shadow:0 0 0 0 rgba(178,143,224,.4); } 50%{ transform:scale(1.06); box-shadow:0 0 0 12px rgba(178,143,224,0); } }
+@keyframes prefill-spin { to { transform:rotate(360deg); } }
+.prefill-title { font-size:16px; font-weight:600; margin-bottom:6px; color:hsl(var(--foreground)); }
+.prefill-sub { font-size:13px; color:hsl(var(--muted-foreground)); margin-bottom:20px; min-height:18px; transition:opacity .2s; }
+.prefill-bar-track { height:6px; border-radius:3px; background:hsl(var(--muted)); overflow:hidden; }
+.prefill-bar-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,#2A0F2E,#B28FE0); width:0%; transition:width .4s ease; }
+.prefill-count { font-size:12px; color:hsl(var(--muted-foreground)); margin-top:10px; }
+
 /* Page skills picker */
 .page-skills-btn { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:500; padding:3px 9px; border-radius:20px; border:1px solid hsl(var(--border)); background:transparent; color:hsl(var(--muted-foreground)); cursor:pointer; transition:all .12s; }
 .page-skills-btn:hover { border-color:#2A0F2E; color:#2A0F2E; }
@@ -334,6 +348,20 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
 </div>
 
 
+
+
+<!-- Prefill progress modal -->
+<div id="prefill-overlay" class="prefill-overlay hidden">
+  <div class="prefill-modal">
+    <div class="prefill-orb">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 2v4"/><path d="m6.41 6.41 2.83 2.83"/><path d="M2 12h4"/><path d="M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/><path d="M22 12h-4"/></svg>
+    </div>
+    <div class="prefill-title">Pré-remplissage en cours</div>
+    <div class="prefill-sub" id="prefill-sub">Lecture des sources…</div>
+    <div class="prefill-bar-track"><div class="prefill-bar-fill" id="prefill-bar"></div></div>
+    <div class="prefill-count" id="prefill-count"></div>
+  </div>
+</div>
 
 <!-- Page skills picker -->
 <div id="skills-picker-overlay" class="skills-picker-overlay hidden" onclick="if(event.target===this)closeSkillsPicker()">
@@ -1729,6 +1757,22 @@ function switchVariant(secId, idx) {
   saveToStorage();
 }
 
+function showPrefillModal() {
+  document.getElementById("prefill-overlay").classList.remove("hidden");
+  setPrefillProgress(0, "Lecture des sources…", "");
+}
+function hidePrefillModal() {
+  document.getElementById("prefill-overlay").classList.add("hidden");
+}
+function setPrefillProgress(pct, sub, count) {
+  const bar = document.getElementById("prefill-bar");
+  const subEl = document.getElementById("prefill-sub");
+  const countEl = document.getElementById("prefill-count");
+  if (bar) bar.style.width = pct + "%";
+  if (subEl && sub !== undefined) subEl.textContent = sub;
+  if (countEl && count !== undefined) countEl.textContent = count;
+}
+
 async function prefillPageFromSkills() {
   const page = currentPage();
   const sections = getSectionsForPage(page);
@@ -1747,6 +1791,7 @@ async function prefillPageFromSkills() {
   const btn = document.getElementById("prefill-btn");
   const original = btn.innerHTML;
   btn.disabled = true;
+  showPrefillModal();
 
   const skillsContext = activeSkills.map(s => `### ${s.name}\n${s.content.trim()}`).join("\n\n");
   const sys = `Tu es un assistant qui prépare un brief de page web pour ${cfg.productName} (${cfg.sector}).
@@ -1767,7 +1812,8 @@ ${skillsContext}`;
 
   try {
     for (let b = 0; b < batches.length; b++) {
-      btn.innerHTML = `<svg class="animate-spin" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> ${b*BATCH_SIZE}/${sections.length}…`;
+      const secNames = batches[b].map(s=>s.name).join(", ");
+      setPrefillProgress(Math.round((b/batches.length)*100), `Rédaction : ${secNames}`, `${b*BATCH_SIZE} / ${sections.length} sections`);
 
       const fieldSpec = batches[b].map(sec => {
         const qs = sec.questions.filter(q => !q.kw);
@@ -1782,11 +1828,25 @@ ${fieldSpec}
 Réponds UNIQUEMENT avec un objet JSON valide, sans texte ni backticks autour.
 Format : {"sectionId::questionId":"réponse", ...}`;
 
-      const resp = await fetch("/api/chat", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 2000, system: sys, messages: [{ role: "user", content: userPrompt }] })
-      });
-      const data = await resp.json();
+      let data;
+      let attempt = 0;
+      while (attempt < 2) {
+        const resp = await fetch("/api/chat", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 2000, system: sys, messages: [{ role: "user", content: userPrompt }] })
+        });
+        data = await resp.json();
+        // Rate limited → wait and retry once
+        if (data.error && /rate limit|429/i.test(data.error.message || "")) {
+          attempt++;
+          if (attempt < 2) {
+            setPrefillProgress(Math.round((b/batches.length)*100), "Limite de l'API atteinte — reprise dans 60s…", `${totalFilled} champs déjà remplis`);
+            await new Promise(r => setTimeout(r, 60000));
+            continue;
+          }
+        }
+        break;
+      }
       if (data.error) throw new Error(data.error.message);
       let text = data.content?.map(x => x.text || "").join("") || "";
       text = text.replace(/```json|```/g, "").trim();
@@ -1801,12 +1861,22 @@ Format : {"sectionId::questionId":"réponse", ...}`;
         if (el) { el.value = val; autoResize(el); }
         totalFilled++;
       });
+
+      // Pause between batches to respect Anthropic's per-minute input token rate limit
+      if (b < batches.length - 1) {
+        setPrefillProgress(Math.round(((b+1)/batches.length)*100), "Petite pause pour respecter les limites…", `${totalFilled} / ${sections.reduce((n,s)=>n+s.questions.filter(q=>!q.kw).length,0)} champs`);
+        await new Promise(r => setTimeout(r, 12000)); // pause to respect per-minute token rate limit
+      }
     }
 
+    setPrefillProgress(100, "Terminé !", `${totalFilled} champs remplis`);
+    await new Promise(r => setTimeout(r, 900));
+    hidePrefillModal();
     btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> ${totalFilled} champs remplis`;
     setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 2500);
     saveToStorage();
   } catch(err) {
+    hidePrefillModal();
     btn.innerHTML = original;
     btn.disabled = false;
     alert(`Erreur lors du pré-remplissage : ${err.message}`);
@@ -1849,6 +1919,10 @@ function closeSkillsPicker() {
   saveToStorage();
 }
 
+// Rough token estimate: ~4 chars per token (FR/EN average)
+function estTokens(chars) { return Math.round(chars / 4); }
+function fmtTokens(t) { return t >= 1000 ? (Math.round(t/100)/10) + 'k' : t + ''; }
+
 function renderSkillsPicker() {
   const page = currentPage();
   const list = document.getElementById('skills-picker-list');
@@ -1862,12 +1936,47 @@ function renderSkillsPicker() {
   }
   list.innerHTML = state.skills.filter(s => s.content.trim()).map(skill => {
     const checked = page.pageSkills.includes(skill.id);
+    const tok = estTokens(skill.content.length);
     return `<div class="skill-pick-item${checked?' checked':''}" onclick="togglePageSkill(${skill.id})">
       <div class="skill-pick-check">${checked?'✓':''}</div>
       <div class="skill-pick-name">${skill.name}</div>
-      <div class="skill-pick-status">${skill.content.length > 100 ? Math.round(skill.content.length/100)/10+'k car.' : skill.content.length+' car.'}</div>
+      <div class="skill-pick-status">~${fmtTokens(tok)} tok</div>
     </div>`;
   }).join('');
+  renderSkillsTotal();
+}
+
+// Cumulative weight of active sources + warning when large
+function renderSkillsTotal() {
+  const page = currentPage();
+  let box = document.getElementById('skills-total-box');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'skills-total-box';
+    const list = document.getElementById('skills-picker-list');
+    list.parentNode.insertBefore(box, list.nextSibling);
+  }
+  const activeIds = page.pageSkills || [];
+  const activeSkills = state.skills.filter(s => activeIds.includes(s.id) && s.content.trim());
+  const totalChars = activeSkills.reduce((n,s)=>n+s.content.length,0);
+  const totalTok = estTokens(totalChars);
+  // The per-minute input rate limit is ~10k tokens; skills are re-injected per batch.
+  // Warn when active sources approach a level that will trigger throttling/pauses.
+  const WARN = 4000;   // tokens — pré-remplissage commencera à ralentir
+  const HIGH = 7000;   // tokens — fortes pauses / risque de limite
+  let color = 'hsl(var(--muted-foreground))', msg = '';
+  if (totalTok >= HIGH) {
+    color = '#dc2626';
+    msg = `⚠ Sources volumineuses (~${fmtTokens(totalTok)} tokens). Le pré-remplissage sera lent (pauses pour respecter la limite API). Désactive des sources non essentielles pour cette page.`;
+  } else if (totalTok >= WARN) {
+    color = '#BA7517';
+    msg = `Sources assez lourdes (~${fmtTokens(totalTok)} tokens). Le pré-remplissage fonctionnera mais avec quelques pauses.`;
+  }
+  box.style.cssText = 'margin-top:4px;font-size:11px;line-height:1.5;';
+  box.innerHTML = `<div style="display:flex;justify-content:space-between;color:hsl(var(--muted-foreground));padding:2px 2px;">
+      <span>${activeSkills.length} source(s) active(s)</span>
+      <span style="font-weight:600;color:${totalTok>=WARN?color:'hsl(var(--foreground))'};">~${fmtTokens(totalTok)} tokens</span>
+    </div>${msg?`<div style="color:${color};padding:6px 8px;background:${color}11;border-radius:8px;margin-top:4px;">${msg}</div>`:''}`;
 }
 
 function togglePageSkill(skillId) {
