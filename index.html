@@ -1747,17 +1747,8 @@ async function prefillPageFromSkills() {
   const btn = document.getElementById("prefill-btn");
   const original = btn.innerHTML;
   btn.disabled = true;
-  btn.innerHTML = `<svg class="animate-spin" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Pré-remplissage…`;
 
   const skillsContext = activeSkills.map(s => `### ${s.name}\n${s.content.trim()}`).join("\n\n");
-
-  // Build the list of fields to fill — only non-keyword questions
-  const fieldSpec = sections.map(sec => {
-    const qs = sec.questions.filter(q => !q.kw);
-    return `## Section "${sec.name}" (${sec.sub}) — id:${sec.id}\nRôle de la section : ${sec.why}\nChamps à remplir :\n` +
-      qs.map(q => `- [${sec.id}::${q.id}] ${q.label}${q.hint?` (${q.hint})`:''}`).join("\n");
-  }).join("\n\n");
-
   const sys = `Tu es un assistant qui prépare un brief de page web pour ${cfg.productName} (${cfg.sector}).
 À partir de la base de connaissances fournie, tu rédiges des réponses CONCISES et factuelles pour pré-remplir les champs d'un brief.
 Ces réponses serviront de matière première — elles doivent être des notes de brief, pas du copy final.
@@ -1766,39 +1757,53 @@ Base-toi UNIQUEMENT sur la base de connaissances. Si une information manque pour
 ## BASE DE CONNAISSANCES
 ${skillsContext}`;
 
-  const userPrompt = `Voici les champs à pré-remplir pour la page "${page.name}", section par section.
-Pour chaque champ, rédige une réponse courte (1-3 phrases ou quelques éléments clés) basée sur la base de connaissances.
+  // Split sections into batches of 3 to stay under the Edge timeout
+  const BATCH_SIZE = 3;
+  const batches = [];
+  for (let i = 0; i < sections.length; i += BATCH_SIZE) batches.push(sections.slice(i, i + BATCH_SIZE));
+
+  if (!page._formData) page._formData = {};
+  let totalFilled = 0;
+
+  try {
+    for (let b = 0; b < batches.length; b++) {
+      btn.innerHTML = `<svg class="animate-spin" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> ${b*BATCH_SIZE}/${sections.length}…`;
+
+      const fieldSpec = batches[b].map(sec => {
+        const qs = sec.questions.filter(q => !q.kw);
+        return `## Section "${sec.name}" (${sec.sub}) — id:${sec.id}\nRôle : ${sec.why}\nChamps :\n` +
+          qs.map(q => `- [${sec.id}::${q.id}] ${q.label}${q.hint?` (${q.hint})`:''}`).join("\n");
+      }).join("\n\n");
+
+      const userPrompt = `Pré-remplis ces champs pour la page "${page.name}". Réponse courte par champ (1-3 phrases), basée sur la base de connaissances.
 
 ${fieldSpec}
 
-Réponds UNIQUEMENT avec un objet JSON valide, sans texte avant ni après, sans backticks markdown.
-Format : un objet plat où chaque clé est "sectionId::questionId" et chaque valeur est la réponse en texte.
-Exemple : {"hero::cible":"Cabinets d'expertise comptable...", "hero::probleme":"..."}`;
+Réponds UNIQUEMENT avec un objet JSON valide, sans texte ni backticks autour.
+Format : {"sectionId::questionId":"réponse", ...}`;
 
-  try {
-    const resp = await fetch("/api/chat", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 4000, system: sys, messages: [{ role: "user", content: userPrompt }] })
-    });
-    const data = await resp.json();
-    if (data.error) throw new Error(data.error.message);
-    let text = data.content?.map(b => b.text || "").join("") || "";
-    // Strip markdown fences if any
-    text = text.replace(/```json|```/g, "").trim();
-    const answers = JSON.parse(text);
+      const resp = await fetch("/api/chat", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 2000, system: sys, messages: [{ role: "user", content: userPrompt }] })
+      });
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error.message);
+      let text = data.content?.map(x => x.text || "").join("") || "";
+      text = text.replace(/```json|```/g, "").trim();
+      let answers;
+      try { answers = JSON.parse(text); } catch(e) { console.warn("Batch parse failed, skipping", e); continue; }
 
-    // Fill the textareas + persist into page._formData
-    if (!page._formData) page._formData = {};
-    let filled = 0;
-    Object.entries(answers).forEach(([key, val]) => {
-      const [secId, qId] = key.split("::");
-      if (!secId || !qId) return;
-      page._formData[`${secId}-${qId}`] = val;
-      const el = document.getElementById(`q-${secId}-${qId}`);
-      if (el) { el.value = val; autoResize(el); filled++; }
-    });
+      Object.entries(answers).forEach(([key, val]) => {
+        const [secId, qId] = key.split("::");
+        if (!secId || !qId) return;
+        page._formData[`${secId}-${qId}`] = val;
+        const el = document.getElementById(`q-${secId}-${qId}`);
+        if (el) { el.value = val; autoResize(el); }
+        totalFilled++;
+      });
+    }
 
-    btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> ${filled} champs remplis`;
+    btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> ${totalFilled} champs remplis`;
     setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 2500);
     saveToStorage();
   } catch(err) {
