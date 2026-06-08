@@ -114,6 +114,27 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
 .seo-modal-new { flex:1; background:hsl(var(--background)); border:1px solid hsl(var(--input)); border-radius:var(--radius); padding:6px 10px; font-size:13px; color:hsl(var(--foreground)); font-family:inherit; outline:none; }
 .seo-modal-new:focus { border-color:#2A0F2E; }
 
+
+/* Page skills picker */
+.page-skills-btn { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:500; padding:3px 9px; border-radius:20px; border:1px solid hsl(var(--border)); background:transparent; color:hsl(var(--muted-foreground)); cursor:pointer; transition:all .12s; }
+.page-skills-btn:hover { border-color:#2A0F2E; color:#2A0F2E; }
+.page-skills-btn.has-override { background:#2A0F2E; color:#fff; border-color:#2A0F2E; }
+.skills-picker-overlay { position:fixed; inset:0; background:rgba(0,0,0,.3); z-index:200; display:flex; align-items:center; justify-content:center; }
+.skills-picker { background:hsl(var(--card)); border:1px solid hsl(var(--border)); border-radius:calc(var(--radius)+4px); padding:20px; width:360px; max-height:70vh; display:flex; flex-direction:column; gap:12px; box-shadow:0 8px 32px rgba(0,0,0,.15); }
+.skills-picker-header { display:flex; align-items:center; justify-content:space-between; }
+.skills-picker-title { font-size:14px; font-weight:600; }
+.skills-picker-list { display:flex; flex-direction:column; gap:6px; overflow-y:auto; }
+.skill-pick-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:var(--radius); border:1px solid hsl(var(--border)); cursor:pointer; transition:all .12s; }
+.skill-pick-item:hover { background:hsl(var(--accent)); }
+.skill-pick-item.checked { border-color:#2A0F2E; background:#2A0F2E08; }
+.skill-pick-check { width:16px; height:16px; border-radius:4px; border:1.5px solid hsl(var(--border)); flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .12s; }
+.skill-pick-item.checked .skill-pick-check { background:#2A0F2E; border-color:#2A0F2E; color:#fff; font-size:10px; }
+.skill-pick-name { font-size:13px; font-weight:500; flex:1; }
+.skill-pick-status { font-size:10px; color:hsl(var(--muted-foreground)); }
+.skills-picker-footer { border-top:1px solid hsl(var(--border)); padding-top:12px; display:flex; gap:8px; justify-content:space-between; align-items:center; }
+.skills-picker-reset { font-size:12px; color:hsl(var(--muted-foreground)); cursor:pointer; }
+.skills-picker-reset:hover { color:#2A0F2E; }
+
 /* Page tabs */
 .page-tab { display:inline-flex;align-items:center;gap:7px;padding:0 10px 0 12px;height:32px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;color:hsl(var(--muted-foreground));border:none;background:transparent;white-space:nowrap;transition:all .12s;flex-shrink:0; }
 .page-tab:hover { color:hsl(var(--foreground));background:hsl(var(--accent)); }
@@ -232,6 +253,10 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
 <div class="flex items-center border-b border-border bg-background shrink-0 px-3 gap-1" style="height:40px;min-height:40px;">
   <div class="flex items-center gap-0.5 flex-1 overflow-x-auto" id="pages-tabs" style="scrollbar-width:none;-ms-overflow-style:none;height:100%;"></div>
   <div style="width:1px;height:16px;background:hsl(var(--border));flex-shrink:0;margin:0 4px;"></div>
+  <button class="page-skills-btn" id="page-skills-btn" onclick="openSkillsPicker()" title="Sources de cette page">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    Sources
+  </button>
   <button class="btn btn-icon shrink-0" onclick="addPage()" title="Nouvelle page" style="width:28px;height:28px;">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
   </button>
@@ -281,6 +306,25 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
   </aside>
 </div>
 
+
+
+<!-- Page skills picker -->
+<div id="skills-picker-overlay" class="skills-picker-overlay hidden" onclick="if(event.target===this)closeSkillsPicker()">
+  <div class="skills-picker">
+    <div class="skills-picker-header">
+      <span class="skills-picker-title">Sources pour cette page</span>
+      <button class="btn btn-icon" onclick="closeSkillsPicker()" style="width:28px;height:28px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <p style="font-size:12px;color:hsl(var(--muted-foreground));margin-top:-4px;">Sélectionne les skills à injecter dans les générations de cette page. Par défaut, les skills globales actives sont utilisées.</p>
+    <div class="skills-picker-list" id="skills-picker-list"></div>
+    <div class="skills-picker-footer">
+      <span class="skills-picker-reset" onclick="resetPageSkills()">↺ Utiliser les skills globales</span>
+      <button class="btn btn-primary text-sm" onclick="closeSkillsPicker()">OK</button>
+    </div>
+  </div>
+</div>
 
 <!-- SEO tag modal -->
 <div id="seo-tag-modal" class="seo-modal-overlay hidden" onclick="if(event.target===this)closeSeoModal()">
@@ -581,7 +625,7 @@ const SECTIONS = TEMPLATES_CONFIG.product.sections;
 // ── PAGES STATE ──────────────────────────────────────────────────
 let pageIdCounter = 0;
 function newPageState(name) {
-  return { id:++pageIdCounter, name, outputs:{}, completed:new Set(), scrollPos:0, seoPool:[] };
+  return { id:++pageIdCounter, name, outputs:{}, completed:new Set(), scrollPos:0, seoPool:[], pageSkills:null }; // pageSkills: null = use global active, array = per-page override
 }
 // ── SKILLS STATE ──────────────────────────────────────────────────
 let skillIdCounter = 0;
@@ -655,6 +699,7 @@ function createPageFromTemplate(templateId) {
 }
 
 function switchPage(id) {
+  setTimeout(updatePageSkillsBtn, 50);
   // save scroll position of current page
   const formMain = document.getElementById("form-main");
   const cp = currentPage();
@@ -1278,7 +1323,10 @@ async function generateSection(secId) {
   const cfg = state.config;
 
   // Build skills context from active skills with content
-  const activeSkills = state.skills.filter(s => s.active && s.content.trim());
+  const page = currentPage();
+  const activeSkills = page.pageSkills !== null
+    ? state.skills.filter(s => page.pageSkills.includes(s.id) && s.content.trim())
+    : state.skills.filter(s => s.active && s.content.trim());
   const skillsContext = activeSkills.length > 0
     ? "\n\n## KNOWLEDGE BASE\n" + activeSkills.map(s => `### ${s.name}\n${s.content.trim()}`).join("\n\n")
     : "";
@@ -1714,6 +1762,68 @@ function updateFooterStatus(secId) {
     statusEl.textContent = '';
     btnEl.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 3 14 9-14 9V3z"/></svg> Générer`;
   }
+}
+
+function openSkillsPicker() {
+  renderSkillsPicker();
+  document.getElementById('skills-picker-overlay').classList.remove('hidden');
+}
+
+function closeSkillsPicker() {
+  document.getElementById('skills-picker-overlay').classList.add('hidden');
+  updatePageSkillsBtn();
+  saveToStorage();
+}
+
+function renderSkillsPicker() {
+  const page = currentPage();
+  const list = document.getElementById('skills-picker-list');
+  if (!state.skills.length) {
+    list.innerHTML = '<p style="font-size:12px;color:hsl(var(--muted-foreground));font-style:italic;">Aucune skill disponible — ajoute-en dans les Paramètres.</p>';
+    return;
+  }
+  // If no override yet, init from global active state
+  if (page.pageSkills === null) {
+    page.pageSkills = state.skills.filter(s => s.active && s.content.trim()).map(s => s.id);
+  }
+  list.innerHTML = state.skills.filter(s => s.content.trim()).map(skill => {
+    const checked = page.pageSkills.includes(skill.id);
+    return `<div class="skill-pick-item${checked?' checked':''}" onclick="togglePageSkill(${skill.id})">
+      <div class="skill-pick-check">${checked?'✓':''}</div>
+      <div class="skill-pick-name">${skill.name}</div>
+      <div class="skill-pick-status">${skill.content.length > 100 ? Math.round(skill.content.length/100)/10+'k car.' : skill.content.length+' car.'}</div>
+    </div>`;
+  }).join('');
+}
+
+function togglePageSkill(skillId) {
+  const page = currentPage();
+  if (page.pageSkills === null) {
+    page.pageSkills = state.skills.filter(s => s.active && s.content.trim()).map(s => s.id);
+  }
+  const idx = page.pageSkills.indexOf(skillId);
+  if (idx >= 0) page.pageSkills.splice(idx, 1);
+  else page.pageSkills.push(skillId);
+  renderSkillsPicker();
+}
+
+function resetPageSkills() {
+  currentPage().pageSkills = null;
+  renderSkillsPicker();
+  updatePageSkillsBtn();
+}
+
+function updatePageSkillsBtn() {
+  const btn = document.getElementById('page-skills-btn');
+  if (!btn) return;
+  const page = currentPage();
+  const isOverride = page.pageSkills !== null;
+  btn.classList.toggle('has-override', isOverride);
+  const count = isOverride
+    ? page.pageSkills.length
+    : state.skills.filter(s => s.active && s.content.trim()).length;
+  btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    Sources${count > 0 ? ' · '+count : ''}`;
 }
 
 function autoResize(ta) {
@@ -2220,6 +2330,7 @@ function loadFromStorage() {
         page.templateId = p.templateId || "product";
         page.outputs = p.outputs || {};
     page.seoPool = p.seoPool || [];
+    page.pageSkills = p.pageSkills !== undefined ? p.pageSkills : null;
         page.completed = new Set(p.completed || []);
         page.scrollPos = p.scrollPos || 0;
         page._formData = p._formData || {};
