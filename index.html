@@ -257,14 +257,14 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
 
 <!-- Pages tab bar -->
 <div class="flex items-center border-b border-border bg-background shrink-0 px-3 gap-1" style="height:40px;min-height:40px;">
-  <div class="flex items-center gap-0.5 flex-1 overflow-x-auto" id="pages-tabs" style="scrollbar-width:none;-ms-overflow-style:none;height:100%;"></div>
-  <div style="width:1px;height:16px;background:hsl(var(--border));flex-shrink:0;margin:0 4px;"></div>
+  <div class="flex items-center gap-0.5 overflow-x-auto" id="pages-tabs" style="scrollbar-width:none;-ms-overflow-style:none;height:100%;"></div>
+  <button class="btn btn-icon shrink-0" onclick="addPage()" title="Nouvelle page" style="width:26px;height:26px;">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <div class="flex-1"></div>
   <button class="page-skills-btn" id="page-skills-btn" onclick="openSkillsPicker()" title="Sources de cette page">
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
     Sources
-  </button>
-  <button class="btn btn-icon shrink-0" onclick="addPage()" title="Nouvelle page" style="width:28px;height:28px;">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
   </button>
 </div>
 
