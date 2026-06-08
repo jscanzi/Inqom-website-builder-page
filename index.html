@@ -1323,7 +1323,6 @@ async function generateSection(secId) {
   const cfg = state.config;
 
   // Build skills context from active skills with content
-  const page = currentPage();
   const activeSkills = page.pageSkills !== null
     ? state.skills.filter(s => page.pageSkills.includes(s.id) && s.content.trim())
     : state.skills.filter(s => s.active && s.content.trim());
