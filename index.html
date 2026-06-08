@@ -1204,7 +1204,7 @@ function variantBarHTML(secId) {
     : '';
   return `<div class="wf-variant-bar" id="vbar-${secId}">
     <button class="wf-variant-add" id="vadd-${secId}" onclick="event.stopPropagation();generateSection('${secId}',true)" title="Générer un autre angle">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="M4 4l5 5"/></svg>
     </button>${pills}
   </div>`;
 }
