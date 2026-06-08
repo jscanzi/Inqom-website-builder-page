@@ -238,6 +238,12 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
   </div>
   <div class="flex items-center gap-3">
 
+    <span id="sync-status" class="text-xs font-medium" style="color:#888;" title="État de synchronisation avec l'équipe">● …</span>
+
+    <button class="btn btn-icon" onclick="refreshFromKV()" title="Récupérer les changements de l'équipe">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+    </button>
+
     <button class="btn btn-icon" onclick="openSettings()" title="Paramètres">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
     </button>
@@ -2134,6 +2140,140 @@ async function generateAll() {
 // ── LOCAL STORAGE PERSISTENCE ────────────────────────────────────
 const STORAGE_KEY = "inqom-brief-tool-v1";
 
+// ── PROJECT / COLLABORATION ──────────────────────────────────────
+// The project key determines which shared state the team works on.
+// Set via ?project=NAME in the URL; defaults to "default".
+function getProjectKey() {
+  const p = new URLSearchParams(location.search).get("project");
+  return (p || "default").toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 60) || "default";
+}
+const PROJECT_KEY = getProjectKey();
+let KV_AVAILABLE = false;      // set true once a KV round-trip succeeds
+let kvSaveTimer = null;
+let lastSavedSnapshot = "";    // dedupe identical saves
+
+// Build the serializable state object (shared by local + KV save)
+function buildStateSnapshot() {
+  return {
+    pages: state.pages.map(p => ({
+      id: p.id, name: p.name, templateId: p.templateId || "product",
+      outputs: p.outputs, completed: Array.from(p.completed),
+      scrollPos: p.scrollPos || 0, seoPool: p.seoPool || [],
+      pageSkills: p.pageSkills !== undefined ? p.pageSkills : null,
+      _formData: p._formData || {}
+    })),
+    currentPageId: state.currentPageId,
+    config: state.config,
+    templateIntents: Object.fromEntries(
+      Object.keys(TEMPLATES_CONFIG).map(tplId => [
+        tplId, (TEMPLATES_CONFIG[tplId].sections || []).map(s => ({ id: s.id, editorialIntent: s.editorialIntent || "" }))
+      ])
+    ),
+    skills: state.skills.map(s => ({ id: s.id, name: s.name, content: s.content, active: s.active, createdAt: s.createdAt })),
+    savedAt: new Date().toISOString()
+  };
+}
+
+// Push state to Vercel KV (debounced) — shared across the team
+function saveToKV() {
+  if (kvSaveTimer) clearTimeout(kvSaveTimer);
+  kvSaveTimer = setTimeout(async () => {
+    try {
+      const snapshot = buildStateSnapshot();
+      const serialized = JSON.stringify(snapshot);
+      if (serialized === lastSavedSnapshot) return; // nothing changed
+      const resp = await fetch(`/api/state?project=${PROJECT_KEY}`, {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: serialized
+      });
+      if (resp.ok) { KV_AVAILABLE = true; lastSavedSnapshot = serialized; updateSyncStatus("saved"); }
+      else updateSyncStatus("error");
+    } catch(e) { updateSyncStatus("error"); }
+  }, 1200); // debounce 1.2s after last change
+}
+
+// Pull shared state from Vercel KV
+async function loadFromKV() {
+  try {
+    const resp = await fetch(`/api/state?project=${PROJECT_KEY}`);
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    if (data && data.state) { KV_AVAILABLE = true; return data.state; }
+    KV_AVAILABLE = true; // KV works, just empty
+    return null;
+  } catch(e) { return null; }
+}
+
+async function refreshFromKV() {
+  updateSyncStatus("saving");
+  const kvState = await loadFromKV();
+  if (kvState) {
+    applySnapshot(kvState);
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(kvState)); } catch(e) {}
+    renderTabs();
+    renderFormForPage();
+    renderWireframeForPage();
+    updateProgress();
+    updateSyncStatus("saved");
+  } else {
+    updateSyncStatus(KV_AVAILABLE ? "saved" : "error");
+  }
+}
+
+function updateSyncStatus(s) {
+  const el = document.getElementById("sync-status");
+  if (!el) return;
+  if (s === "saved") { el.textContent = "● Synchronisé"; el.style.color = "#16a34a"; }
+  else if (s === "saving") { el.textContent = "● Sauvegarde…"; el.style.color = "#888"; }
+  else if (s === "error") { el.textContent = "● Hors ligne"; el.style.color = "#dc2626"; }
+}
+
+// Apply a loaded snapshot object into live state (shared by KV + localStorage paths)
+function applySnapshot(data) {
+  if (!data) return false;
+  if (data.config) Object.assign(state.config, data.config);
+
+  const configSkills = state.skills;
+  if (data.skills && data.skills.length > 0) {
+    const merged = configSkills.map(cs => {
+      const saved = data.skills.find(s => s.name === cs.name);
+      return saved ? { ...cs, active: saved.active, content: cs.content || saved.content } : cs;
+    });
+    data.skills.forEach(saved => { if (!configSkills.find(s => s.name === saved.name)) merged.push(saved); });
+    state.skills = merged;
+    skillIdCounter = Math.max(...merged.map(s => s.id || 0), 0);
+  }
+
+  if (data.templateIntents) {
+    Object.entries(data.templateIntents).forEach(([tplId, intents]) => {
+      const tpl = TEMPLATES_CONFIG[tplId];
+      if (!tpl) return;
+      intents.forEach(({id, editorialIntent}) => {
+        const sec = tpl.sections.find(s => s.id === id);
+        if (sec) sec.editorialIntent = editorialIntent;
+      });
+    });
+  }
+
+  if (data.pages && data.pages.length > 0) {
+    pageIdCounter = 0;
+    state.pages = data.pages.map(p => {
+      const page = newPageState(p.name);
+      page.id = p.id;
+      if (p.id > pageIdCounter) pageIdCounter = p.id;
+      page.templateId = p.templateId || "product";
+      page.outputs = p.outputs || {};
+      page.seoPool = p.seoPool || [];
+      page.pageSkills = p.pageSkills !== undefined ? p.pageSkills : null;
+      page.completed = new Set(p.completed || []);
+      page.scrollPos = p.scrollPos || 0;
+      page._formData = p._formData || {};
+      return page;
+    });
+    state.currentPageId = data.currentPageId || state.pages[0].id;
+  }
+  return true;
+}
+
 function saveToStorage() {
   try {
     const data = {
@@ -2172,74 +2312,15 @@ function saveToStorage() {
   } catch(e) {
     console.warn("Storage save failed:", e);
   }
+  // Also sync to shared KV store (debounced)
+  saveToKV();
 }
 
 function loadFromStorage() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return false;
-    const data = JSON.parse(raw);
-
-    // Restore config
-    if (data.config) Object.assign(state.config, data.config);
-
-    // Restore skills — config.json is source of truth for content, localStorage for user prefs
-    const configSkills = state.skills; // already loaded from config.json
-    if (data.skills && data.skills.length > 0) {
-      // Start from config.json skills, apply user preferences from localStorage
-      const merged = configSkills.map(configSkill => {
-        const saved = data.skills.find(s => s.name === configSkill.name);
-        if (saved) {
-          return {
-            ...configSkill,
-            active: saved.active, // respect user's active/inactive choice
-            content: configSkill.content || saved.content, // config.json content wins if present
-          };
-        }
-        return configSkill;
-      });
-      // Add any custom skills the user created (not in config.json)
-      data.skills.forEach(saved => {
-        if (!configSkills.find(s => s.name === saved.name)) {
-          merged.push(saved);
-        }
-      });
-      state.skills = merged;
-      skillIdCounter = Math.max(...merged.map(s => s.id || 0), 0);
-    }
-
-    // Restore editorial intents
-    if (data.templateIntents) {
-      Object.entries(data.templateIntents).forEach(([tplId, intents]) => {
-        const tpl = TEMPLATES_CONFIG[tplId];
-        if (!tpl) return;
-        intents.forEach(({id, editorialIntent}) => {
-          const sec = tpl.sections.find(s => s.id === id);
-          if (sec) sec.editorialIntent = editorialIntent;
-        });
-      });
-    }
-
-    // Restore pages
-    if (data.pages && data.pages.length > 0) {
-      pageIdCounter = 0;
-      state.pages = data.pages.map(p => {
-        const page = newPageState(p.name);
-        page.id = p.id;
-        if (p.id > pageIdCounter) pageIdCounter = p.id;
-        page.templateId = p.templateId || "product";
-        page.outputs = p.outputs || {};
-    page.seoPool = p.seoPool || [];
-    page.pageSkills = p.pageSkills !== undefined ? p.pageSkills : null;
-        page.completed = new Set(p.completed || []);
-        page.scrollPos = p.scrollPos || 0;
-        page._formData = p._formData || {};
-        return page;
-      });
-      state.currentPageId = data.currentPageId || state.pages[0].id;
-    }
-
-    return true;
+    return applySnapshot(JSON.parse(raw));
   } catch(e) {
     console.warn("Storage load failed:", e);
     return false;
@@ -2354,8 +2435,18 @@ async function initApp() {
     console.log("No config.json found, using defaults");
   }
 
-  // Then merge localStorage on top (user edits, custom skills, page data)
-  loadFromStorage();
+  // Load shared state: try KV first (team state), fall back to localStorage
+  const kvState = await loadFromKV();
+  if (kvState) {
+    applySnapshot(kvState);
+    // Mirror into localStorage as a local cache
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(kvState)); } catch(e) {}
+    updateSyncStatus("saved");
+  } else {
+    // No shared state yet (or KV offline) — use local cache
+    loadFromStorage();
+    if (KV_AVAILABLE) updateSyncStatus("saved"); else updateSyncStatus("error");
+  }
 
   renderTabs();
   renderFormForPage();
