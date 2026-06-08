@@ -1,0 +1,56 @@
+Document de Référence Copywriting : INQOM
+
+### 1. Positionnement
+- Ce que nous sommes : Inqom est un logiciel SaaS moderne de production comptable et fiscale destiné exclusivement aux experts-comptables. Il allie la puissance de l'Intelligence Artificielle (IA) à un écosystème ouvert (API-first) pour automatiser la tenue comptable et sécuriser les obligations fiscales. Inqom agit comme un "back office puissant" qui redonne aux cabinets la liberté d'exercer leur rôle de conseil.
+- Proposition de valeur centrale : Révolutionner la productivité des cabinets tout en garantissant un haut niveau de qualité et de sécurité (certifications exigeantes). Inqom permet un gain de temps massif sur la saisie et la révision, permettant aux collaborateurs de se concentrer sur l'accompagnement stratégique.
+- Ce que nous ne sommes pas : Inqom n'est pas un outil de gestion destiné directement aux dirigeants d'entreprise pour court-circuiter l'expert-comptable.
+
+### 2. Cibles
+- Profils et Rôles : Experts-comptables, DAF, et collaborateurs comptables.
+- Tailles et typologies de cabinet : Cabinets d'expertise comptable (majoritairement les petits et moyens cabinets - LAF, MAF - avec une approche multi-métiers, ou les cabinets spécialisés - SAF). Inqom est particulièrement adapté pour la gestion des TPE, PME, SCI, BNC, Associations, et CSE.
+- Situations déclenchantes (Triggers) :
+  - Tension RH et difficultés de recrutement dans la profession (besoin d'outils modernes pour attirer les jeunes talents et éviter les tâches répétitives).
+  - Préparation à la réforme de la facture électronique (besoin d'un outil compatible et intégré).
+  - Volonté de moderniser un système d'information vieillissant (fuir les éditeurs historiques fermés).
+
+### 3. Problèmes adressés (Douleurs)
+- Pour les collaborateurs : La saisie manuelle chronophage et démotivante ("décérébration" des tâches), les rapprochements bancaires fastidieux, et la double saisie entre la liasse fiscale et la plaquette.
+- Pour les experts-comptables (Associés) : Le manque de rentabilité sur les petits dossiers (comme les SCI ou BNC), le risque d'erreurs fiscales sur des dossiers complexes (ex: intégration fiscale), et le risque de dépendance ou d'enfermement technologique vis-à-vis des éditeurs historiques monolithiques.
+- Pour les clients finaux : Le manque de visibilité en temps réel sur leurs données financières et la complexité des échanges de documents avec leur comptable.
+
+### 4. Arguments clés (Preuves et Chiffres)
+- Gains de productivité prouvés :
+  - 2h30 de gain par dossier/mois sur la génération d'écritures comptables.
+  - 1h30 de gain par dossier/mois sur la récupération bancaire.
+  - Jusqu'à 6 heures de gain par an sur les déclarations de TVA (sur un dossier mensuel).
+  - Jusqu'à 2 heures de gain par an sur la révision et la clôture.
+- Technologie différenciante :
+  - Automatisation sans paramétrage préalable : L'IA génère les écritures en quelques minutes et s'adapte en apprenant des réaffectations du comptable.
+  - Module APEF (Assistant à la Préparation des Etats Financiers) : mutualisation des données pour générer plaquettes et liasses fiscales sans double saisie.
+  - Inqom Copilot : Un assistant IA formé sur le BOFIP et l'ANC pour fournir des réponses fiscales et comptables fiables et sourcées.
+- Preuves de confiance : Utilisé par plus de 40 000 entreprises et soutenu par le groupe européen Visma (1,3 million de clients, 15 000 employés).
+- Sécurité maximale : Hébergement en France/Europe, certifications NF 203, Qualiopi et ISO 27001.
+
+### 5. Tone of voice (Voix de la marque)
+- Style et registre : Professionnel, expert, rassurant, innovant, et partenaire. Le ton doit être direct et orienté bénéfice (ROI).
+- Ce qu'on dit : On valorise l'humain. L'IA est présentée comme un assistant (un copilote) qui "libère le potentiel" et "augmente" le collaborateur, lui permettant de se concentrer sur l'écoute, le conseil et la proactivité. On met en avant la notion d'écosystème ouvert et de transparence.
+- Ce qu'on évite : On ne dit jamais que l'IA va "remplacer" le comptable. On évite le jargon technique inutile pour les clients finaux, et on ne se positionne pas comme un simple "outil de facturation" mais bien comme le moteur de production du cabinet.
+
+### 6. Mots et phrases de marque (Vocabulaire Inqom)
+- "La comptabilité de demain, aujourd'hui."
+- "Inqom Copilot" : Notre assistant comptable intelligent.
+- "APEF" : Assistant à la Préparation des Etats Financiers.
+- "Inqom Care" : Notre service d'accompagnement humain sur-mesure (consultants dédiés, e-learning).
+- "Écosystème ouvert" / "API-first" : Pour désigner notre intégration fluide avec plus de 60 logiciels partenaires.
+- "Gagnant-gagnant avec l'expert-comptable" : Pour souligner que nous ne court-circuitons pas le cabinet.
+
+### 7. Objections fréquentes & Réponses
+- Objection "C'est cher / Inflation logicielle" : Inqom garantit un retour sur investissement grâce aux heures gagnées chaque mois sur la saisie et la révision. De plus, Inqom propose de verrouiller les tarifs sur des engagements longs (ex: 6 ans) pour contrer l'inflation.
+- Objection "La migration est trop lourde / Perte d'historique" : Inqom propose un accompagnement sur-mesure ("Inqom Care") avec un consultant dédié, des formations personnalisées et un support technique réactif pour assurer une transition en toute sérénité.
+- Objection "L'IA n'est pas fiable sur des dossiers complexes" : Inqom ne se contente pas d'une IA d'OCR classique. L'outil dispose de garde-fous, d'un moteur de règles puissant pour corriger l'IA, et gère de manière pointue des cas complexes (Intégration fiscale avec aide aux retraitements, SCI multi-immeubles, BNC).
+- Objection "Peur pour l'emploi des collaborateurs" : La machine ne remplace pas l'humain ("le conseil est un algorithme complexe"). L'outil permet au contraire de fidéliser les collaborateurs en supprimant les tâches rébarbatives.
+
+### 8. Concurrents et positionnement relatif
+- Face aux acteurs "historiques" (monolithiques) : Ces acteurs enferment les cabinets dans des systèmes fermés ("stratégie d'enfermement"). Notre angle : Inqom est un écosystème ouvert (API-first, marketplace) qui s'intègre facilement avec les outils existants et offre une interface SaaS moderne.
+- Face aux nouveaux entrants agressifs "direct-to-client" : Certains concurrents visent une croissance rapide en démarchant directement les PME et refusent la marque blanche pour les cabinets, risquant de désintermédier l'expert-comptable. Notre angle : Inqom est conçu par et pour les experts-comptables. Nous ne visons pas la clientèle finale en direct. Nous redonnons le contrôle et la valeur ajoutée au cabinet pour en faire une société multiservices.
+- Face aux simples "automatiseurs" : Certains outils se contentent d'un report mécanique des données (ex: intégration fiscale basique). Notre angle : Inqom offre une assistance experte aux retraitements fiscaux, des alertes intelligentes et gère même l'agrégation de liasses pour des filiales non tenues sur le logiciel.

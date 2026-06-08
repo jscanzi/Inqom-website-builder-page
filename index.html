@@ -859,54 +859,6 @@ function buildSidebar() {
   });
 }
 
-// ── STEPPER STATE ──
-function getStepIdx(pageId) {
-  return state.stepperIdx[pageId] || 0;
-}
-function setStepIdx(pageId, idx) {
-  const sections = getSectionsForPage(currentPage());
-  idx = Math.max(0, Math.min(idx, sections.length - 1));
-  state.stepperIdx[pageId] = idx;
-}
-function goToStep(idx) {
-  const page = currentPage();
-  setStepIdx(page.id, idx);
-  showCurrentStep();
-}
-function showCurrentStep() {
-  const page = currentPage();
-  const sections = getSectionsForPage(page);
-  const idx = getStepIdx(page.id);
-  const sec = sections[idx];
-
-  // Show/hide section cards
-  sections.forEach((s, i) => {
-    const el = document.getElementById(`section-${s.id}`);
-    if (el) el.classList.toggle('stepper-section-hidden', i !== idx);
-  });
-
-  // Update sidebar active
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById(`nav-${sec.id}`)?.classList.add('active');
-
-
-
-  // Scroll form to top
-  const formMain = document.getElementById('form-main');
-  formMain.scrollTop = 0;
-
-  // Highlight wireframe
-  highlightWireframeSection(sec.id);
-
-  // Auto-resize all textareas in active section (after display:none is removed)
-  const card = document.getElementById(`section-${sec.id}`);
-  if (card) requestAnimationFrame(() => requestAnimationFrame(() => {
-    card.querySelectorAll('textarea').forEach(autoResize);
-    refreshAllKwPools();
-  }));
-}
-
-
 function buildSections() {
   const container = document.getElementById("sections-container");
   const sections = getSectionsForPage(currentPage());
@@ -981,42 +933,6 @@ function block(cls="medium") { return `<div class="wf-block ${cls}"></div>`; }
 function wfEditable(text, outputKey, secId, cls="") {
   const safe = (text||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
   return `<span class="wf-editable ${cls}">${safe}</span>`;
-}
-
-function startWfEdit(el, secId, outputKey, e) {
-  e.stopPropagation();
-  if (el.querySelector('textarea,input')) return;
-  const current = el.textContent;
-  const ta = document.createElement('textarea');
-  ta.className = 'wf-editing';
-  ta.value = current;
-  ta.rows = Math.max(1, Math.ceil(current.length / 55));
-  el.innerHTML = '';
-  el.appendChild(ta);
-  ta.focus(); ta.select();
-  ta.addEventListener('blur', () => {
-    const v = ta.value.trim();
-    el.innerHTML = v || current;
-    const page = currentPage();
-    if (page.outputs[secId]) {
-      const lines = page.outputs[secId].split('\n');
-      const updated = lines.map(line => {
-        const ci = line.indexOf(':');
-        if (ci > 2) {
-          const k = line.substring(0,ci).trim();
-          const kU = k.toUpperCase();
-          const oU = (outputKey||"").toUpperCase();
-          if (kU === oU || kU.startsWith(oU) || oU.startsWith(kU.split(/\s*[\u2014\-]\s*/)[0])) {
-            return k + ': ' + v;
-          }
-        }
-        return line;
-      });
-      page.outputs[secId] = updated.join('\n');
-      saveToStorage();
-    }
-  });
-  ta.addEventListener('keydown', e => { if(e.key==='Escape') el.innerHTML = current; });
 }
 
 function renderWfSection(secId, data) {
@@ -1387,7 +1303,8 @@ function clearSection(secId) {
   const _sel = document.getElementById(`status-${secId}`) || document.getElementById("status-active");
   if(_sel) _sel.textContent="";
   updateFooterStatus(secId);
-  document.getElementById(`btn-${secId}`).innerHTML=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 3 14 9-14 9V3z"/></svg> Générer`;
+  const _cb = document.getElementById(`btn-${secId}`) || (getActiveSectionId()===secId ? document.getElementById("btn-active-section") : null);
+  if(_cb) _cb.innerHTML=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 3 14 9-14 9V3z"/></svg> Générer`;
   const sec = getSectionsForPage(currentPage()).find(s=>s.id===secId);
   const wfEl = document.getElementById(`wf-${secId}`);
   if (wfEl) {
@@ -1848,7 +1765,6 @@ function resetPrompt(){if(confirm("Réinitialiser le prompt par défaut ?"))docu
 function switchTab(tab,btn){["general","prompt","seo","skills","intents","test"].forEach(t=>document.getElementById(`tab-${t}`).classList.add("hidden"));document.getElementById(`tab-${tab}`).classList.remove("hidden");document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");}
 
 // ── THEME ─────────────────────────────────────────────────────────
-function toggleDark(){document.documentElement.classList.toggle("dark");const d=document.documentElement.classList.contains("dark");document.getElementById("dark-icon").innerHTML=d?`<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`:``+`<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;}
 
 // ── EXPORTS ───────────────────────────────────────────────────────
 function exportTxt(){
@@ -1864,30 +1780,7 @@ function exportTxt(){
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`brief-${state.config.productName.toLowerCase()}.txt`;a.click();
 }
 
-function exportHTML(){
-  const date=new Date().toLocaleDateString("fr-FR");
-  let pagesHTML="";
-  state.pages.forEach(page=>{
-    const sections=getSectionsForPage(page).filter(s=>page.outputs[s.id]);
-    if(!sections.length)return;
-    const sectionsHTML=sections.map(s=>{
-      const lines=page.outputs[s.id].split("\n").filter(l=>l.trim());
-      const parsed=[];
-      lines.forEach(line=>{const ci=line.indexOf(":");if(ci>2&&line.substring(0,ci).trim()===line.substring(0,ci).trim().toUpperCase()&&line.substring(0,ci).trim().length<80){parsed.push({k:line.substring(0,ci).trim(),v:line.substring(ci+1).trim()});}else if(parsed.length>0)parsed[parsed.length-1].v+="\n"+line;});
-      const rows=parsed.map(({k,v})=>`<div class="row"><div class="key">${k}</div><div class="val">${v.replace(/\n/g,"<br>")}</div></div>`).join("");
-      return`<section><header><h3>${s.name} <span class="sub">— ${s.sub}</span>${s.seo?'<span class="badge">SEO</span>':""}</header>${rows}</section>`;
-    }).join("");
-    pagesHTML+=`<div class="page"><h2>${page.name}</h2>${sectionsHTML}</div>`;
-  });
-  const html=`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Brief — ${state.config.productName}</title>
-<style>*{box-sizing:border-box}body{font-family:system-ui,sans-serif;max-width:900px;margin:48px auto;padding:0 24px;color:#111}h1{font-size:22px;font-weight:600;margin:0 0 4px}.meta{font-size:13px;color:#888;margin-bottom:40px}.page{margin-bottom:56px}h2{font-size:18px;font-weight:600;margin:0 0 16px;padding-bottom:10px;border-bottom:2px solid #111}section{border:1px solid #e5e7eb;border-radius:10px;padding:20px;margin-bottom:16px}header{display:flex;align-items:center;gap:8px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #f3f4f6}h3{font-size:14px;font-weight:600;margin:0}.sub{font-weight:400;color:#6b7280}.badge{font-size:10px;background:#dbeafe;color:#1d4ed8;border-radius:20px;padding:2px 10px;border:1px solid #bfdbfe}.row{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #f9fafb}.row:last-child{border:none;margin:0;padding:0}.key{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:#9ca3af;font-weight:600;margin-bottom:4px}.val{font-size:14px;line-height:1.7}
-</style></head><body>
-<h1>Brief textes — ${state.config.productName}</h1>
-<p class="meta">Exporté le ${date} · ${state.pages.length} page(s)</p>
-${pagesHTML}</body></html>`;
-  const blob=new Blob([html],{type:"text/html"});
-  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`brief-${state.config.productName.toLowerCase()}.html`;a.click();
-}
+
 
 // ── SKILLS ───────────────────────────────────────────────────────
 async function extractFileContent(file, skillId) {
