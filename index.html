@@ -290,9 +290,8 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 3 14 9-14 9V3z"/></svg>
         Générer
       </button>
-      <button class="btn btn-secondary text-sm hidden" id="btn-other-angle" onclick="generateOtherAngle()" title="Génère un angle éditorial différent">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4"/><path d="m6.41 6.41 2.83 2.83"/><path d="M2 12h4"/><path d="M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/><path d="M22 12h-4"/></svg>
-        Autre angle
+      <button class="btn btn-icon hidden" id="btn-other-angle" onclick="generateOtherAngle()" title="Générer un autre angle éditorial" style="border:1px solid hsl(var(--border));width:34px;height:34px;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="M4 4l5 5"/></svg>
       </button>
       <button class="btn btn-ghost text-sm" style="color:hsl(var(--muted-foreground))" onclick="clearActiveSection()">Effacer</button>
       <div class="hidden items-center gap-1 ml-2" id="variant-selector"></div>
@@ -1250,7 +1249,9 @@ async function generateSection(secId, otherAngle=false) {
   const animOriginal = animBtn.innerHTML;
   btn.disabled = true;
   if (otherBtn) otherBtn.disabled = true;
-  animBtn.innerHTML = `<svg class="animate-spin" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> ${otherAngle ? 'Nouvel angle…' : 'Génération…'}`;
+  animBtn.innerHTML = otherAngle
+    ? `<svg class="animate-spin" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`
+    : `<svg class="animate-spin" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Génération…`;
 
   const cfg = state.config;
 
@@ -1267,7 +1268,7 @@ async function generateSection(secId, otherAngle=false) {
   const kwValue = kwField?(answers[kwField.id]||cfg.globalKw):cfg.globalKw;
   const competitorCtx = cfg.competitor?`\nContexte confidentiel (ne jamais citer) : concurrent principal = ${cfg.competitor}.`:"";
 
-  const userPrompt = `Page : ${page.name}
+  let userPrompt = `Page : ${page.name}
 Section : ${sec.name} — ${sec.sub}
 Rôle : ${sec.why}
 
@@ -1326,7 +1327,7 @@ RÈGLES ABSOLUES :
   btn.disabled = false;
   if (otherBtn) {
     otherBtn.disabled = false;
-    otherBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4"/><path d="m6.41 6.41 2.83 2.83"/><path d="M2 12h4"/><path d="M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/><path d="M22 12h-4"/></svg> Autre angle`;
+    otherBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="M4 4l5 5"/></svg>`;
   }
   btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg> Régénérer`;
 }
