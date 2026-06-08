@@ -115,6 +115,11 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
 .seo-modal-new:focus { border-color:#2A0F2E; }
 
 
+
+.variant-pill { width:22px; height:22px; border-radius:50%; border:1px solid hsl(var(--border)); background:transparent; color:hsl(var(--muted-foreground)); font-size:11px; font-weight:600; cursor:pointer; transition:all .12s; display:inline-flex; align-items:center; justify-content:center; }
+.variant-pill:hover { border-color:#2A0F2E; color:#2A0F2E; }
+.variant-pill.active { background:#2A0F2E; color:#fff; border-color:#2A0F2E; }
+
 /* Page skills picker */
 .page-skills-btn { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:500; padding:3px 9px; border-radius:20px; border:1px solid hsl(var(--border)); background:transparent; color:hsl(var(--muted-foreground)); cursor:pointer; transition:all .12s; }
 .page-skills-btn:hover { border-color:#2A0F2E; color:#2A0F2E; }
@@ -285,7 +290,12 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 3 14 9-14 9V3z"/></svg>
         Générer
       </button>
+      <button class="btn btn-secondary text-sm hidden" id="btn-other-angle" onclick="generateOtherAngle()" title="Génère un angle éditorial différent">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4"/><path d="m6.41 6.41 2.83 2.83"/><path d="M2 12h4"/><path d="M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/><path d="M22 12h-4"/></svg>
+        Autre angle
+      </button>
       <button class="btn btn-ghost text-sm" style="color:hsl(var(--muted-foreground))" onclick="clearActiveSection()">Effacer</button>
+      <div class="hidden items-center gap-1 ml-2" id="variant-selector"></div>
       <span class="text-xs ml-auto" id="status-active" style="color:hsl(var(--muted-foreground))"></span>
     </div>
 
@@ -631,7 +641,7 @@ const SECTIONS = TEMPLATES_CONFIG.product.sections;
 // ── PAGES STATE ──────────────────────────────────────────────────
 let pageIdCounter = 0;
 function newPageState(name) {
-  return { id:++pageIdCounter, name, outputs:{}, completed:new Set(), scrollPos:0, seoPool:[], pageSkills:null }; // pageSkills: null = use global active, array = per-page override
+  return { id:++pageIdCounter, name, outputs:{}, variants:{}, activeVariant:{}, completed:new Set(), scrollPos:0, seoPool:[], pageSkills:null }; // variants: {secId:[txt,...]}, activeVariant: {secId:idx}
 }
 // ── SKILLS STATE ──────────────────────────────────────────────────
 let skillIdCounter = 0;
@@ -1223,7 +1233,7 @@ function parsedOutputs(secId) {
 }
 
 // ── GENERATE ─────────────────────────────────────────────────────
-async function generateSection(secId) {
+async function generateSection(secId, otherAngle=false) {
   const sec = getSectionsForPage(currentPage()).find(s=>s.id===secId);
   // Use footer btn/status (active section), fallback to per-section ids
   const btn = document.getElementById('btn-active-section') || document.getElementById(`btn-${secId}`);
@@ -1234,8 +1244,13 @@ async function generateSection(secId) {
   const answers = {};
   sec.questions.forEach(q => { answers[q.id] = document.getElementById(`q-${secId}-${q.id}`)?.value?.trim()||""; });
 
+  // Animate the relevant button (other-angle vs main generate)
+  const otherBtn = document.getElementById('btn-other-angle');
+  const animBtn = (otherAngle && otherBtn) ? otherBtn : btn;
+  const animOriginal = animBtn.innerHTML;
   btn.disabled = true;
-  btn.innerHTML = `<svg class="animate-spin" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Génération…`;
+  if (otherBtn) otherBtn.disabled = true;
+  animBtn.innerHTML = `<svg class="animate-spin" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> ${otherAngle ? 'Nouvel angle…' : 'Génération…'}`;
 
   const cfg = state.config;
 
@@ -1273,6 +1288,12 @@ RÈGLES ABSOLUES :
 - Les descriptions sont SÉPARÉES des titres H3 — ne jamais les fusionner sur la même ligne
 - Respecter scrupuleusement les limites de mots indiquées pour chaque output`;
 
+  // When asked for another angle, inject the existing variants + a divergence instruction
+  if (otherAngle && page.variants[secId] && page.variants[secId].length) {
+    const previous = page.variants[secId].map((v,i)=>`--- Version ${i+1} ---\n${v}`).join("\n\n");
+    userPrompt += `\n\n## ANGLES DÉJÀ EXPLORÉS (À NE PAS RÉPÉTER)\n${previous}\n\nCONSIGNE CRITIQUE : propose un angle éditorial RADICALEMENT DIFFÉRENT des versions ci-dessus. Change la promesse centrale, le bénéfice mis en avant et les accroches. Ne réutilise pas les mêmes formulations ni le même axe narratif. Garde le même format de sortie mais explore une autre porte d'entrée (ex : si la version précédente parlait de souveraineté, parle de productivité ou de modernité).`;
+  }
+
   try {
     const response = await fetch("/api/chat", {
       method:"POST", headers:{"Content-Type":"application/json"},
@@ -1281,6 +1302,15 @@ RÈGLES ABSOLUES :
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
     const text = data.content?.map(b=>b.text||"").join("")||"";
+    // Store as a variant
+    if (!page.variants[secId]) page.variants[secId] = [];
+    if (otherAngle) {
+      page.variants[secId].push(text);
+    } else {
+      // Fresh generation resets variants
+      page.variants[secId] = [text];
+    }
+    page.activeVariant[secId] = page.variants[secId].length - 1;
     page.outputs[secId] = text;
     page.completed.add(secId);
     markDone(secId);
@@ -1294,6 +1324,10 @@ RÈGLES ABSOLUES :
     if(statusEl){statusEl.textContent=`Erreur : ${err.message}`;statusEl.style.color="#dc2626";}
   }
   btn.disabled = false;
+  if (otherBtn) {
+    otherBtn.disabled = false;
+    otherBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4"/><path d="m6.41 6.41 2.83 2.83"/><path d="M2 12h4"/><path d="M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/><path d="M22 12h-4"/></svg> Autre angle`;
+  }
   btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg> Régénérer`;
 }
 
@@ -1302,6 +1336,8 @@ function clearSection(secId) {
   const page = currentPage();
   page.completed.delete(secId);
   delete page.outputs[secId];
+  delete page.variants[secId];
+  delete page.activeVariant[secId];
   if (page._formData) getSectionsForPage(currentPage()).find(s=>s.id===secId)?.questions.forEach(q=>{delete page._formData[`${secId}-${q.id}`];});
   unmarkDone(secId);
   updateProgress();
@@ -1656,6 +1692,39 @@ function getActiveSectionId() {
   return sections[idx]?.id || null;
 }
 
+function generateOtherAngle() {
+  const secId = getActiveSectionId();
+  if (secId) generateSection(secId, true);
+}
+
+function switchVariant(secId, idx) {
+  const page = currentPage();
+  if (!page.variants[secId] || !page.variants[secId][idx]) return;
+  page.activeVariant[secId] = idx;
+  page.outputs[secId] = page.variants[secId][idx];
+  updateSeoPool(secId, page.outputs[secId]);
+  refreshWireframeSection(secId);
+  renderVariantSelector(secId);
+  saveToStorage();
+}
+
+function renderVariantSelector(secId) {
+  const sel = document.getElementById('variant-selector');
+  if (!sel) return;
+  const page = currentPage();
+  const variants = page.variants[secId] || [];
+  if (variants.length <= 1) {
+    sel.classList.add('hidden');
+    sel.innerHTML = '';
+    return;
+  }
+  const active = page.activeVariant[secId] ?? 0;
+  sel.classList.remove('hidden');
+  sel.style.display = 'flex';
+  sel.innerHTML = '<span class="text-xs" style="color:hsl(var(--muted-foreground));margin-right:4px;">Angle</span>' +
+    variants.map((v,i) => `<button class="variant-pill${i===active?' active':''}" onclick="switchVariant('${secId}',${i})" title="Variante ${i+1}">${i+1}</button>`).join('');
+}
+
 function generateActiveSection() {
   const secId = getActiveSectionId();
   if (secId) generateSection(secId);
@@ -1671,14 +1740,18 @@ function updateFooterStatus(secId) {
   const statusEl = document.getElementById('status-active');
   const btnEl = document.getElementById('btn-active-section');
   if (!statusEl || !btnEl) return;
+  const otherBtn = document.getElementById('btn-other-angle');
   if (page.completed.has(secId)) {
     statusEl.textContent = '✓ Généré';
     statusEl.style.color = '#16a34a';
     btnEl.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg> Régénérer`;
+    if (otherBtn) otherBtn.classList.remove('hidden');
   } else {
     statusEl.textContent = '';
     btnEl.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 3 14 9-14 9V3z"/></svg> Générer`;
+    if (otherBtn) otherBtn.classList.add('hidden');
   }
+  renderVariantSelector(secId);
 }
 
 function openSkillsPicker() {
@@ -2157,7 +2230,8 @@ function buildStateSnapshot() {
   return {
     pages: state.pages.map(p => ({
       id: p.id, name: p.name, templateId: p.templateId || "product",
-      outputs: p.outputs, completed: Array.from(p.completed),
+      outputs: p.outputs, variants: p.variants || {}, activeVariant: p.activeVariant || {},
+      completed: Array.from(p.completed),
       scrollPos: p.scrollPos || 0, seoPool: p.seoPool || [],
       pageSkills: p.pageSkills !== undefined ? p.pageSkills : null,
       _formData: p._formData || {}
@@ -2262,6 +2336,8 @@ function applySnapshot(data) {
       if (p.id > pageIdCounter) pageIdCounter = p.id;
       page.templateId = p.templateId || "product";
       page.outputs = p.outputs || {};
+      page.variants = p.variants || {};
+      page.activeVariant = p.activeVariant || {};
       page.seoPool = p.seoPool || [];
       page.pageSkills = p.pageSkills !== undefined ? p.pageSkills : null;
       page.completed = new Set(p.completed || []);
@@ -2282,6 +2358,8 @@ function saveToStorage() {
         name: p.name,
         templateId: p.templateId || "product",
         outputs: p.outputs,
+        variants: p.variants || {},
+        activeVariant: p.activeVariant || {},
         completed: Array.from(p.completed),
         scrollPos: p.scrollPos || 0,
         _formData: p._formData || {}
