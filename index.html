@@ -1084,7 +1084,7 @@ function renderWfSection(secId, data) {
     const probKeys = keys.filter(k => k.toUpperCase().includes('PROBLÈME') || k.toUpperCase().includes('PROBLEME') || k.toUpperCase().includes('PAIN')).slice(0,4);
     const gainKeys = keys.filter(k => k.toUpperCase().startsWith('GAIN') || k.toUpperCase().startsWith('H3 GAIN')).slice(0,4);
     const pRows = probKeys.length ? probKeys.map((k, i) => {
-      const num = (k.match(/\d+/) || [i+1])[0];
+      const num = (k.match(/(\d+)\s*$/) || [null, String(i+1)])[1];
       const title = (data[k]||'').trim();
       const descKey = keys.find(dk => {
         const u = dk.toUpperCase();
@@ -1094,7 +1094,7 @@ function renderWfSection(secId, data) {
       return `<div class="wf-row-item"><div class="wf-dot-bad">✕</div><div><div class="wf-h3">${wfEditable(title, k, secId)}</div>${desc?`<div class="wf-body" style="margin-top:2px;">${wfEditable(desc, descKey, secId)}</div>`:''}</div></div>`;
     }).join('') : `${placeholder(2)}`;
     const gRows = gainKeys.length ? gainKeys.map((k, i) => {
-      const num = (k.match(/\d+/) || [i+1])[0];
+      const num = (k.match(/(\d+)\s*$/) || [null, String(i+1)])[1];
       const title = (data[k]||'').trim();
       const descKey = keys.find(dk => {
         const u = dk.toUpperCase();
@@ -1169,11 +1169,14 @@ function renderWfSection(secId, data) {
 
   const emptyCards = Array(isGrid4?4:6).fill(0).map(()=>`<div class="wf-card${cardAlt}">${secId==='avantages'?'<div class="wf-card-icon"></div>':''}<div class="wf-block short" style="margin-bottom:6px;"></div><div class="wf-block xshort" style="opacity:.5;"></div></div>`).join('');
   const cards = h3Keys.length ? h3Keys.map((k, i) => {
-    const num = (k.match(/\d+/) || [i+1])[0];
+    // Extract the trailing number (avoid catching the "3" in "H3")
+    const numMatch = k.match(/(\d+)\s*$/);
+    const num = numMatch ? numMatch[1] : String(i+1);
     const title = (data[k]||'').trim();
     const descKey = keys.find(dk => {
-      const u = dk.toUpperCase();
-      return u.startsWith('DESCRIPTION ' + num) || u === ('DESC ' + num) || u === ('DESCRIPTION' + num);
+      const u = dk.toUpperCase().trim();
+      return u === ('DESCRIPTION ' + num) || u === ('DESC ' + num) || u === ('DESCRIPTION' + num)
+          || u === ('RÉPONSE ' + num) || u === ('REPONSE ' + num);
     });
     const desc = descKey ? (data[descKey]||'').trim() : '';
     return `<div class="wf-card${cardAlt}">
