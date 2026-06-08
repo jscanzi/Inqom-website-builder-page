@@ -153,6 +153,18 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
 
 /* Wireframe — landing sobre Inter */
 .wf-root { background:var(--wf-bg);font-family:"Inter",system-ui,sans-serif;color:var(--wf-accent); }
+
+/* Variant bar — overlay bottom-right of each wireframe section */
+.wf-variant-bar { position:absolute; bottom:10px; right:10px; display:flex; align-items:center; gap:5px; padding:4px 6px; border-radius:24px; background:#2A0F2E; box-shadow:0 2px 10px rgba(0,0,0,.18); opacity:0; transform:translateY(4px); transition:opacity .15s, transform .15s; pointer-events:none; z-index:6; }
+.wf-section:hover .wf-variant-bar, .wf-section.wf-active .wf-variant-bar { opacity:1; transform:translateY(0); pointer-events:all; }
+.wf-variant-add { width:24px; height:24px; border-radius:50%; border:none; background:rgba(255,255,255,.15); color:#fff; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:background .12s; }
+.wf-variant-add:hover { background:rgba(255,255,255,.3); }
+.wf-variant-add:disabled { opacity:.5; cursor:wait; }
+.wf-variant-pill { width:22px; height:22px; border-radius:50%; border:none; background:rgba(255,255,255,.15); color:#fff; font-size:11px; font-weight:600; cursor:pointer; transition:all .12s; display:inline-flex; align-items:center; justify-content:center; }
+.wf-variant-pill:hover { background:rgba(255,255,255,.3); }
+.wf-variant-pill.active { background:#fff; color:#2A0F2E; }
+.wf-variant-sep { width:1px; height:14px; background:rgba(255,255,255,.2); margin:0 1px; }
+
 .wf-section { padding:44px 36px;border-bottom:0.5px solid var(--wf-block);background:#fff;position:relative;transition:background .2s; }
 .dark .wf-section { background:#1a1a1a; }
 .wf-section.wf-alt { background:var(--wf-bg); }
@@ -290,11 +302,7 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 3 14 9-14 9V3z"/></svg>
         Générer
       </button>
-      <button class="btn btn-icon hidden" id="btn-other-angle" onclick="generateOtherAngle()" title="Générer un autre angle éditorial" style="border:1px solid hsl(var(--border));width:34px;height:34px;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="M4 4l5 5"/></svg>
-      </button>
       <button class="btn btn-ghost text-sm" style="color:hsl(var(--muted-foreground))" onclick="clearActiveSection()">Effacer</button>
-      <div class="hidden items-center gap-1 ml-2" id="variant-selector"></div>
       <span class="text-xs ml-auto" id="status-active" style="color:hsl(var(--muted-foreground))"></span>
     </div>
 
@@ -1171,7 +1179,7 @@ function renderWireframeForPage() {
     const isAlt = altSections.includes(sec.id);
     el.className = "wf-section" + (isAlt?" wf-alt":"") + (isDone?" wf-done":"");
     const data = parsedOutputs(sec.id);
-    el.innerHTML = `<div class="animate-in">${renderWfSection(sec.id, data)}</div>`;
+    el.innerHTML = `<div class="animate-in">${renderWfSection(sec.id, data)}</div>` + variantBarHTML(sec.id);
     root.appendChild(el);
   });
 
@@ -1184,6 +1192,23 @@ function renderWireframeForPage() {
   document.getElementById("wf-page-name").textContent = `— ${page.name}`;
 }
 
+function variantBarHTML(secId) {
+  const page = currentPage();
+  if (!page.completed.has(secId)) return ''; // only show once generated
+  const variants = page.variants[secId] || [];
+  const active = page.activeVariant[secId] ?? 0;
+  const pills = variants.length > 1
+    ? '<div class="wf-variant-sep"></div>' + variants.map((v,i) =>
+        `<button class="wf-variant-pill${i===active?' active':''}" onclick="event.stopPropagation();switchVariant('${secId}',${i})" title="Angle ${i+1}">${i+1}</button>`
+      ).join('')
+    : '';
+  return `<div class="wf-variant-bar" id="vbar-${secId}">
+    <button class="wf-variant-add" id="vadd-${secId}" onclick="event.stopPropagation();generateSection('${secId}',true)" title="Générer un autre angle">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>${pills}
+  </div>`;
+}
+
 function refreshWireframeSection(secId) {
   const el = document.getElementById(`wf-${secId}`);
   if (!el) return;
@@ -1191,7 +1216,7 @@ function refreshWireframeSection(secId) {
   const data = parsedOutputs(secId);
   const altSecs = ['keydatas','avantages','howitworks','pourqui','faq'];
   el.className = "wf-section" + (altSecs.includes(secId)?" wf-alt":"") + " wf-done";
-  el.innerHTML = `<div class="animate-in">${renderWfSection(secId, data)}</div>`;
+  el.innerHTML = `<div class="animate-in">${renderWfSection(secId, data)}</div>` + variantBarHTML(secId);
   el.scrollIntoView({behavior:"smooth",block:"center"});
   const page = currentPage();
   document.getElementById("wf-status").textContent = `${page.completed.size}/${getSectionsForPage(page).length} sections`;
@@ -1243,15 +1268,15 @@ async function generateSection(secId, otherAngle=false) {
   const answers = {};
   sec.questions.forEach(q => { answers[q.id] = document.getElementById(`q-${secId}-${q.id}`)?.value?.trim()||""; });
 
-  // Animate the relevant button (other-angle vs main generate)
-  const otherBtn = document.getElementById('btn-other-angle');
-  const animBtn = (otherAngle && otherBtn) ? otherBtn : btn;
-  const animOriginal = animBtn.innerHTML;
+  // Animate: in-section add button for "other angle", footer button otherwise
+  const addBtn = document.getElementById(`vadd-${secId}`);
   btn.disabled = true;
-  if (otherBtn) otherBtn.disabled = true;
-  animBtn.innerHTML = otherAngle
-    ? `<svg class="animate-spin" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`
-    : `<svg class="animate-spin" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Génération…`;
+  if (otherAngle && addBtn) {
+    addBtn.disabled = true;
+    addBtn.innerHTML = `<svg class="animate-spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`;
+  } else {
+    btn.innerHTML = `<svg class="animate-spin" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Génération…`;
+  }
 
   const cfg = state.config;
 
@@ -1325,11 +1350,8 @@ RÈGLES ABSOLUES :
     if(statusEl){statusEl.textContent=`Erreur : ${err.message}`;statusEl.style.color="#dc2626";}
   }
   btn.disabled = false;
-  if (otherBtn) {
-    otherBtn.disabled = false;
-    otherBtn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="M4 4l5 5"/></svg>`;
-  }
   btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg> Régénérer`;
+  // The variant bar (with add button) is re-rendered by refreshWireframeSection
 }
 
 function clearSection(secId) {
@@ -1693,11 +1715,6 @@ function getActiveSectionId() {
   return sections[idx]?.id || null;
 }
 
-function generateOtherAngle() {
-  const secId = getActiveSectionId();
-  if (secId) generateSection(secId, true);
-}
-
 function switchVariant(secId, idx) {
   const page = currentPage();
   if (!page.variants[secId] || !page.variants[secId][idx]) return;
@@ -1705,25 +1722,7 @@ function switchVariant(secId, idx) {
   page.outputs[secId] = page.variants[secId][idx];
   updateSeoPool(secId, page.outputs[secId]);
   refreshWireframeSection(secId);
-  renderVariantSelector(secId);
   saveToStorage();
-}
-
-function renderVariantSelector(secId) {
-  const sel = document.getElementById('variant-selector');
-  if (!sel) return;
-  const page = currentPage();
-  const variants = page.variants[secId] || [];
-  if (variants.length <= 1) {
-    sel.classList.add('hidden');
-    sel.innerHTML = '';
-    return;
-  }
-  const active = page.activeVariant[secId] ?? 0;
-  sel.classList.remove('hidden');
-  sel.style.display = 'flex';
-  sel.innerHTML = '<span class="text-xs" style="color:hsl(var(--muted-foreground));margin-right:4px;">Angle</span>' +
-    variants.map((v,i) => `<button class="variant-pill${i===active?' active':''}" onclick="switchVariant('${secId}',${i})" title="Variante ${i+1}">${i+1}</button>`).join('');
 }
 
 function generateActiveSection() {
@@ -1741,18 +1740,14 @@ function updateFooterStatus(secId) {
   const statusEl = document.getElementById('status-active');
   const btnEl = document.getElementById('btn-active-section');
   if (!statusEl || !btnEl) return;
-  const otherBtn = document.getElementById('btn-other-angle');
   if (page.completed.has(secId)) {
     statusEl.textContent = '✓ Généré';
     statusEl.style.color = '#16a34a';
     btnEl.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg> Régénérer`;
-    if (otherBtn) otherBtn.classList.remove('hidden');
   } else {
     statusEl.textContent = '';
     btnEl.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 3 14 9-14 9V3z"/></svg> Générer`;
-    if (otherBtn) otherBtn.classList.add('hidden');
   }
-  renderVariantSelector(secId);
 }
 
 function openSkillsPicker() {
