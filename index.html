@@ -304,7 +304,16 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
 </div>
 
 <!-- Main layout -->
-<div class="flex flex-1 overflow-hidden">
+<div class="flex flex-1 overflow-hidden" style="position:relative;">
+  <!-- Empty state (no pages) -->
+  <div id="empty-state" class="hidden" style="position:absolute;inset:0;z-index:50;background:hsl(var(--background));display:flex;align-items:center;justify-content:center;">
+    <div style="max-width:560px;width:100%;padding:0 24px;">
+      <h2 class="text-base font-semibold mb-1">Nouvelle page</h2>
+      <p class="text-xs text-muted-foreground mb-5">Choisissez un type de page pour démarrer</p>
+      <div class="grid grid-cols-2 gap-3" id="empty-template-grid"></div>
+    </div>
+  </div>
+
   <!-- Sidebar nav -->
   <aside class="w-48 border-r border-border flex flex-col shrink-0 overflow-y-auto py-4 px-3">
     <nav id="sidebar-nav" class="flex flex-col gap-0.5 pt-2"></nav>
@@ -767,6 +776,36 @@ function escapeHtml(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").rep
 
 let _pendingTemplateId = null;
 
+function renderEmptyTemplateGrid() {
+  const grid = document.getElementById("empty-template-grid");
+  if (!grid) return;
+  grid.innerHTML = "";
+  PAGE_TEMPLATES.forEach(tpl => {
+    const isReady = tpl.status === "ready";
+    const card = document.createElement("button");
+    card.className = "card p-4 text-left transition-all duration-15 " + (isReady ? "hover:border-foreground cursor-pointer" : "opacity-50 cursor-not-allowed");
+    card.disabled = !isReady;
+    card.onclick = () => { if(isReady) createPageFromTemplate(tpl.id); };
+    card.innerHTML = `
+      <div class="flex items-start justify-between mb-3">
+        <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background:hsl(var(--muted));color:hsl(var(--foreground))">${tpl.icon}</div>
+        ${!isReady ? `<span class="badge badge-amber" style="font-size:10px;">Bientôt</span>` : ""}
+      </div>
+      <div class="text-sm font-medium mb-1">${tpl.label}</div>
+      <div class="text-xs leading-relaxed" style="color:hsl(var(--muted-foreground))">${tpl.description}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+function showEmptyState() {
+  renderEmptyTemplateGrid();
+  document.getElementById("empty-state").classList.remove("hidden");
+}
+function hideEmptyState() {
+  document.getElementById("empty-state").classList.add("hidden");
+}
+
+
 function addPage() {
   openTemplateModal();
 }
@@ -797,11 +836,45 @@ function createPageFromTemplate(templateId) {
   const tpl = PAGE_TEMPLATES.find(t => t.id === templateId);
   if (!tpl || tpl.status !== "ready") return;
   _pendingTemplateId = templateId;
+
+  const fromEmpty = !document.getElementById("empty-state").classList.contains("hidden");
+  if (fromEmpty) {
+    // Render the fill-choice inline inside the empty state
+    const wrap = document.getElementById("empty-state").querySelector("div");
+    wrap.innerHTML = `
+      <button class="btn btn-icon" onclick="resetEmptyState()" style="margin-bottom:12px;font-size:12px;width:auto;padding:0 4px;color:hsl(var(--muted-foreground));">← Retour</button>
+      <h2 class="text-base font-semibold mb-1">${tpl.label}</h2>
+      <p class="text-xs text-muted-foreground mb-5">Comment veux-tu remplir le brief ?</p>
+      <div class="grid grid-cols-2 gap-3">
+        <button class="card p-4 text-left hover:border-foreground cursor-pointer transition-all" onclick="confirmCreatePage(true)">
+          <div class="w-9 h-9 rounded-lg flex items-center justify-center mb-3" style="background:#2A0F2E;color:#fff;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4"/><path d="m6.41 6.41 2.83 2.83"/><path d="M2 12h4"/><path d="M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/><path d="M22 12h-4"/></svg></div>
+          <div class="text-sm font-medium mb-1">Avec l'IA</div>
+          <div class="text-xs leading-relaxed" style="color:hsl(var(--muted-foreground))">L'IA pré-remplit les champs à partir de tes sources produit. Tu valides ensuite.</div>
+        </button>
+        <button class="card p-4 text-left hover:border-foreground cursor-pointer transition-all" onclick="confirmCreatePage(false)">
+          <div class="w-9 h-9 rounded-lg flex items-center justify-center mb-3" style="background:hsl(var(--muted));color:hsl(var(--foreground))"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></div>
+          <div class="text-sm font-medium mb-1">À la main</div>
+          <div class="text-xs leading-relaxed" style="color:hsl(var(--muted-foreground))">Tu remplis toi-même les champs du brief, section par section.</div>
+        </button>
+      </div>`;
+    return;
+  }
+
+  // Modal flow (pages already exist)
   document.getElementById("onboarding-path").classList.add("hidden");
   document.getElementById("template-grid").classList.add("hidden");
   document.getElementById("fill-choice").classList.remove("hidden");
   document.getElementById("template-modal-title").textContent = tpl.label;
   document.getElementById("template-modal-sub").textContent = "Méthode de remplissage";
+}
+
+function resetEmptyState() {
+  const wrap = document.getElementById("empty-state").querySelector("div");
+  wrap.innerHTML = `
+    <h2 class="text-base font-semibold mb-1">Nouvelle page</h2>
+    <p class="text-xs text-muted-foreground mb-5">Choisissez un type de page pour démarrer</p>
+    <div class="grid grid-cols-2 gap-3" id="empty-template-grid"></div>`;
+  renderEmptyTemplateGrid();
 }
 
 function backToTemplates() {
@@ -828,6 +901,7 @@ function confirmCreatePage(useAI) {
   page.templateId = templateId;
   state.pages.push(page);
   document.getElementById("template-modal").classList.add("hidden");
+  hideEmptyState();
   switchPage(page.id);
   if (useAI) {
     // Open the sources picker first so the user confirms which skills to use,
@@ -2832,8 +2906,8 @@ async function initApp() {
 
   renderTabs();
   if (state.pages.length === 0) {
-    // First run — no page yet, show onboarding modal
-    openTemplateModal();
+    // First run — no page yet, show inline empty state
+    showEmptyState();
   } else {
     renderFormForPage();
     renderWireframeForPage();
