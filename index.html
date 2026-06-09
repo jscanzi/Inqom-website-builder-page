@@ -414,11 +414,20 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
     <!-- Onboarding path (first launch only) -->
     <div id="onboarding-path" class="hidden" style="margin-bottom:22px;">
       <div style="display:flex;align-items:flex-start;gap:0;background:hsl(var(--muted));border-radius:12px;padding:14px 8px;">
-        ${['Choisis un type de page','Sélectionne tes sources produit','Pré-remplis avec l\'IA ou à la main, puis génère'].map((t,i)=>`
-          <div style="flex:1;text-align:center;padding:0 6px;position:relative;">
-            <div style="width:26px;height:26px;border-radius:50%;background:#2A0F2E;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;">${i+1}</div>
-            <div style="font-size:11px;line-height:1.4;color:hsl(var(--muted-foreground));">${t}</div>
-          </div>${i<2?'<div style="align-self:flex-start;margin-top:12px;color:hsl(var(--border));font-size:14px;">→</div>':''}`).join('')}
+        <div style="flex:1;text-align:center;padding:0 6px;">
+          <div style="width:26px;height:26px;border-radius:50%;background:#2A0F2E;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;">1</div>
+          <div style="font-size:11px;line-height:1.4;color:hsl(var(--muted-foreground));">Choisis un type de page</div>
+        </div>
+        <div style="align-self:flex-start;margin-top:12px;color:hsl(var(--border));font-size:14px;">→</div>
+        <div style="flex:1;text-align:center;padding:0 6px;">
+          <div style="width:26px;height:26px;border-radius:50%;background:#2A0F2E;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;">2</div>
+          <div style="font-size:11px;line-height:1.4;color:hsl(var(--muted-foreground));">Sélectionne tes sources produit</div>
+        </div>
+        <div style="align-self:flex-start;margin-top:12px;color:hsl(var(--border));font-size:14px;">→</div>
+        <div style="flex:1;text-align:center;padding:0 6px;">
+          <div style="width:26px;height:26px;border-radius:50%;background:#2A0F2E;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;">3</div>
+          <div style="font-size:11px;line-height:1.4;color:hsl(var(--muted-foreground));">Pré-remplis avec l'IA ou à la main, puis génère</div>
+        </div>
       </div>
     </div>
     <div class="grid grid-cols-2 gap-3" id="template-grid"></div>
