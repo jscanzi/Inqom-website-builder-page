@@ -805,14 +805,17 @@ function showEmptyState() {
     <p class="text-xs text-muted-foreground mb-5">Choisissez un type de page pour démarrer.</p>
     <div class="grid grid-cols-2 gap-3" id="empty-template-grid"></div>`;
   renderEmptyTemplateGrid();
-  document.getElementById("empty-state").classList.remove("hidden");
+  const es = document.getElementById("empty-state");
+  es.classList.remove("hidden");
+  es.style.display = "flex";
 }
 function hideEmptyState() {
-  document.getElementById("empty-state").classList.add("hidden");
+  const es = document.getElementById("empty-state");
+  es.classList.add("hidden");
+  es.style.display = "none";
 }
 // Single source of truth: show empty state iff there are no pages
 function syncEmptyState() {
-  console.log("[syncEmptyState] pages:", state.pages.length, "ids:", state.pages.map(p=>p.id+":"+p.name));
   if (state.pages.length === 0) showEmptyState();
   else hideEmptyState();
 }
