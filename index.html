@@ -812,6 +812,7 @@ function hideEmptyState() {
 }
 // Single source of truth: show empty state iff there are no pages
 function syncEmptyState() {
+  console.log("[syncEmptyState] pages:", state.pages.length, "ids:", state.pages.map(p=>p.id+":"+p.name));
   if (state.pages.length === 0) showEmptyState();
   else hideEmptyState();
 }
@@ -2674,9 +2675,12 @@ async function refreshFromKV() {
     applySnapshot(kvState);
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(kvState)); } catch(e) {}
     renderTabs();
-    renderFormForPage();
-    renderWireframeForPage();
-    updateProgress();
+    syncEmptyState();
+    if (state.pages.length > 0) {
+      renderFormForPage();
+      renderWireframeForPage();
+      updateProgress();
+    }
     updateSyncStatus("saved");
   } else {
     updateSyncStatus(KV_AVAILABLE ? "saved" : "error");
