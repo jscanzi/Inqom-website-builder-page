@@ -2600,7 +2600,7 @@ async function generateAll() {
 }
 
 // ── LOCAL STORAGE PERSISTENCE ────────────────────────────────────
-const STORAGE_KEY = "inqom-brief-tool-v1";
+const STORAGE_KEY = "inqom-brief-tool-v1::" + getProjectKey();
 
 // ── PROJECT / COLLABORATION ──────────────────────────────────────
 // The project key determines which shared state the team works on.
