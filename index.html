@@ -308,8 +308,8 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
   <!-- Empty state (no pages) -->
   <div id="empty-state" class="hidden" style="position:absolute;inset:0;z-index:50;background:hsl(var(--background));display:flex;align-items:center;justify-content:center;">
     <div style="max-width:560px;width:100%;padding:0 24px;">
-      <h2 class="text-base font-semibold mb-1">Nouvelle page</h2>
-      <p class="text-xs text-muted-foreground mb-5">Choisissez un type de page pour démarrer</p>
+      <h2 class="text-base font-semibold mb-1">Bienvenue 👋</h2>
+      <p class="text-xs text-muted-foreground mb-5">Choisissez un type de page pour démarrer.</p>
       <div class="grid grid-cols-2 gap-3" id="empty-template-grid"></div>
     </div>
   </div>
@@ -2916,12 +2916,17 @@ async function initApp() {
     if (KV_AVAILABLE) updateSyncStatus("saved"); else updateSyncStatus("error");
   }
 
-  renderTabs();
+  // Authoritative: decide empty-state vs content based on pages
   syncEmptyState();
-  if (state.pages.length > 0) {
-    renderFormForPage();
-    renderWireframeForPage();
-    updateProgress();
+  try {
+    renderTabs();
+    if (state.pages.length > 0) {
+      renderFormForPage();
+      renderWireframeForPage();
+      updateProgress();
+    }
+  } catch(err) {
+    console.error("Render error at boot:", err);
   }
   patchStateForAutosave();
 
