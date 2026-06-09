@@ -404,14 +404,47 @@ body { font-family:'Geist',system-ui,sans-serif; background:hsl(var(--background
   <div class="modal" style="max-width:560px;">
     <div class="flex items-center justify-between mb-5">
       <div>
-        <h2 class="text-base font-semibold">Nouvelle page</h2>
-        <p class="text-xs text-muted-foreground mt-0.5">Choisissez un type de page pour démarrer</p>
+        <h2 class="text-base font-semibold" id="template-modal-title">Nouvelle page</h2>
+        <p class="text-xs text-muted-foreground mt-0.5" id="template-modal-sub">Choisissez un type de page pour démarrer</p>
       </div>
-      <button class="btn btn-icon" onclick="closeTemplateModal()">
+      <button class="btn btn-icon" id="template-modal-close" onclick="closeTemplateModal()">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
+    <!-- Onboarding path (first launch only) -->
+    <div id="onboarding-path" class="hidden" style="margin-bottom:22px;">
+      <div style="display:flex;align-items:flex-start;gap:0;background:hsl(var(--muted));border-radius:12px;padding:14px 8px;">
+        ${['Choisis un type de page','Sélectionne tes sources produit','Pré-remplis avec l\'IA ou à la main, puis génère'].map((t,i)=>`
+          <div style="flex:1;text-align:center;padding:0 6px;position:relative;">
+            <div style="width:26px;height:26px;border-radius:50%;background:#2A0F2E;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;">${i+1}</div>
+            <div style="font-size:11px;line-height:1.4;color:hsl(var(--muted-foreground));">${t}</div>
+          </div>${i<2?'<div style="align-self:flex-start;margin-top:12px;color:hsl(var(--border));font-size:14px;">→</div>':''}`).join('')}
+      </div>
+    </div>
     <div class="grid grid-cols-2 gap-3" id="template-grid"></div>
+
+    <!-- Fill-method choice (shown after a template is picked) -->
+    <div id="fill-choice" class="hidden">
+      <button class="btn btn-icon" onclick="backToTemplates()" style="margin-bottom:12px;font-size:12px;width:auto;padding:0 4px;color:hsl(var(--muted-foreground));">← Retour</button>
+      <h3 class="text-sm font-semibold mb-1">Comment veux-tu remplir le brief ?</h3>
+      <p class="text-xs text-muted-foreground mb-4">Tu pourras toujours ajuster ensuite.</p>
+      <div class="grid grid-cols-2 gap-3">
+        <button class="card p-4 text-left hover:border-foreground cursor-pointer transition-all" onclick="confirmCreatePage(true)">
+          <div class="w-9 h-9 rounded-lg flex items-center justify-center mb-3" style="background:#2A0F2E;color:#fff;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4"/><path d="m6.41 6.41 2.83 2.83"/><path d="M2 12h4"/><path d="M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/><path d="M22 12h-4"/></svg>
+          </div>
+          <div class="text-sm font-medium mb-1">Avec l'IA</div>
+          <div class="text-xs leading-relaxed" style="color:hsl(var(--muted-foreground))">L'IA pré-remplit les champs à partir de tes sources produit. Tu valides ensuite.</div>
+        </button>
+        <button class="card p-4 text-left hover:border-foreground cursor-pointer transition-all" onclick="confirmCreatePage(false)">
+          <div class="w-9 h-9 rounded-lg flex items-center justify-center mb-3" style="background:hsl(var(--muted));color:hsl(var(--foreground))">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          </div>
+          <div class="text-sm font-medium mb-1">À la main</div>
+          <div class="text-xs leading-relaxed" style="color:hsl(var(--muted-foreground))">Tu remplis toi-même les champs du brief, section par section.</div>
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -689,7 +722,7 @@ function newSkill(name, content='', active=true) {
 }
 
 const state = {
-  pages:[ newPageState("Page produit") ],
+  pages:[], // empty by default — onboarding modal handles first page creation
   stepperIdx: {},
   skills: [], // Loaded from config.json
   currentPageId:1,
@@ -722,30 +755,75 @@ function renderTabs() {
 
 function escapeHtml(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 
+let _pendingTemplateId = null;
+
 function addPage() {
   openTemplateModal();
 }
 
 function openTemplateModal() {
+  // Show onboarding path only on first launch (no pages yet)
+  const isFirstRun = state.pages.length === 0;
+  document.getElementById("onboarding-path").classList.toggle("hidden", !isFirstRun);
+  document.getElementById("template-modal-close").style.display = isFirstRun ? "none" : "";
+  document.getElementById("template-modal-title").textContent = isFirstRun ? "Bienvenue 👋" : "Nouvelle page";
+  document.getElementById("template-modal-sub").textContent = isFirstRun
+    ? "Transformez votre connaissance produit en briefs de page."
+    : "Choisissez un type de page pour démarrer";
+  // Reset to template step
+  document.getElementById("template-grid").classList.remove("hidden");
+  document.getElementById("fill-choice").classList.add("hidden");
+  _pendingTemplateId = null;
   document.getElementById("template-modal").classList.remove("hidden");
 }
 function closeTemplateModal() {
+  // Don't allow closing on first run — user must create a page
+  if (state.pages.length === 0) return;
   document.getElementById("template-modal").classList.add("hidden");
 }
 
+// Step 1: a template was chosen → show the fill-method choice
 function createPageFromTemplate(templateId) {
   const tpl = PAGE_TEMPLATES.find(t => t.id === templateId);
   if (!tpl || tpl.status !== "ready") return;
+  _pendingTemplateId = templateId;
+  document.getElementById("onboarding-path").classList.add("hidden");
+  document.getElementById("template-grid").classList.add("hidden");
+  document.getElementById("fill-choice").classList.remove("hidden");
+  document.getElementById("template-modal-title").textContent = tpl.label;
+  document.getElementById("template-modal-sub").textContent = "Méthode de remplissage";
+}
+
+function backToTemplates() {
+  document.getElementById("fill-choice").classList.add("hidden");
+  document.getElementById("template-grid").classList.remove("hidden");
+  const isFirstRun = state.pages.length === 0;
+  document.getElementById("onboarding-path").classList.toggle("hidden", !isFirstRun);
+  document.getElementById("template-modal-title").textContent = isFirstRun ? "Bienvenue 👋" : "Nouvelle page";
+  document.getElementById("template-modal-sub").textContent = isFirstRun
+    ? "Transformez votre connaissance produit en briefs de page."
+    : "Choisissez un type de page pour démarrer";
+}
+
+// Step 2: fill method chosen → create the page, then route to AI prefill or manual
+function confirmCreatePage(useAI) {
+  const templateId = _pendingTemplateId;
+  const tpl = PAGE_TEMPLATES.find(t => t.id === templateId);
+  if (!tpl) return;
   const existing = state.pages.map(p=>p.name);
   const base = tpl.label;
-  let name = base;
-  let i = 2;
+  let name = base, i = 2;
   while (existing.includes(name)) { name = `${base} ${i++}`; }
   const page = newPageState(name);
   page.templateId = templateId;
   state.pages.push(page);
-  closeTemplateModal();
+  document.getElementById("template-modal").classList.add("hidden");
   switchPage(page.id);
+  if (useAI) {
+    // Open the sources picker first so the user confirms which skills to use,
+    // then they trigger prefill. (Prefill needs active sources.)
+    setTimeout(() => { openSkillsPicker(); }, 200);
+  }
 }
 
 function switchPage(id) {
@@ -757,7 +835,12 @@ function switchPage(id) {
 
   state.currentPageId = id;
   renderTabs();
-  renderFormForPage();
+  // First run (no pages from KV/localStorage) → show onboarding
+  if (state.pages.length === 0) {
+    openTemplateModal();
+  } else {
+    renderFormForPage();
+  }
   renderWireframeForPage();
   updateProgress();
 
@@ -792,6 +875,7 @@ function deletePage(id, e) {
 
 // ── FORM ─────────────────────────────────────────────────────────
 function renderFormForPage() {
+  if (!currentPage()) return; // no page yet (onboarding open)
   document.getElementById("sidebar-nav").innerHTML = "";
   document.getElementById("sections-container").innerHTML = "";
   buildSidebar();
@@ -1113,10 +1197,13 @@ function renderWfSection(secId, data) {
 
   // ── FAQ ──
   if (secId === 'faq') {
-    // Build Q/R pairs from numbered outputs: H3 QUESTION 1..5 + RÉPONSE 1..5
-    const items = [1,2,3,4,5].map(num => {
-      const qKey = keys.find(k => k.toUpperCase().match(new RegExp('(H3 QUESTION|QUESTION) ' + num + '$')));
-      const aKey = keys.find(k => k.toUpperCase().match(new RegExp('(R[ÉE]PONSE|ANSWER) ' + num + '$')));
+    // Build Q/R pairs — match by trailing number, with position fallback
+    const qKeys = keys.filter(k => /(H3 QUESTION|QUESTION|H3)\b/.test(k.toUpperCase()) && /\d\s*$/.test(k));
+    const aKeys = keys.filter(k => /^(R[ÉE]PONSE|ANSWER)\b/.test(k.toUpperCase().trim()));
+    const items = qKeys.map((qKey, i) => {
+      const qn = qKey.match(/(\d+)\s*$/);
+      let aKey = qn ? aKeys.find(ak => { const an = ak.match(/(\d+)\s*$/); return an && an[1] === qn[1]; }) : null;
+      if (!aKey) aKey = aKeys[i];
       if (!qKey && !aKey) return '';
       const q = qKey ? (data[qKey]||'').trim() : '';
       const a = aKey ? (data[aKey]||'').trim() : '';
@@ -1133,15 +1220,18 @@ function renderWfSection(secId, data) {
 
   // ── HOWITWORKS ──
   if (secId === 'howitworks') {
-    const stepKeys = keys.filter(k => k.toUpperCase().includes('ÉTAPE') || k.toUpperCase().includes('ETAPE') || k.toUpperCase().includes('STEP') || (k.toUpperCase().startsWith('H3') && k.match(/\d/)));
+    const stepKeys = keys.filter(k => {
+      const u = k.toUpperCase();
+      return u.includes('ÉTAPE') || u.includes('ETAPE') || u.includes('STEP') || (u.startsWith('H3') && /\d/.test(u));
+    });
+    const stepDescKeys = keys.filter(dk => /^(DESCRIPTION|DESC)\b/.test(dk.toUpperCase().trim()));
     const steps = stepKeys.length ? stepKeys.map((k,i) => {
       const v = data[k]||'';
-      // Find the matching DESCRIPTION key by step number
       const num = i+1;
-      const descKey = keys.find(dk => {
-        const u = dk.toUpperCase();
-        return u.startsWith('DESCRIPTION') && (u.endsWith(' '+num) || u === 'DESCRIPTION '+num);
-      });
+      // Match description by trailing number, fall back to position
+      const kn = k.match(/(\d+)\s*$/);
+      let descKey = kn ? stepDescKeys.find(dk => { const dn = dk.match(/(\d+)\s*$/); return dn && dn[1] === kn[1]; }) : null;
+      if (!descKey) descKey = stepDescKeys[i];
       const descVal = descKey ? (data[descKey]||'') : '';
       return `<div class="wf-step">
         <div class="wf-step-num">${num}</div>
@@ -1168,16 +1258,22 @@ function renderWfSection(secId, data) {
   const cardAlt = (secId === 'casusage' || secId === 'pourqui') ? ' alt' : '';
 
   const emptyCards = Array(isGrid4?4:6).fill(0).map(()=>`<div class="wf-card${cardAlt}">${secId==='avantages'?'<div class="wf-card-icon"></div>':''}<div class="wf-block short" style="margin-bottom:6px;"></div><div class="wf-block xshort" style="opacity:.5;"></div></div>`).join('');
+  // Collect description keys in document order, matched by trailing number when possible
+  const descKeysAll = keys.filter(dk => {
+    const u = dk.toUpperCase().trim();
+    return /^(DESCRIPTION|DESC|RÉPONSE|REPONSE)\b/.test(u);
+  });
   const cards = h3Keys.length ? h3Keys.map((k, i) => {
-    // Extract the trailing number (avoid catching the "3" in "H3")
     const numMatch = k.match(/(\d+)\s*$/);
-    const num = numMatch ? numMatch[1] : String(i+1);
+    const num = numMatch ? numMatch[1] : null;
     const title = (data[k]||'').trim();
-    const descKey = keys.find(dk => {
-      const u = dk.toUpperCase().trim();
-      return u === ('DESCRIPTION ' + num) || u === ('DESC ' + num) || u === ('DESCRIPTION' + num)
-          || u === ('RÉPONSE ' + num) || u === ('REPONSE ' + num);
-    });
+    // 1) Try to match a description with the SAME trailing number
+    let descKey = num ? descKeysAll.find(dk => {
+      const dn = dk.match(/(\d+)\s*$/);
+      return dn && dn[1] === num;
+    }) : null;
+    // 2) Fallback: pair by position (i-th H3 → i-th description)
+    if (!descKey && descKeysAll[i]) descKey = descKeysAll[i];
     const desc = descKey ? (data[descKey]||'').trim() : '';
     return `<div class="wf-card${cardAlt}">
       ${secId === 'avantages' ? '<div class="wf-card-icon"></div>' : ''}
@@ -2003,6 +2099,7 @@ function updatePageSkillsBtn() {
   const btn = document.getElementById('page-skills-btn');
   if (!btn) return;
   const page = currentPage();
+  if (!page) return;
   const isOverride = page.pageSkills !== null;
   btn.classList.toggle('has-override', isOverride);
   const count = isOverride
