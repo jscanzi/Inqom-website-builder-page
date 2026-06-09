@@ -698,6 +698,7 @@ const TEMPLATES_CONFIG = {
 
 // Helper: get sections for current page
 function getSectionsForPage(page) {
+  if (!page) return TEMPLATES_CONFIG.product.sections;
   const templateId = page.templateId || "product";
   const tpl = TEMPLATES_CONFIG[templateId];
   return (tpl && tpl.sections.length > 0) ? tpl.sections : TEMPLATES_CONFIG.product.sections;
@@ -1292,6 +1293,7 @@ const WF_TEMPLATES = {};
 
 
 function renderWireframeForPage() {
+  if (!currentPage()) return;
   const root = document.getElementById("wf-root");
   root.innerHTML = "";
   const page = currentPage();
@@ -2820,9 +2822,14 @@ async function initApp() {
   }
 
   renderTabs();
-  renderFormForPage();
-  renderWireframeForPage();
-  updateProgress();
+  if (state.pages.length === 0) {
+    // First run — no page yet, show onboarding modal
+    openTemplateModal();
+  } else {
+    renderFormForPage();
+    renderWireframeForPage();
+    updateProgress();
+  }
   patchStateForAutosave();
 
   window.addEventListener("beforeunload", saveToStorage);
