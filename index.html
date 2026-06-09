@@ -798,11 +798,22 @@ function renderEmptyTemplateGrid() {
 }
 
 function showEmptyState() {
+  // Reset content to the template grid (in case fill-choice was shown before)
+  const wrap = document.getElementById("empty-state").querySelector("div");
+  wrap.innerHTML = `
+    <h2 class="text-base font-semibold mb-1">Bienvenue 👋</h2>
+    <p class="text-xs text-muted-foreground mb-5">Choisissez un type de page pour démarrer.</p>
+    <div class="grid grid-cols-2 gap-3" id="empty-template-grid"></div>`;
   renderEmptyTemplateGrid();
   document.getElementById("empty-state").classList.remove("hidden");
 }
 function hideEmptyState() {
   document.getElementById("empty-state").classList.add("hidden");
+}
+// Single source of truth: show empty state iff there are no pages
+function syncEmptyState() {
+  if (state.pages.length === 0) showEmptyState();
+  else hideEmptyState();
 }
 
 
@@ -2906,9 +2917,9 @@ async function initApp() {
 
   renderTabs();
   if (state.pages.length === 0) {
-    // First run — no page yet, show inline empty state
-    showEmptyState();
+    syncEmptyState();
   } else {
+    hideEmptyState();
     renderFormForPage();
     renderWireframeForPage();
     updateProgress();
