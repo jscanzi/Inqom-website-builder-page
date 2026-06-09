@@ -914,10 +914,11 @@ function confirmCreatePage(useAI) {
   document.getElementById("template-modal").classList.add("hidden");
   hideEmptyState();
   switchPage(page.id);
+  saveToStorage(); // persist immediately so a refresh keeps the page
   if (useAI) {
-    // Open the sources picker first so the user confirms which skills to use,
-    // then they trigger prefill. (Prefill needs active sources.)
-    setTimeout(() => { openSkillsPicker(); }, 200);
+    // Launch prefill directly from the page's active sources.
+    // (prefillPageFromSkills warns if no source is active.)
+    setTimeout(() => { prefillPageFromSkills(); }, 250);
   }
 }
 
@@ -2916,10 +2917,8 @@ async function initApp() {
   }
 
   renderTabs();
-  if (state.pages.length === 0) {
-    syncEmptyState();
-  } else {
-    hideEmptyState();
+  syncEmptyState();
+  if (state.pages.length > 0) {
     renderFormForPage();
     renderWireframeForPage();
     updateProgress();
